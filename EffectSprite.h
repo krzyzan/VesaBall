@@ -10,7 +10,7 @@ public:
 		FLOAT Duration, DWORD Blending );
 	virtual ~CEffectSprite(void);
 
-	void FrameMove( FLOAT fElapsedTime );
+	HRESULT FrameMove( FLOAT fElapsedTime );
 
 protected:
 	FLOAT fRemaining;

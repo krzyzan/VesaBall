@@ -1,7 +1,10 @@
 #pragma once
+
 #include "d3dappscene.h"
-#include "menuitem.h"
-#include "cursor.h"
+
+class CMovingSprite;
+class CMenuItem;
+
 
 class CGameMenu :
 	public CD3DAppScene
@@ -11,15 +14,17 @@ public:
 	~CGameMenu();
 
 	HRESULT InitDeviceObjects();
-	HRESULT FrameMove( FLOAT fElapsedTime );
-	HRESULT Render();
+	HRESULT RenderLoop();
 	HRESULT RestoreDeviceObjects();
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
 
-	LPDIRECT3DTEXTURE8		pTex[256];
-	LPD3DXSPRITE			pSprite;
+	HRESULT AddMenuTitle( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position, D3DCOLOR Blending );
+	HRESULT AddMenuItem( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position, D3DCOLOR Blending, HRESULT UID );
+	HRESULT AddCursor( LPDIRECT3DTEXTURE8 pTex );
 
-	list<CMovingSprite*>	listFrameMove;
-	list<CMenuItem*>		listMenuItem;
+	LPD3DXSPRITE				pSprite;
+
+	list<CMovingSprite*>		listFrameMove;
+	list<CMenuItem*>			listMenuItem;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "Sprite.h"
 
+
 class CMovingSprite :
 	public CSprite
 {
@@ -13,5 +14,5 @@ public:
 	D3DXVECTOR2	vSpeed;
 	D3DXVECTOR2	vAccel;
 
-	virtual void FrameMove( FLOAT fElapsedTime ) = 0;
+	virtual HRESULT FrameMove( FLOAT fElapsedTime ) = 0;	//TODO: zdefiniowaæ ruch
 };

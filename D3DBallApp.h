@@ -1,5 +1,5 @@
 // D3DBallApp.h: interface for the CD3DBallApp class.
-// v0.20
+// v0.40
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -32,7 +32,7 @@ v0.14
 	- dodany Reset() w konstruktorze CTimer, 
 		bo inaczej nie dzia³a w konfiguracji Release u Laski (dziwne, nie???)
 	- CSprite::FrameMove() jest teraz CSprite::FrameMove( FLOAT fElapsedTime )
-		i wszystkie obiekty dostaj¹ wspólny czas z timerFrameMove
+		i wszystkie obiekty dostaj¹ wspólny czas z timerRenderLimiter
 	- Poprawne obliczanie odbiæ
 	- ZIKO: Ustawianie RotationCenter na œrodku sprita
 	- ZIKO: Nowa grafika
@@ -63,22 +63,25 @@ v0.18
 	- Klasa CLevel
 
 v0.20
-	
+	- Poprawione tekstury
+	- Przesk³adanie kodu
 
 v0.30
-	- Klasa CD3DAppScene
+	- Nowa klasa bazowa CD3DAppScene
+	- Klasa CLevel
 	- Klasa CGameMenu
 
-	
+v0.40
+	- Klasa CMenuItem, CCursor
+	- Menu gry
+	- Przepisanie kodu obliczaj¹cego zderzenia obiektów (potrzebne do klasy CBonus)
+    	
 ToDo:
-	- Zrobiæ dzia³aj¹ce menu (AddMenuItem, enum/uid w CD3DBallApp)
-	- Skasowaæ Render i FrameMove
-	- Wywaliæ niepotrzebne argumenty z konstruktorów
-	- Zmieniæ mo¿e ¿eby kulki sprawdza³y w co trafiaj¹, ( lista pListBouncing w CBall itp. )
-		du¿a zmiana wiêc zrobiæ kopiê projektu
-	- Zrobiæ menu
-	- Zrobiæ porzadek z destruktorami ( wykasowaæ niepotrzebne, wszystkie musz¹ byæ virtual )
 	- Zrobic start pi³ki z deski
+	- Wywaliæ niepotrzebne argumenty z konstruktorów
+	- Zrobiæ porz¹dek ze sta³ymi jak 0.75
+	- zmieniæ listy na vectory
+	- Zrobiæ porzadek z destruktorami ( wykasowaæ niepotrzebne, wszystkie musz¹ byæ virtual )
 	- Rzeczy niezwi¹zane z ruchem (np. blending, efekty) wrzucic do Render
 	- Zrobiæ Game Over
 	- Co robiæ gdy wjedziemy bokiem deski w kulkê???
@@ -93,39 +96,38 @@ ToDo:
 	- Deska, która losowo odbija 
 */
 
-
 #pragma once
 
-#include <list>			//TMP
-
 #include <d3dx8.h>
-
 #include "D3DApp.h"
-#include "D3DAppScene.h"
 
-#include "Paddle.h"		//TMP
-#include "Brick.h"		//TMP
+class CD3DAppScene;
 
-using namespace std;
 
 class CD3DBallApp :
 	public CD3DApp  
 {
+	enum UID_SCENE_RESULT {
+		MENU_START	= 100,
+		MENU_EDITOR,
+		MENU_QUIT,
+		GAME_OVER
+	};
+
 public:
 	CD3DBallApp();
 
 	HRESULT InitDeviceObjects();
-	HRESULT FrameMove();
-	HRESULT Render();
 	HRESULT RestoreDeviceObjects();
+	HRESULT RenderLoop();
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
 	HRESULT	FinalCleanup();
 
-	CTimer			timerFrameMove;
-	FLOAT			fTimeToRender;
-
-	DWORD			numFrameMove, numRender;
+protected:
+	HRESULT CreateMenu();
+	HRESULT CreateLevel();
+	HRESULT EndScene();
 
 	CD3DAppScene*	pScene;
 };

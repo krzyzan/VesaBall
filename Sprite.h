@@ -4,13 +4,12 @@
 
 #pragma once
 
-#include <d3dx8.h>
-#include <list>		//TMP
-
 using namespace std;
+#include <list>		//TODO: TMP
+#include <d3dx8.h>
 
-class CBall;		//TMP
-class CLevel;
+class CBall;		//TODO: TMP
+
 
 class CSprite  
 {
@@ -20,7 +19,7 @@ public:
 	virtual ~CSprite();
 
 	virtual void Render( LPD3DXSPRITE pSprite ) const;
-	virtual void Collide( list<CBall*>* pListBall, BOOL & bThruBrick );	//TMP
+	virtual void BallHits( CBall* pBall, const D3DXVECTOR2 & vSide );
 
 	LPDIRECT3DTEXTURE8	pTexture;
 	D3DXVECTOR2			vScaling;

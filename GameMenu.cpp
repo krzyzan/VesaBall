@@ -1,44 +1,20 @@
 #include "stdafx.h"
 #include "gamemenu.h"
 #include "menuitem.h"
+#include "cursor.h"
+
 
 CGameMenu::CGameMenu( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice )
 	: CD3DAppScene( d3dDevice, DIDevice )
 {
-	ZeroMemory( pTex, sizeof(pTex) );
 	pSprite		= NULL;
 }
 
 HRESULT CGameMenu::InitDeviceObjects()
 {
-	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Cursor_arrow.png",	&pTex[0] );
-	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Menu_title.png",	&pTex[1] );
-	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Menu_start.png",	&pTex[2] );
-	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Menu_editor.png",	&pTex[3] );
-	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Menu_quit.png",		&pTex[4] );
-
-	// tytu³ menu
-	CSprite* pSprite = new CSprite( 
-		pTex[1], D3DXVECTOR2( 0.8f, 0.2f ), 0,
-		D3DXVECTOR2( 0.5f, 0.15f ), 0xFFFFFFFF );
-	listRender.push_back( pSprite );
-
-	// pozycje menu
-	for (int i=2; i<5; i++) {
-		CMenuItem* pMenuItem = new CMenuItem( pTex[i], 
-			D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, i*0.1f+0.2f ), 
-			0xFFFFFFFF );
-		listRender.push_back( pMenuItem );
-		listMenuItem.push_back( pMenuItem );
-	}
-
-	// kursor
-	CCursor* pCursor = new CCursor( pTex[0], pDIDevice, &listMenuItem );
-	listRender.push_back( pCursor );
-	listFrameMove.push_back( pCursor );
-
 	return S_OK;
 }
+
 
 HRESULT CGameMenu::RestoreDeviceObjects()
 {
@@ -48,20 +24,21 @@ HRESULT CGameMenu::RestoreDeviceObjects()
 }
 
 
-HRESULT CGameMenu::FrameMove( FLOAT fElapsedTime )
+HRESULT CGameMenu::RenderLoop()
 {
-	list<CMovingSprite*>::iterator	iMovingSprite;
+	// TODO: wywaliæ listê CMovingSprite* zast¹piæ CCursor*
+
+	HRESULT hr;
 
 	// wykonujemy ruch dla wszystkich obiektów
-	for (iMovingSprite = listFrameMove.begin(); iMovingSprite != listFrameMove.end(); iMovingSprite++)
-		(*iMovingSprite)->FrameMove( fElapsedTime );
+	list<CMovingSprite*>::iterator	iMovingSprite;
+	for (iMovingSprite = listFrameMove.begin(); iMovingSprite != listFrameMove.end(); iMovingSprite++) {
+        hr = (*iMovingSprite)->FrameMove( 0 );
+		if (hr != S_OK)
+			return hr;
+	}
 
-	return S_OK;
-}
-
-
-HRESULT CGameMenu::Render()
-{
+	// renderujemy
 	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(58,110,145), 1.0f, 0 );
 
 	pd3dDevice->BeginScene();
@@ -73,6 +50,9 @@ HRESULT CGameMenu::Render()
 
 	pSprite->End();
 	pd3dDevice->EndScene();
+
+	// Show the frame on the primary surface.
+	pd3dDevice->Present( NULL, NULL, NULL, NULL );
 
 	return S_OK;
 }
@@ -93,8 +73,34 @@ HRESULT CGameMenu::DeleteDeviceObjects()
 	while (iSprite != listRender.end())
 		delete (*iSprite++);
 
-	for (int i=0; i<256; i++)
-		SAFE_RELEASE( pTex[i] );
+	return S_OK;
+}
+
+
+HRESULT CGameMenu::AddMenuItem( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, 
+	const D3DXVECTOR2 & Position, D3DCOLOR Blending, HRESULT UID )
+{
+	CMenuItem* pMenuItem = new CMenuItem( pTex, Size, Position, Blending, UID );
+	listRender.push_back( pMenuItem );
+	listMenuItem.push_back( pMenuItem );
+
+	return S_OK;
+}
+
+HRESULT CGameMenu::AddCursor( LPDIRECT3DTEXTURE8 pTex )
+{
+	CCursor* pCursor = new CCursor( pTex, pDIDevice, &listMenuItem );
+	listRender.push_back( pCursor );
+	listFrameMove.push_back( pCursor );
+
+	return S_OK;
+}
+
+HRESULT CGameMenu::AddMenuTitle( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, 
+	const D3DXVECTOR2 & Position, D3DCOLOR Blending )
+{
+	CSprite* pSprite = new CSprite(	pTex, Size, 0, Position, Blending );
+	listRender.push_back( pSprite );
 
 	return S_OK;
 }

@@ -13,17 +13,17 @@ class CBall :
 	public CMovingSprite  
 {
 public:
-	CBall( LPDIRECT3DTEXTURE8 Texture, 
-		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, 
-		list<CSprite*>*	ListRender,	list<CMovingSprite*>* ListFrameMove,
-		LPDIRECT3DTEXTURE8 SparkTexture );
+	CBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, list<CSprite*>* ListObst, 
+		list<CSprite*>* ListRender, list<CMovingSprite*>* ListFrameMove, LPDIRECT3DTEXTURE8 SparkTexture );
 	virtual ~CBall();
 
-	void FrameMove( FLOAT fElapsedTime );
-	void ThrowSparkles( const D3DXVECTOR2 & vPositionFromCenter );
+	HRESULT FrameMove( FLOAT fElapsedTime );
+	void StrikeSparkles( const D3DXVECTOR2 & vPositionFromCenter );
+	D3DXVECTOR2 IsColliding( CSprite* pSprite );
 
 protected:
 	list<CSprite*>*			pListRender;
 	list<CMovingSprite*>*	pListFrameMove;
+	list<CSprite*>*			pListObst;
 	LPDIRECT3DTEXTURE8		pSparkTexture;
 };

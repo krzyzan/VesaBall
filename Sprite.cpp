@@ -4,9 +4,8 @@
 
 #include "StdAfx.h"
 #include "Sprite.h"
-#include "Level.h"
 
-#include "Ball.h"	//TMP
+#include "Ball.h"	//TODO: TMP
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -40,6 +39,6 @@ void CSprite::Render( LPD3DXSPRITE pSprite ) const
 	pSprite->Draw( pTexture, NULL, &vScaling, &vRotationCenter, fRotation, &Position, dwBlending );
 }
 
-void CSprite::Collide( list<CBall*>* pListBall, BOOL & bThruBrick )
+void CSprite::BallHits( CBall* pBall, const D3DXVECTOR2 & vSide )
 {
 }

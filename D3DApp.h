@@ -120,8 +120,7 @@ public:
 protected:
 	virtual HRESULT InitDeviceObjects()			= 0;
 	virtual HRESULT RestoreDeviceObjects()		= 0;
-	virtual HRESULT FrameMove()					= 0;
-	virtual HRESULT Render()					= 0;
+	virtual HRESULT RenderLoop()				= 0;
 	virtual HRESULT InvalidateDeviceObjects()	= 0;
 	virtual HRESULT DeleteDeviceObjects()		= 0;
 	virtual HRESULT FinalCleanup()				= 0;
@@ -173,9 +172,9 @@ private:
 	//FLOAT					fFPS; 				// Instanteous frame rate
 
 protected:
+	HWND	hWnd; 								// The main app window
+
 	// Needed for the static WndProc()
 	static CD3DApp* s_pD3DApp;
 	static LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-
-	HWND					hWnd; 				// The main app window
 };

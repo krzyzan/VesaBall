@@ -1,5 +1,5 @@
 // D3DApp.cpp: implementation of the CD3DApp class.
-// v1.11
+// v2.00
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -573,25 +573,9 @@ HRESULT CD3DApp::Render3DEnvironment()
 		return hr;
 	}
 	
-	// Store the time for the app
-	//fTime 	   = Timer.GetTime();
-	//fElapsedTime = Timer.GetElapsedTime();
-
-	// Frame move the scene
-	if( FAILED( hr = FrameMove() ) )
-		return hr;
-
 	// Render the scene as normal
-	if( FAILED( hr = Render() ) )
+	if( FAILED( hr = RenderLoop() ) )
 		return hr;
-
-/*
-	// Keep track of the frame count
-	static FLOAT fLastTime = 0.0f;
-	static DWORD dwFrames  = 0L;
-	FLOAT fTime = Timer.GetAbsoluteTime();
-	++dwFrames;
-*/
 
 	return S_OK;
 }
