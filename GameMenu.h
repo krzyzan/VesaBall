@@ -10,6 +10,13 @@ class CGameMenu :
 	public CD3DAppScene
 {
 public:
+	enum MSG_UID {
+		START	= 100,
+		EDITOR,
+		QUIT,
+		GAME_OVER		//TODO: TMP
+	};
+
 	CGameMenu( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
 	~CGameMenu();
 

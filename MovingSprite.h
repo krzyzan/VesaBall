@@ -14,5 +14,7 @@ public:
 	D3DXVECTOR2	vSpeed;
 	D3DXVECTOR2	vAccel;
 
-	virtual HRESULT FrameMove( FLOAT fElapsedTime ) = 0;	//TODO: zdefiniowaæ ruch
+	virtual HRESULT FrameMove( FLOAT fElapsedTime );
+
+	D3DXVECTOR2 IsColliding( CSprite* pSprite );		//TODO: zmieniæ nazwê
 };

@@ -20,17 +20,21 @@ public:
 	HRESULT FrameMove( FLOAT fElapsedTime );
 	void Render( LPD3DXSPRITE pSprite ) const;
 	
-	void CPaddle::BallHits( CBall* pBall, const D3DXVECTOR2 & vSide );
+	void BallHits( CBall* pBall, const D3DXVECTOR2 & vSide );
+	void BonusHits( CBonus* pBonus, const D3DXVECTOR2 & vSide );
 
 	void LaunchBall( CBall* pBall, FLOAT speed );		//TODO: protected?
 	void CatchBall( CBall* pBall );						//TODO: protected?
 
+	static PrepareEnvironment( BOOL* pGameStates );
+
+protected:
+	static BOOL* s_pGameStates;
+
 private:
 	LPDIRECTINPUTDEVICE8 pDIDevice;
 	CSprite* pLightningPaddle;
-	CSprite* pLightningBall;							//TODO?
 	FLOAT fTimeToLightningChange;
-
 
 	list<CBall*> listCatchedBalls;
 };

@@ -1,7 +1,8 @@
 #pragma once
 
-using namespace std;
 #include <list>
+using namespace std;
+
 #include <dinput.h>
 
 #include "movingsprite.h"

@@ -12,6 +12,23 @@ CGameMenu::CGameMenu( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice
 
 HRESULT CGameMenu::InitDeviceObjects()
 {
+	LPDIRECT3DTEXTURE8 pTex;
+
+	LoadTexture( "gfx/Menu_title.png", &pTex );
+    AddMenuTitle( pTex, D3DXVECTOR2( 0.8f, 0.2f ), D3DXVECTOR2( 0.5f, 0.15f ),	0xFFFFFFFF );
+
+	LoadTexture( "gfx/Menu_start.png", &pTex );
+	AddMenuItem( pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.4f ), 0xFFFFCC00, START );
+
+	LoadTexture( "gfx/Menu_editor.png", &pTex );
+	AddMenuItem( pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.5f ), 0xFFFFCC00, EDITOR );
+
+	LoadTexture( "gfx/Menu_quit.png", &pTex );
+	AddMenuItem( pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.6f ), 0xFFFFCC00, QUIT );
+
+	LoadTexture( "gfx/Cursor_arrow.png", &pTex );
+	AddCursor( pTex );
+
 	return S_OK;
 }
 

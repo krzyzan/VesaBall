@@ -6,19 +6,22 @@
 #include "Ball.h"
 #include "Level.h"
 #include "EffectSprite.h"
+#include "Bonus.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBall::CBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, list<CSprite*>* ListObst, 
-		list<CSprite*>* ListRender, list<CMovingSprite*>* ListFrameMove, LPDIRECT3DTEXTURE8 SparkTexture )
+list<CMovingSprite*>*	CBall::s_pListFrameMove;
+list<CSprite*>*			CBall::s_pListRender;
+list<CSprite*>*			CBall::s_pListObst;
+LPDIRECT3DTEXTURE8		CBall::s_pSparkTexture;
+BOOL*					CBall::s_pGameStates;
+
+
+CBall::CBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed )
 	: CMovingSprite( Texture, D3DXVECTOR2(1.0f/64, 1.0f/64), 0, Position, Speed, D3DXVECTOR2(0, 0), 0xFFFFFFFF )
 {
-	pListObst = ListObst;
-	pListRender = ListRender;
-	pListFrameMove = ListFrameMove;
-	pSparkTexture = SparkTexture;
 }
 
 CBall::~CBall()
@@ -26,23 +29,25 @@ CBall::~CBall()
 
 }
 
-D3DXVECTOR2 CBall::IsColliding( CSprite* pSprite )
+void CBall::PrepareEnvironment( BOOL* pGameStates, list<CSprite*>* pListObst, list<CSprite*>* pListRender, 
+	list<CMovingSprite*>* pListFrameMove, LPDIRECT3DTEXTURE8 pSparkTexture)
 {
-	if (fabs(vOldPosition.x - pSprite->vPosition.x) < vSize.x/2 + pSprite->vSize.x/2 &&
-			fabs(vPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2 )
-		return (vSpeed.y > 0) ? D3DXVECTOR2( 0, -vSize.y/2 ) : D3DXVECTOR2( 0, vSize.y/2 );
-
-	if (fabs(vOldPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2 &&
-			fabs(vPosition.x - pSprite->vPosition.x) < vSize.x/2 + pSprite->vSize.x/2 )
-		return (vSpeed.x > 0) ? D3DXVECTOR2( -vSize.x/2, 0 ) : D3DXVECTOR2( vSize.x/2, 0 );
-
-	return D3DXVECTOR2(0,0);
+	s_pGameStates = pGameStates;
+	s_pListObst = pListObst;
+	s_pListRender = pListRender;
+	s_pListFrameMove = pListFrameMove;
+	s_pSparkTexture = pSparkTexture;
 }
 
 HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 {
-	vOldPosition = vPosition;
-	vPosition += vSpeed*fElapsedTime;
+	CMovingSprite::FrameMove( fElapsedTime );
+
+	//TODO: kolor kulek zmnieniæ raz a nie milion razy na sekunde :)
+	if (s_pGameStates[ CBonus::GhostBall ])
+		dwBlending = 0xFFAFCFFF;
+	else
+		dwBlending = 0xFFFFFFFF;
 
 	// kasuj gdy wyjdzie za ekran
 	if (vPosition.y > BOARD_B + vSize.y/2 ) {
@@ -75,7 +80,7 @@ HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 
 	// odbicia od przeszkód
 	list<CSprite*>::iterator iObst;
-	for (iObst = pListObst->begin(); iObst != pListObst->end(); iObst++) {
+	for (iObst = s_pListObst->begin(); iObst != s_pListObst->end(); iObst++) {
 		D3DXVECTOR2 vSide = IsColliding( *iObst );
 		if (vSide == D3DXVECTOR2(0,0)) 
 			continue;
@@ -94,9 +99,9 @@ void CBall::StrikeSparkles( const D3DXVECTOR2 & vSide )
 	for (int i=0; i<8; i++) {
 			FLOAT fSparkDuration = frand(0.4f, 1.0f);
 			D3DXVECTOR2 vSparkSpeed = D3DXVECTOR2( frand(-1.0f, 1.0f), frand(-1.0f, 1.0f) )/10 + vSpeed/4;
-			CEffectSprite* pEffectSprite = new CEffectSprite( pSparkTexture, vSparkSize, 
+			CEffectSprite* pEffectSprite = new CEffectSprite( s_pSparkTexture, vSparkSize, 
 				vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
-			pListFrameMove->push_back( pEffectSprite );
-			pListRender->push_back( pEffectSprite );
+			s_pListFrameMove->push_back( pEffectSprite );
+			s_pListRender->push_back( pEffectSprite );
 	}
 }

@@ -13,7 +13,7 @@ CTimer::CTimer()
 
     // Use QueryPerformanceFrequency() to get frequency of timer.  
     LARGE_INTEGER qwTicksPerSec;
-    m_bUsingQPF = (bool) (QueryPerformanceFrequency( &qwTicksPerSec ) != 0);
+    m_bUsingQPF = (BOOL) (QueryPerformanceFrequency( &qwTicksPerSec ) != 0);
     m_llQPFTicksPerSec = qwTicksPerSec.QuadPart;
 }
 
@@ -147,7 +147,7 @@ FLOAT CTimer::GetElapsedTime()
 
 
 //--------------------------------------------------------------------------------------
-bool CTimer::IsStopped()
+BOOL CTimer::IsStopped()
 {
     return m_bTimerStopped;
 }

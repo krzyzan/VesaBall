@@ -17,11 +17,11 @@ public:
     FLOAT GetAbsoluteTime();	// get the absolute system time
     FLOAT GetTime();			// get the current time
     FLOAT GetElapsedTime();	// get the time that elapsed between GetElapsedTime() calls
-    bool IsStopped();			// returns true if timer stopped
+    BOOL IsStopped();			// returns true if timer stopped
 
 protected:
-    bool m_bUsingQPF;
-    bool m_bTimerStopped;
+    BOOL m_bUsingQPF;
+    BOOL m_bTimerStopped;
     LONGLONG m_llQPFTicksPerSec;
 
     LONGLONG m_llStopTime;

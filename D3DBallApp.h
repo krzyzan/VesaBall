@@ -86,12 +86,14 @@ v0.45
 
     	
 ToDo:
-	- Zrobic start pi³ki z deski
+	- zrobic GameOver oraz wyjœcie do menu z levelu
+	- zrobic ³adowanie levelów z pliku
+	- zrobic boczne œciany
+	- zrobic œciane górn¹ oraz licznik punktów
+	- listBonusObst zamieniæ na CPaddle*
 	- Wywaliæ niepotrzebne argumenty z konstruktorów
-	- zmieniæ listy na vectory
 	- Zrobiæ porzadek z destruktorami ( wykasowaæ niepotrzebne, wszystkie musz¹ byæ virtual )
 	- Rzeczy niezwi¹zane z ruchem (np. blending, efekty) wrzucic do Render
-	- Zrobiæ Game Over
 	- Co robiæ gdy wjedziemy bokiem deski w kulkê???
 	- zrobiæ CBrickArray
 	- zrobiæ obs³ugê dŸwiêku (np. kasuj¹c niepotrzebny kod z sampli do DSound )
@@ -115,13 +117,6 @@ class CD3DAppScene;
 class CD3DBallApp :
 	public CD3DApp  
 {
-	enum MSG_UID {
-		MENU_START	= 100,
-		MENU_EDITOR,
-		MENU_QUIT,
-		GAME_OVER
-	};
-
 public:
 	CD3DBallApp();
 
@@ -133,8 +128,5 @@ public:
 	HRESULT	FinalCleanup();
 
 protected:
-	HRESULT CreateMenu();
-	HRESULT CreateLevel();
-
 	CD3DAppScene*	pScene;
 };

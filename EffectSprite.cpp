@@ -18,8 +18,7 @@ CEffectSprite::~CEffectSprite()
 
 HRESULT CEffectSprite::FrameMove( FLOAT fElapsedTime )
 {
-	vSpeed += vAccel * fElapsedTime;
-	vPosition += vSpeed * fElapsedTime;
+	CMovingSprite::FrameMove( fElapsedTime );
 
 	dwBlending &= 0x00FFFFFF;
 	dwBlending += ((DWORD)(fRemaining/fDuration * 0xFF) << 24);

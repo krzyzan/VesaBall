@@ -11,12 +11,6 @@ class CBrick;
 class CMovingSprite;
 class CPaddle;
 
-// Flagi gry
-#define	GS_GHOSTBALL	0x00000001
-#define	GS_FIREBALL		0x00000002
-#define GS_MAGNETIC		0x00000004
-//TODO: dokoñczyæ
-
 class CLevel :
 	public CD3DAppScene
 {
@@ -30,22 +24,27 @@ public:
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
 
-	CBall*   AddBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, LPDIRECT3DTEXTURE8 SparkTexture );
+	CBall*   AddBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
 	CBrick*  AddBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size );
-	CPaddle* AddPaddle( LPDIRECT3DTEXTURE8 PaddleTex, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECT3DTEXTURE8 BallTex, LPDIRECT3DTEXTURE8 SparkleTex );
+	CPaddle* AddPaddle( LPDIRECT3DTEXTURE8 PaddleTex, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECT3DTEXTURE8 BallTex );
 	
 protected:
 	LPD3DXSPRITE			pSprite;
 
 	list<CMovingSprite*>	listFrameMove;
 	list<CSprite*>			listBallObst;
-
+	list<CSprite*>			listBonusObst;
+	
 	BOOL bThruBrick;
 
 	HWND					hWnd;					//TODO: TMP
 	CTimer					timerRenderLimiter;
 	FLOAT					fTimeToRender;
 	DWORD					numFrameMove, numRender;
+	
+	BOOL*					pGameStates;
+	LPDIRECT3DTEXTURE8*		pBonusTextures;
+
 
 private:
 	HRESULT MoveObjects( FLOAT fElapsedTime );

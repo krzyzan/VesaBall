@@ -4,22 +4,25 @@
 
 #pragma once
 
+#include <list.h>
 using namespace std;
 
-#include <list.h>
 #include "Sprite.h"
 
 class CMovingSprite;
+
 
 class CBrick :
 	public CSprite  
 {
 public:
-	CBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size, list<CSprite*>* ListRender, list<CMovingSprite*>* ListFrameMove );
+	CBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size );
 	virtual ~CBrick();
 
 	void BallHits( CBall* pBall, const D3DXVECTOR2 & vSide );
 
-	list<CSprite*>*			pListRender;
-	list<CMovingSprite*>*	pListFrameMove;
+	static void PrepareEnvironment( list<CSprite*>* pListRender, list<CMovingSprite*>* pListFrameMove, BOOL pGameStates[] );
+	static list<CSprite*>*			s_pListRender;
+	static list<CMovingSprite*>*	s_pListFrameMove;
+	static BOOL*					s_pGameStates;
 };

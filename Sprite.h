@@ -4,12 +4,13 @@
 
 #pragma once
 
-using namespace std;
 #include <list>		//TODO: TMP
+using namespace std;
+
 #include <d3dx8.h>
 
 class CBall;		//TODO: TMP
-
+class CBonus;		//TODO: TMP
 
 class CSprite  
 {
@@ -19,7 +20,8 @@ public:
 	virtual ~CSprite();
 
 	virtual void Render( LPD3DXSPRITE pSprite ) const;
-	virtual void BallHits( CBall* pBall, const D3DXVECTOR2 & vSide );
+	virtual void BallHits( CBall* pBall, const D3DXVECTOR2 & vSide );	//TODO: TMP
+	virtual void BonusHits( CBonus* pBonus, const D3DXVECTOR2 & vSide );	//TODO: TMP
 
 	void SetSize( const D3DXVECTOR2 & Size );
 

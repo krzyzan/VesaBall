@@ -4,6 +4,7 @@
 #include "Ball.h"
 #include "Brick.h"
 #include "Paddle.h"
+#include "Bonus.h"
 
 CLevel::CLevel( /*TODO: TMP*/HWND wnd, LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice )
 	: CD3DAppScene( d3dDevice, DIDevice )
@@ -15,6 +16,13 @@ CLevel::CLevel( /*TODO: TMP*/HWND wnd, LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPU
 	numRender		= 0;
 
 	bThruBrick = FALSE;
+
+	pGameStates = new BOOL[ CBonus::MAX_TYPE ];
+	ZeroMemory( pGameStates, sizeof(*pGameStates) * CBonus::MAX_TYPE );
+
+	pBonusTextures = new LPDIRECT3DTEXTURE8[ CBonus::MAX_TYPE ];
+	ZeroMemory( pGameStates, sizeof(*pBonusTextures) * CBonus::MAX_TYPE );
+
 }
 
 
@@ -31,10 +39,45 @@ CLevel::~CLevel()
 
 	MessageBox( hWnd, str, "Internal counters", MB_OK );
 	*/
+
+	delete [] pGameStates;
+	delete [] pBonusTextures;
 }
 
 HRESULT CLevel::InitDeviceObjects()
 {
+	LPDIRECT3DTEXTURE8 pPaddleTex;
+	LPDIRECT3DTEXTURE8 pBrickTex;
+	LPDIRECT3DTEXTURE8 pLightningTex;
+	LPDIRECT3DTEXTURE8 pBallTex;
+	LPDIRECT3DTEXTURE8 pSparkTex;
+
+	LoadTexture( "gfx/SparkEffect.png", &pSparkTex );
+	LoadTexture( "gfx/Paddle.png", &pPaddleTex );
+	LoadTexture( "gfx/Lightning.png", &pLightningTex );
+	LoadTexture( "gfx/Ball_alu.png", &pBallTex );
+	LoadTexture( "gfx/Bonus_ThruBrick.png",			&pBonusTextures[CBonus::GhostBall] );
+	LoadTexture( "gfx/Bonus_MagneticPaddle.png",	&pBonusTextures[CBonus::MagneticPaddle] );
+
+	CBall::PrepareEnvironment( pGameStates, &listBallObst, &listRender, &listFrameMove, pSparkTex); //TODO: poprawiæ kolejnoœæ argumentów
+	CBonus::PrepareEnvironment( &listBonusObst, pBonusTextures );
+	CBrick::PrepareEnvironment( &listRender, &listFrameMove, pGameStates );
+	CPaddle::PrepareEnvironment( pGameStates );
+
+	//Tworzymy deskê z kulka
+	//TODO: gdy dodajemy kulke po desce b³yskawica pojawia sie w z³ym mejscu
+	AddPaddle( pPaddleTex, pLightningTex, pBallTex );
+
+	//Tworzymy cegie³ki
+	LoadTexture( "gfx/Brick5.png", &pBrickTex );
+
+	float x, y;
+	for (y=BOARD_T+BOARD_H/2/BRICK_Y; y<BOARD_T+BOARD_H*0.50; y+=BOARD_H/BRICK_Y)
+		for (x=BOARD_L+BOARD_W/2/BRICK_X; x<BOARD_R; x+=BOARD_W/BRICK_X)
+			if (rand()%4>0)
+				AddBrick( pBrickTex, D3DXVECTOR2( x, y ), 
+					D3DXVECTOR2( BOARD_W/BRICK_X, BOARD_H/BRICK_Y) );
+
 	timerRenderLimiter.Start();
 	fTimeToRender = 0;
 
@@ -114,6 +157,7 @@ HRESULT CLevel::DestroyObjects()
 	list<CMovingSprite*>::iterator	iMovingSprite;
 	list<CSprite*>::iterator		iSprite;
 	list<CSprite*>::iterator		iBallObst;
+	list<CSprite*>::iterator		iBonusObst;
 
 	// Kasujemy z listy przeszkód dla kulek
 	iBallObst = listBallObst.begin(); 
@@ -122,6 +166,15 @@ HRESULT CLevel::DestroyObjects()
 			iBallObst = listBallObst.erase( iBallObst );
 		else
 			iBallObst++;
+	}
+
+	// Kasujemy z listy przeszkód dla bonusów
+	iBonusObst = listBonusObst.begin(); 
+	while (iBonusObst != listBonusObst.end()) {
+		if ((*iBonusObst)->bDeleteMe)
+			iBonusObst = listBonusObst.erase( iBonusObst );
+		else
+			iBonusObst++;
 	}
 
 	// Kasujemy z listy obiektów ruchomych
@@ -170,9 +223,9 @@ HRESULT CLevel::RenderObjects()
 }
 
 
-CBall* CLevel::AddBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, LPDIRECT3DTEXTURE8 SparkTexture )
+CBall* CLevel::AddBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed )
 {
-	CBall* pBall = new CBall( Texture, Position, Speed, &listBallObst,  &listRender, &listFrameMove, SparkTexture );
+	CBall* pBall = new CBall( Texture, Position, Speed );
 	listRender.push_front( pBall );
 	listFrameMove.push_front( pBall );
 
@@ -182,21 +235,22 @@ CBall* CLevel::AddBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position
 
 CBrick* CLevel::AddBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size )
 {
-	CBrick* pBrick = new CBrick( Texture, Position, Size, &listRender, &listFrameMove );
+	CBrick* pBrick = new CBrick( Texture, Position, Size );
 	listRender.push_back( pBrick );
 	listBallObst.push_back( pBrick );
 
 	return pBrick;
 }
 
-CPaddle* CLevel::AddPaddle( LPDIRECT3DTEXTURE8 PaddleTex, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECT3DTEXTURE8 BallTex, LPDIRECT3DTEXTURE8 SparkleTex )
+CPaddle* CLevel::AddPaddle( LPDIRECT3DTEXTURE8 PaddleTex, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECT3DTEXTURE8 BallTex )
 {
 	CPaddle* pPaddle = new CPaddle( PaddleTex, LightningTex, pDIDevice );
 	listRender.push_back( pPaddle );
 	listFrameMove.push_back( pPaddle );
 	listBallObst.push_back( pPaddle );
+	listBonusObst.push_back( pPaddle );
 
-	CBall* pBall = AddBall( BallTex, pPaddle->vPosition + D3DXVECTOR2(0.01f, 0), D3DXVECTOR2(), SparkleTex );
+	CBall* pBall = AddBall( BallTex, pPaddle->vPosition + D3DXVECTOR2(0.01f, 0), D3DXVECTOR2() );
 	pBall->vPosition.y = pPaddle->vPosition.y - pPaddle->vSize.y/2 - pBall->vSize.y/2;	//TODO: TMP
 	pPaddle->CatchBall( pBall );
 

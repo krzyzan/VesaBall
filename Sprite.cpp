@@ -47,3 +47,7 @@ void CSprite::Render( LPD3DXSPRITE pSprite ) const
 void CSprite::BallHits( CBall* pBall, const D3DXVECTOR2 & vSide )
 {
 }
+
+void CSprite::BonusHits( CBonus* pBonus, const D3DXVECTOR2 & vSide )
+{
+}

@@ -1,8 +1,9 @@
 #pragma once
 
-using namespace std;
+
 #include <list>
 #include <vector>
+using namespace std;
 
 #include <d3dx8.h>
 #include <dinput.h>

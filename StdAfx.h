@@ -38,5 +38,7 @@ using namespace std;
 #define BOARD_W	(BOARD_R-BOARD_L)	//width
 #define BOARD_H	(BOARD_B-BOARD_T)	//height
 
+#define BONUS_PROBABILITY	0.05f
+
 inline float frand( float i, float j ) 
 	{ return ((float)rand()/RAND_MAX)*(j-i)+i; };
