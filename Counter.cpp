@@ -29,7 +29,7 @@ void CCounter::Render( LPD3DXSPRITE pSprite ) const
 {
 	D3DXVECTOR2 Position = (vPosition - vSize/2);
 	for (int r=dwNumRollers-1; r>=0; r--) {
-		CONST RECT SrcRect = {0, ((LONG)pRoller[r]%10)*dwDigitHeight, 64, ((LONG)pRoller[r]%10 + 1)*dwDigitHeight };
+		CONST RECT SrcRect = {0, ((LONG)(pRoller[r]+0.5f)%10)*dwDigitHeight, 64, ((LONG)(pRoller[r]+0.5f)%10 + 1)*dwDigitHeight };
 		pSprite->Draw( pTexture, &SrcRect, &vScaling, &vRotationCenter, fRotation, &(Position * RES_X), dwBlending );
 		Position.x += vSize.x/dwNumRollers;
 	}
@@ -45,16 +45,15 @@ HRESULT CCounter::FrameMove( FLOAT fElapsedTime )
 
 void CCounter::Reset()
 {
-	dwScore = 0;
-
+	dwCount = 0;
 	ZeroMemory( pRoller, sizeof(pRoller[0])*dwNumRollers );
 	ZeroMemory( pRollerDest, sizeof(pRoller[0])*dwNumRollers );
 }
 
-void CCounter::Increment( DWORD Delta )
+void CCounter::Set( DWORD c )
 {
-	dwScore += Delta;
-	DWORD dwScoreDest = dwScore;
+	dwCount = c;
+	DWORD dwScoreDest = c;
 	for (DWORD r=0; r<dwNumRollers; r++) {
 		pRollerDest[r] = dwScoreDest;
 		dwScoreDest /= 10;

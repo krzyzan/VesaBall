@@ -13,7 +13,10 @@ public:
 	HRESULT CCounter::FrameMove( FLOAT fElapsedTime );
 
 	void Reset();
-	void Increment( DWORD Delta );
+	void Set( DWORD c );
+	DWORD Get() const {	return dwCount; };
+	void Inc( DWORD c ) { Set( Get()+c ); };
+	void Dec( DWORD c ) { Set( Get()-c ); };
 
 private:
 	float* pRoller;
@@ -22,5 +25,5 @@ private:
 	DWORD dwDigitHeight;
 	DWORD dwNumRollers;
 
-	DWORD dwScore;
+	DWORD dwCount;
 };

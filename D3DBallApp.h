@@ -113,7 +113,7 @@ ToDo:
 	- zrobiæ CBrickArray
 	- zrobiæ obs³ugê dŸwiêku (np. kasuj¹c niepotrzebny kod z sampli do DSound )
 	- Porz¹dek z protected, public, private
-	- Przyspieszanie pi³ki przy odbiciu (a¿ do 1.0f ?)
+	- Przyspieszanie kulki przy odbiciu (a¿ do 1.0f ?)
 
 ToDo:
 	- Poœwiata/ogon dla fireballa

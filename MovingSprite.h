@@ -16,5 +16,6 @@ public:
 
 	virtual HRESULT FrameMove( FLOAT fElapsedTime );
 
-	D3DXVECTOR2 IsColliding( CSprite* pSprite );		//TODO: zmieniæ nazwê
+	bool Overlaps( CSprite* pSprite );
+	D3DXVECTOR2 GetContactSide( CSprite* pSprite );
 };

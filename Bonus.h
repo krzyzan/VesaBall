@@ -1,9 +1,6 @@
 #pragma once
 #include "MovingSprite.h"
 
-#include <list>
-using namespace std;
-
 
 class CBonus :
 	public CMovingSprite
@@ -38,12 +35,11 @@ public:
 		MAX_TYPE
 	};
 
-	CBonus( DWORD Type, const LPDIRECT3DTEXTURE8* pBonusTextures, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
+	CBonus( TYPE Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
 	virtual ~CBonus();
 
 	HRESULT FrameMove( FLOAT fElapsedTime );
 	DWORD	dwType;
 
-protected:
-	static LPDIRECT3DTEXTURE8*		s_pTextures;
+	static LPDIRECT3DTEXTURE8 s_pTextures[MAX_TYPE];
 };

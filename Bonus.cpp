@@ -1,10 +1,10 @@
 #include "StdAfx.h"
 #include "Bonus.h"
 
-LPDIRECT3DTEXTURE8*	CBonus::s_pTextures;
+LPDIRECT3DTEXTURE8 CBonus::s_pTextures[CBonus::MAX_TYPE];
 
-CBonus::CBonus( DWORD Type, const LPDIRECT3DTEXTURE8* pBonusTextures, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed )
-	: CMovingSprite( pBonusTextures[Type], D3DXVECTOR2(1.0f/32, 1.0f/32), 0, Position, Speed, D3DXVECTOR2(0, 0.25f), 0xFFFFFFFF )
+CBonus::CBonus( TYPE Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed )
+	: CMovingSprite( s_pTextures[Type], D3DXVECTOR2(1.0f/32, 1.0f/32), 0, Position, Speed, D3DXVECTOR2(0, 0.25f), 0xFFFFFFFF )
 {
 	dwType = Type;
 }

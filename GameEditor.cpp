@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "GameEditor.h"
 #include "Cursor.h"
+#include "Brick.h"
 
 #include <fstream>		//TMP
 
@@ -9,7 +10,7 @@ CGameEditor::CGameEditor( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDe
 {
 	pCursor		= NULL;
 	pSprite		= NULL;
-	curType = 0;
+	curType		= 0;
 }
 
 
@@ -25,7 +26,6 @@ HRESULT CGameEditor::InitDeviceObjects()
 	LPDIRECT3DTEXTURE8 pTex;
 	LoadTexture( "gfx/Cursor_arrow.png", &pTex );
 	pCursor = new CCursor( pTex );
-	listRender.push_back( pCursor );
 
 	return S_OK;
 }
@@ -55,19 +55,18 @@ HRESULT CGameEditor::RenderLoop()
             case DIMOFS_BUTTON0:
             case DIMOFS_BUTTON1:
 				if (didod[ i ].dwData & 0x80) {
-					POINT pos;
-					pos.x = (LONG)((pCursor->vPosition.x - BOARD_L) * BRICK_X / BOARD_W);
-					pos.y = (LONG)((pCursor->vPosition.y - BRICK_TABLE_T) * BRICK_Y / BRICK_TABLE_H);
-					if (pos.x>=0 && pos.x<BRICK_X && pos.y>=0 && pos.y<BRICK_Y) {
-						if (pBrickTable[pos.x][pos.y]) {
-							curType = pBrickTable[pos.x][pos.y]->dwType;
+					if ( pBrickArray->Contains( pCursor->vPosition ) ) {
+						POINT pos = pBrickArray->VectorToArrayCoords( pCursor->vPosition );
+						if (pBrickArray->pBrick[pos.x][pos.y]) {
+							curType = pBrickArray->pBrick[pos.x][pos.y]->pTypeDesc->type;
 							if (didod[ i ].dwOfs == DIMOFS_BUTTON0)
-								curType = (curType + 1)%BRICK_TYPES;
-							RemoveBrick( pos );
+								curType = (curType + 1)%CBrick::TYPE_MAX;
+							SAFE_DELETE( pBrickArray->pBrick[pos.x][pos.y] );
 						}
 
-						if (didod[ i ].dwOfs == DIMOFS_BUTTON0)
-							InsertBrick( curType, pos );
+						if (didod[ i ].dwOfs == DIMOFS_BUTTON0) {
+							pBrickArray->InsertBrick( curType, pos );
+						}
 					}
 				}
 				break;
@@ -83,6 +82,8 @@ HRESULT CGameEditor::RenderLoop()
 
 	CGameBoard::RenderLoop();
 
+	pCursor->Render( pSprite );
+
 	pSprite->End();
 	pd3dDevice->EndScene();
 
@@ -96,7 +97,8 @@ HRESULT CGameEditor::RenderLoop()
 
 HRESULT CGameEditor::DeleteDeviceObjects()
 {
-	SaveLevel( "lev/level.lev" );
-	
+	pBrickArray->Save( "lev/level.lev" );
+	delete pCursor;
+
 	return CGameBoard::DeleteDeviceObjects();
 }

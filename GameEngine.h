@@ -5,10 +5,13 @@
 
 class CBall;
 class CMovingSprite;
+class CEffectSprite;
 class CPaddle;
 class CBonus;
 class CCounter;
 
+
+const DWORD INITIAL_LIVES = 2;
 
 class CGameEngine :
 	public CGameBoard
@@ -22,28 +25,24 @@ public:
 	HRESULT DeleteDeviceObjects();
 
 private:
-	void InsertPaddle( CPaddle* Paddle );
-
 	void MoveObjects( FLOAT fElapsedTime );
 	void CollideObjects();
 	void DestroyObjects();
 
-	void ApplyBonus( DWORD Type, bool Value );
-	void CollideBallBrick( CBall* pBall, const POINT & pos );
+	void ApplyBonus( DWORD Type );
+	void ResetBoard();
+	void KillPaddle();
+
 	void CollideBallPaddle( CBall* pBall );
-	
+
 	list<CBall*>			listBall;
 	list<CBonus*>			listBonus;
 	list<CEffectSprite*>	listEffect;
-	CCounter*				pCounter; 
+	CCounter*				pScoreCounter; 
+	CCounter*				pLivesCounter; 
 	CPaddle*				pPaddle;
 
-	LPDIRECT3DTEXTURE8*		pBonusTextures;
-	LPDIRECT3DTEXTURE8		pSparkTex;
-	LPDIRECT3DTEXTURE8		pCounterTex;
-	LPDIRECT3DTEXTURE8		pPaddleTex;
-	LPDIRECT3DTEXTURE8		pLightningTex;
-	LPDIRECT3DTEXTURE8		pBallTex;
+	LPDIRECT3DTEXTURE8		pDigitsTex;
 
 	HWND					hWnd;					//TODO: TMP
 	CTimer					timerRenderLimiter;

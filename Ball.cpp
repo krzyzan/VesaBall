@@ -4,16 +4,17 @@
 
 #include "StdAfx.h"
 #include "Ball.h"
-#include "GameEngine.h"
 #include "EffectSprite.h"
-#include "Bonus.h"
+
+LPDIRECT3DTEXTURE8 CBall::s_pTexture;
+LPDIRECT3DTEXTURE8 CBall::s_pSparkTexture;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBall::CBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed )
-	: CMovingSprite( Texture, D3DXVECTOR2(AVG_BALL_SIZE, AVG_BALL_SIZE), 0, Position, Speed, D3DXVECTOR2(0, 0), 0xFFFFFFFF )
+CBall::CBall( const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed )
+	: CMovingSprite( s_pTexture, D3DXVECTOR2(BALL_SIZE_AVG, BALL_SIZE_AVG), 0, Position, Speed, D3DXVECTOR2(0, 0), 0xFFFFFFFF )
 {
 	bCatched	= false;
 }
@@ -58,26 +59,25 @@ HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 } 
 
 // Iskry przy odbiciu
-void CBall::CreateSparkles( const D3DXVECTOR2 & vSide, list<CSprite*>* pListRender, list<CEffectSprite*>* pListEffect, LPDIRECT3DTEXTURE8 pSparkTexture )
+void CBall::CreateSparkles( const D3DXVECTOR2 & vSide, list<CEffectSprite*>* pListEffect ) const
 {
 	D3DXVECTOR2 vSparkSize		= D3DXVECTOR2(1.0f/256, 1.0f/256);
 	D3DXVECTOR2 vSparkPosition	= vPosition + vSide;
 	D3DXVECTOR2 vSparkGravity	= D3DXVECTOR2( 0.0f, 0.2f );
 	for (int i=0; i<8; i++) {
-			FLOAT fSparkDuration = frand(0.5f, 1.0f);
-			D3DXVECTOR2 vSparkSpeed = D3DXVECTOR2( frand(-1.0f, 1.0f), frand(-1.0f, 1.0f) )/10 + vSpeed/4;
-			CEffectSprite* pEffectSprite = new CEffectSprite( pSparkTexture, vSparkSize, 
-				vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
-			pListEffect->push_back( pEffectSprite );
-			pListRender->push_back( pEffectSprite );
+		FLOAT fSparkDuration = frand(0.5f, 1.0f);
+		D3DXVECTOR2 vSparkSpeed = D3DXVECTOR2( frand(-1.0f, 1.0f), frand(-1.0f, 1.0f) )/10 + vSpeed/8;
+		CEffectSprite* pEffectSprite = new CEffectSprite( s_pSparkTexture, vSparkSize, 
+			vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
+		pListEffect->push_back( pEffectSprite );
 	}
 }
 
 void CBall::MultiplySpeed( float fFactor )
 {
 	float fNewSpeed = D3DXVec2Length( &vSpeed ) * fFactor;
-	fNewSpeed = max( fNewSpeed, MIN_BALL_SPEED );
-	fNewSpeed = min( fNewSpeed, MAX_BALL_SPEED );
+	fNewSpeed = max( fNewSpeed, BALL_SPEED_MIN );
+	fNewSpeed = min( fNewSpeed, BALL_SPEED_MAX );
 	D3DXVec2Normalize( &vSpeed, &vSpeed );
 	vSpeed *= fNewSpeed;
 }

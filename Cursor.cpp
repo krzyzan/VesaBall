@@ -26,6 +26,6 @@ HRESULT CCursor::Move( const D3DXVECTOR2 & vMovement )
 void CCursor::Render( LPD3DXSPRITE pSprite ) const
 {
 	D3DXVECTOR2 Position = (vPosition - vSize/2) * RES_X;
-	//Position = D3DXVECTOR2( floor( Position.x ), floor( Position.y ) );
+	Position = D3DXVECTOR2( floor( Position.x ), floor( Position.y ) );
 	pSprite->Draw( pTexture, NULL, &vScaling, &vRotationCenter, fRotation, &Position, dwBlending );
 }

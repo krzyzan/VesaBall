@@ -59,7 +59,7 @@ CMenuItem* CGameMenu::GetPointedMenuItem()
 	list<CMenuItem*>::iterator iMenuItem;
 	for (iMenuItem = listMenuItem.begin(); iMenuItem != listMenuItem.end(); iMenuItem++)
 		if (fabs((*iMenuItem)->vPosition.y - pCursor->vPosition.y) < (*iMenuItem)->vSize.y/2 &&
-				fabs((*iMenuItem)->vPosition.x - pCursor->vPosition.x) < (*iMenuItem)->vSize.x/2 )
+			fabs((*iMenuItem)->vPosition.x - pCursor->vPosition.x) < (*iMenuItem)->vSize.x/2 )
 			break;
 	return (iMenuItem != listMenuItem.end()) ? *iMenuItem : NULL;
 }

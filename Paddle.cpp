@@ -7,13 +7,16 @@
 #include "Ball.h"
 #include "Bonus.h"
 
-CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECT3DTEXTURE8 LightningTex )
-	: CSprite( Texture, D3DXVECTOR2( 1.0f/8, 1.0f/64 ), 0, 
+LPDIRECT3DTEXTURE8 CPaddle::s_pTexture;
+LPDIRECT3DTEXTURE8 CPaddle::s_pLightningTexture;
+
+CPaddle::CPaddle()
+	: CSprite( s_pTexture, D3DXVECTOR2( 1.0f/8, 1.0f/64 ), 0, 
 		D3DXVECTOR2( BOARD_L+BOARD_W/2, BOARD_B-1.0f/64 ), 
 		0xFFFFFFFF )
 {
 	bGrabPaddle = false;
-	pLightning = new CSprite( LightningTex, D3DXVECTOR2(vSize.x, vSize.y*2), 0, vPosition - D3DXVECTOR2(0,vSize.y/2), dwBlending );
+	pLightning = new CSprite( s_pLightningTexture, D3DXVECTOR2(vSize.x, vSize.y*2), 0, vPosition - D3DXVECTOR2(0,vSize.y/2), dwBlending );
 }
 
 
@@ -32,18 +35,16 @@ HRESULT CPaddle::MouseMove( DIMOUSESTATE2* dims2 )
 	vPosition.x += fHorizMovement;
 	pLightning->vPosition.x += fHorizMovement;
 
-	// przesuwamy z³apane pi³ki razem z desk¹
+	// przesuwamy z³apane kulki razem z desk¹
 	list<CBall*>::iterator iBall;
 	for (iBall = listCatchedBalls.begin(); iBall != listCatchedBalls.end(); iBall++) {
 		(*iBall)->vPosition.x += fHorizMovement;
 		(*iBall)->vOldPosition.y = (*iBall)->vPosition.y = vPosition.y - vSize.y/2 - (*iBall)->vSize.y/2 - 0.001f;	//TODO: hack :(
 	}
 
-	// startujemy pi³ki
+	// startujemy kulki
 	if ( dims2->rgbButtons[0] ) {
-		for (iBall = listCatchedBalls.begin(); iBall != listCatchedBalls.end(); iBall++)
-			LaunchBall( *iBall );
-		listCatchedBalls.clear();
+		LaunchAllBalls();
 	}
 
 	return S_OK;
@@ -60,7 +61,7 @@ void CPaddle::Render( LPD3DXSPRITE pSprite ) const
 	}
 }
 
-//TODO: pi³ki nie moga by³ z³apane przez ten sam punkt deski
+//TODO: kulki nie moga by³ z³apane przez ten sam punkt deski
 
 void CPaddle::CatchBall( CBall* pBall )
 {
@@ -75,17 +76,24 @@ void CPaddle::CatchBall( CBall* pBall )
 
 void CPaddle::LaunchBall( CBall* pBall )
 {
-	pBall->vOldPosition.y = pBall->vPosition.y = vPosition.y - vSize.y/2 - pBall->vSize.y/2 - 0.001f;	//TODO: dok³adnoœæ :(
-	D3DXVECTOR2 vDirection = pBall->vPosition - D3DXVECTOR2(vPosition.x, vPosition.y + vPosition.x/32 );
+	D3DXVECTOR2 vDirection = pBall->vPosition - D3DXVECTOR2(vPosition.x, vPosition.y + vSize.x/16 );	//TODO: poprawiæ w zale¿noœci od rozmiaru deski
 	D3DXVec2Normalize( &vDirection, &vDirection );
 	pBall->vSpeed = vDirection * D3DXVec2Length( &pBall->vSpeed );
 	pBall->bCatched = false;
 }
 
+void CPaddle::LaunchAllBalls()
+{
+	list<CBall*>::iterator iBall;
+	for (iBall = listCatchedBalls.begin(); iBall != listCatchedBalls.end(); iBall++)
+		LaunchBall( *iBall );
+	listCatchedBalls.clear();
+}
+
 void CPaddle::SetWidth( float fNewWidth )
 {
-	fNewWidth = max( fNewWidth, MIN_PADDLE_WIDTH );
-	fNewWidth = min( fNewWidth, MAX_PADDLE_WIDTH );
+	fNewWidth = max( fNewWidth, PADDLE_WIDTH_MIN );
+	fNewWidth = min( fNewWidth, PADDLE_WIDTH_MAX );
 
 	list<CBall*>::iterator iBall;
 	for (iBall = listCatchedBalls.begin(); iBall != listCatchedBalls.end(); iBall++)

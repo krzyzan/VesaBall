@@ -8,11 +8,19 @@
 #include "Bonus.h"
 #include "EffectSprite.h"
 
-CBrick::CBrick( BYTE Type, LPDIRECT3DTEXTURE8* Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size )
-	: CSprite( Texture[Type], Size, 0, Position, brickDescTable[Type].dwBlending )
+CBrick::STypeDesc CBrick::s_TypeDesc[CBrick::TYPE_MAX] = { 
+	{0,	1			}, 
+	{1,	1			}, 
+	{2, 1			},
+	{3,	0xFFFFFFFF	}, 
+	{4,	3			},
+};
+
+CBrick::CBrick( STypeDesc* BrickType, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size )
+: CSprite( BrickType->pTexture[0], Size, 0, Position, 0xFFFFFFFF )
 {
-	dwType = Type;
-	dwDurability = brickDescTable[Type].dwDurability;
+	pTypeDesc = BrickType;
+	dwHitCounter = 0;
 }
 
 
@@ -40,4 +48,15 @@ void CBrick::ReflectBall( CBall* pBall, const D3DXVECTOR2 & vSide )
 		pBall->vPosition.x = 2*(vPosition.x - vSide.x) - pBall->vPosition.x;
 		pBall->vPosition.x -= (vSide.x > 0) ? vSize.x : (-vSize.x);
 	}
+	
+	SetHitCounter( dwHitCounter+1 );
 };
+
+void CBrick::SetHitCounter( DWORD HitCounter )
+{
+	if (pTypeDesc->dur != 0xFFFFFFFF) {
+		dwHitCounter = HitCounter;
+		if (dwHitCounter < pTypeDesc->dur)		//TODO: ugly
+			pTexture = pTypeDesc->pTexture[dwHitCounter];
+	}
+}

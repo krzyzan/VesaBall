@@ -26,6 +26,7 @@
 				RuntimeLibrary="5"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
+				AssemblerOutput="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -74,6 +75,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
+				AssemblerOutput="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"/>
 			<Tool
@@ -123,6 +125,9 @@
 			</File>
 			<File
 				RelativePath=".\Brick.cpp">
+			</File>
+			<File
+				RelativePath=".\BrickArray.cpp">
 			</File>
 			<File
 				RelativePath=".\Counter.cpp">
@@ -188,6 +193,9 @@
 			</File>
 			<File
 				RelativePath=".\Brick.h">
+			</File>
+			<File
+				RelativePath=".\BrickArray.h">
 			</File>
 			<File
 				RelativePath=".\Counter.h">

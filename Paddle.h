@@ -17,7 +17,7 @@ class CPaddle :
 	public CSprite  
 {
 public:
-	CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECT3DTEXTURE8 LightningTex );
+	CPaddle();
 	virtual ~CPaddle();
 
 	void Render( LPD3DXSPRITE pSprite ) const;
@@ -25,10 +25,14 @@ public:
 	
 	void LaunchBall( CBall* pBall );
 	void CatchBall( CBall* pBall );
+	void LaunchAllBalls();
 
 	void SetWidth( float fNewWidth );
 
 	BOOL bGrabPaddle;
+
+	static LPDIRECT3DTEXTURE8 s_pTexture;
+	static LPDIRECT3DTEXTURE8 s_pLightningTexture;
 
 private:
 	list<CBall*> listCatchedBalls;

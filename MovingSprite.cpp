@@ -24,16 +24,20 @@ HRESULT CMovingSprite::FrameMove( FLOAT fElapsedTime )
 	return S_OK;
 }
 
-D3DXVECTOR2 CMovingSprite::IsColliding( CSprite* pSprite )
+bool CMovingSprite::Overlaps( CSprite* pSprite )
 {
-	if (fabs(vOldPosition.x - pSprite->vPosition.x) < vSize.x/2 + pSprite->vSize.x/2 &&
-			fabs(vPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2 )
+	return (fabs(vPosition.x - pSprite->vPosition.x) < vSize.x/2 + pSprite->vSize.x/2 &&
+			fabs(vPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2 ); 
+}
+
+D3DXVECTOR2 CMovingSprite::GetContactSide( CSprite* pSprite )
+{
+	if (fabs(vOldPosition.x - pSprite->vPosition.x) < vSize.x/2 + pSprite->vSize.x/2)
 		return ( pSprite->vPosition.y - vPosition.y > 0) ? D3DXVECTOR2( 0, vSize.y/2 ) : D3DXVECTOR2( 0, -vSize.y/2 );
 
-	if (fabs(vOldPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2 &&
-			fabs(vPosition.x - pSprite->vPosition.x) < vSize.x/2 + pSprite->vSize.x/2 )
+	if (fabs(vOldPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2)
 		return ( pSprite->vPosition.x - vPosition.x > 0) ? D3DXVECTOR2( vSize.x/2, 0 ) : D3DXVECTOR2( -vSize.x/2, 0 );
-
 
 	return D3DXVECTOR2(0,0);
 }
+
