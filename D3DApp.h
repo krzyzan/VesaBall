@@ -1,14 +1,14 @@
 // D3DApp.h: interface for the CD3DApp class.
-// ver 1.1
+// v1.11
 //
 //////////////////////////////////////////////////////////////////////
 
 /*
 Changelog:
 
-v1.0
+v1.00
 	Wersja poczatkowa (zrobiona u Laski)
-v1.1
+v1.10
 	Obs³uga Alt-Tab
 	Obs³uga mychy (Direct Input)
 	Czyszczenie ekranu na starcie
@@ -16,6 +16,8 @@ v1.1
 	Zamiana globalnych zmiennych i funkcji na statyczne (¿eby nikt nie rusza³ s_pCurD3DApp)
 	Usuwamy akceleratory bo s¹ do dupy (ESC dalej dzia³a) => resource.h niepotrzebne
 	Funkcja Render nie musi juz wykonywaæ Present (zajmuje sie tym CD3DApp)
+v1.11
+	Poprawiona obs³uga myszki (by³ z³y format danych)
 */
 
 

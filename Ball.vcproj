@@ -125,13 +125,25 @@
 				RelativePath=".\D3DApp.cpp">
 			</File>
 			<File
+				RelativePath=".\D3DBall.cpp">
+			</File>
+			<File
 				RelativePath=".\D3DBallApp.cpp">
+			</File>
+			<File
+				RelativePath=".\Deck.cpp">
+			</File>
+			<File
+				RelativePath=".\Sprite.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\Ball.h">
+			</File>
 			<File
 				RelativePath=".\D3DApp.h">
 			</File>
@@ -140,6 +152,12 @@
 			</File>
 			<File
 				RelativePath=".\D3DBallApp.h">
+			</File>
+			<File
+				RelativePath=".\Deck.h">
+			</File>
+			<File
+				RelativePath=".\Sprite.h">
 			</File>
 			<File
 				RelativePath=".\timer.h">

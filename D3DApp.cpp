@@ -1,5 +1,5 @@
 // D3DApp.cpp: implementation of the CD3DApp class.
-// ver 1.1
+// v1.11
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -178,7 +178,7 @@ HRESULT CD3DApp::InitD3D()
 	d3dpp.BackBufferCount					= 2;
 	d3dpp.Flags								= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 	d3dpp.FullScreen_RefreshRateInHz		= D3DPRESENT_RATE_DEFAULT;
-	d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
+	d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	// Create the D3DDevice
 	if( FAILED( pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
@@ -263,8 +263,8 @@ HRESULT CD3DApp::Resize3DEnvironment()
 HRESULT CD3DApp::InitDI()
 {
 	pDI->CreateDevice( GUID_SysMouse, &pDIDevice, NULL );
-	pDIDevice->SetDataFormat( &c_dfDIMouse );
-	pDIDevice->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND );
+	pDIDevice->SetDataFormat( &c_dfDIMouse2 );
+	pDIDevice->SetCooperativeLevel( hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND );
 	pDIDevice->SetEventNotification( CreateEvent(NULL, FALSE, FALSE, NULL) );
 
 	DIPROPDWORD dipdw;
