@@ -58,7 +58,7 @@ HRESULT CGameEditor::RenderLoop()
 					POINT pos;
 					pos.x = (LONG)((pCursor->vPosition.x - BOARD_L) * BRICK_X / BOARD_W);
 					pos.y = (LONG)((pCursor->vPosition.y - BRICK_TABLE_T) * BRICK_Y / BRICK_TABLE_H);
-					if (pos.x>=0 && pos.x<BRICK_X && pos.y>=0 && pos.y<BRICK_X) {
+					if (pos.x>=0 && pos.x<BRICK_X && pos.y>=0 && pos.y<BRICK_Y) {
 						if (pBrickTable[pos.x][pos.y]) {
 							curType = pBrickTable[pos.x][pos.y]->dwType;
 							if (didod[ i ].dwOfs == DIMOFS_BUTTON0)
@@ -75,8 +75,19 @@ HRESULT CGameEditor::RenderLoop()
 	
 	}
 
+	// renderujemy
+	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40,0x60,0x60), 1.0f, 0 );
+
+	pd3dDevice->BeginScene();
+	pSprite->Begin();
 
 	CGameBoard::RenderLoop();
+
+	pSprite->End();
+	pd3dDevice->EndScene();
+
+	// Show the frame on the primary surface.
+	pd3dDevice->Present( NULL, NULL, NULL, NULL );
 
 	return S_OK;
 }
@@ -86,7 +97,6 @@ HRESULT CGameEditor::RenderLoop()
 HRESULT CGameEditor::DeleteDeviceObjects()
 {
 	SaveLevel( "lev/level.lev" );
-	CGameBoard::DeleteDeviceObjects();
-
-	return S_OK;
+	
+	return CGameBoard::DeleteDeviceObjects();
 }

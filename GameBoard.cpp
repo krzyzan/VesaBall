@@ -58,21 +58,9 @@ HRESULT CGameBoard::RestoreDeviceObjects()
 
 HRESULT CGameBoard::RenderLoop()
 {
-	// renderujemy
-	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40,0x60,0x60), 1.0f, 0 );
-
-	pd3dDevice->BeginScene();
-	pSprite->Begin();
-
 	list<CSprite*>::iterator iSprite;
 	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
 		(*iSprite)->Render( pSprite );
-
-	pSprite->End();
-	pd3dDevice->EndScene();
-
-	// Show the frame on the primary surface.
-	pd3dDevice->Present( NULL, NULL, NULL, NULL );
 
 	return S_OK;
 }

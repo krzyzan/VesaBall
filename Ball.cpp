@@ -58,7 +58,7 @@ HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 } 
 
 // Iskry przy odbiciu
-void CBall::CreateSparkles( const D3DXVECTOR2 & vSide, list<CSprite*>* pListRender, list<CMovingSprite*>* pListFrameMove, LPDIRECT3DTEXTURE8 pSparkTexture )
+void CBall::CreateSparkles( const D3DXVECTOR2 & vSide, list<CSprite*>* pListRender, list<CEffectSprite*>* pListEffect, LPDIRECT3DTEXTURE8 pSparkTexture )
 {
 	D3DXVECTOR2 vSparkSize		= D3DXVECTOR2(1.0f/256, 1.0f/256);
 	D3DXVECTOR2 vSparkPosition	= vPosition + vSide;
@@ -68,7 +68,7 @@ void CBall::CreateSparkles( const D3DXVECTOR2 & vSide, list<CSprite*>* pListRend
 			D3DXVECTOR2 vSparkSpeed = D3DXVECTOR2( frand(-1.0f, 1.0f), frand(-1.0f, 1.0f) )/10 + vSpeed/4;
 			CEffectSprite* pEffectSprite = new CEffectSprite( pSparkTexture, vSparkSize, 
 				vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
-			pListFrameMove->push_back( pEffectSprite );
+			pListEffect->push_back( pEffectSprite );
 			pListRender->push_back( pEffectSprite );
 	}
 }

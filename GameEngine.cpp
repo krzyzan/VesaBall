@@ -80,31 +80,19 @@ HRESULT CGameEngine::InitDeviceObjects()
 	// tworzymy licznik
 	pCounter = new CCounter( pCounterTex, D3DXVECTOR2(BOARD_W*0.2f, 0.05f*0.75f), D3DXVECTOR2(BOARD_L+BOARD_W*0.125f, 0.05f/2), 92, 6 );
 	listRender.push_back( pCounter );
-	listFrameMove.push_back( pCounter );	
 
 	// tworzymy deskê z kulka
 	InsertPaddle( new CPaddle( pPaddleTex, pLightningTex ) );
 
 	CBall* pBall = new CBall( pBallTex, pPaddle->vPosition + D3DXVECTOR2(0.01f, 0), D3DXVECTOR2(0,AVG_BALL_SPEED) );
-	InsertBall( pBall );
+	listBall.push_front( pBall );
 	pPaddle->CatchBall( pBall );
-
 
 	timerRenderLimiter.Start();
 	fTimeToRender = 0;
 
 	return S_OK;
 }
-
-/*
-LoadLevel( "lvl\test.lvl );
-
-SaveLevel(
-
-void Reset()
-{
-}
-*/
 
 
 HRESULT CGameEngine::RenderLoop()
@@ -118,28 +106,80 @@ HRESULT CGameEngine::RenderLoop()
 	MoveObjects( fElapsedTime * fGameSpeed );
 	CollideObjects();
 
-///////////////////////////////////////
-	
 	fTimeToRender -= fElapsedTime;
 	if (fTimeToRender > 0) 
 		return S_OK;
 
+///////////////////////////////////////
+
 	fTimeToRender = 1.0f/110;
 	numRender++;
 
+	// renderujemy
+	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40,0x60,0x60), 1.0f, 0 );
+
+	pd3dDevice->BeginScene();
+	pSprite->Begin();
+
+	// sceneria
 	CGameBoard::RenderLoop();
 
+	// kulki
+	list<CBall*>::iterator iBall;
+	for (iBall = listBall.begin(); iBall != listBall.end(); iBall++)
+		(*iBall)->Render( pSprite );
+
+	// bonusy
+	list<CBonus*>::iterator iBonus;
+	for (iBonus = listBonus.begin(); iBonus != listBonus.end(); iBonus++)
+		(*iBonus)->Render( pSprite );
+
+	pSprite->End();
+	pd3dDevice->EndScene();
+
+	// Show the frame on the primary surface.
+	pd3dDevice->Present( NULL, NULL, NULL, NULL );
+
 	return S_OK;
+}
+
+HRESULT CGameEngine::DeleteDeviceObjects()
+{
+	// Kasujemy z listy kulek
+	list<CBall*>::iterator iBall = listBall.begin();
+	while (iBall != listBall.end())
+		delete (*iBall++);
+
+	// Kasujemy z listy bonusów
+	list<CBonus*>::iterator iBonus = listBonus.begin();
+	while (iBonus != listBonus.end())
+		delete (*iBonus++);
+
+	return CGameBoard::DeleteDeviceObjects();
 }
 
 
 void CGameEngine::MoveObjects( FLOAT fElapsedTime )
 {
-	// wykonujemy ruch dla wszystkich obiektów
-	list<CMovingSprite*>::iterator	iMovingSprite;
-	for (iMovingSprite = listFrameMove.begin(); iMovingSprite != listFrameMove.end(); iMovingSprite++)
-		(*iMovingSprite)->FrameMove( fElapsedTime );
+	// ruch kulek
+	list<CBall*>::iterator iBall;
+	for (iBall = listBall.begin(); iBall != listBall.end(); iBall++)
+		(*iBall)->FrameMove( fElapsedTime );
 
+	// ruch bonusów
+	list<CBonus*>::iterator iBonus;
+	for (iBonus = listBonus.begin(); iBonus != listBonus.end(); iBonus++)
+		(*iBonus)->FrameMove( fElapsedTime );
+
+	// ruch efektów
+	list<CEffectSprite*>::iterator iEffect;
+	for (iEffect = listEffect.begin(); iEffect != listEffect.end(); iEffect++)
+		(*iEffect)->FrameMove( fElapsedTime );
+
+	// aktualizacja licznika
+	pCounter->FrameMove( fElapsedTime );
+
+	// ruch deski
 	DIMOUSESTATE2 dims2;
     ZeroMemory( &dims2, sizeof(dims2) );
 	pDIDevice->GetDeviceState( sizeof(DIMOUSESTATE2), &dims2 );
@@ -237,7 +277,7 @@ void CGameEngine::ApplyBonus( DWORD Type, bool State )
 					CBall* pBall = new CBall( **iBall );
 					pBall->vSpeed.x =  (*iBall)->vSpeed.y;
 					pBall->vSpeed.y = -(*iBall)->vSpeed.x;
-					InsertBall( pBall );
+					listBall.push_front( pBall );
 				}
 			break;
 
@@ -259,7 +299,7 @@ void CGameEngine::ApplyBonus( DWORD Type, bool State )
 						for (int i=1; i<8; i++) {
 							pBall = new CBall( *pBall );
 							D3DXVec2TransformCoord( &pBall->vSpeed, &pBall->vSpeed, &matRotation );
-							InsertBall( pBall );
+							listBall.push_front( pBall );
 						}
 					}
 				break;
@@ -282,7 +322,7 @@ void CGameEngine::CollideObjects()
 
 		// kasuj gdy wyjdzie za ekran
 		if ((*iBall)->vPosition.y - (*iBall)->vSize.y/2 > BOARD_B )
-			iBall = RemoveBall( iBall );
+			iBall = listBall.erase( iBall );
 		else
 			iBall++;
 	}
@@ -293,13 +333,13 @@ void CGameEngine::CollideObjects()
 		D3DXVECTOR2 vSide = (*iBonus)->IsColliding( pPaddle );
 		if (vSide != D3DXVECTOR2(0,0)) {
 			ApplyBonus( (*iBonus)->dwType, true );
-			iBonus = RemoveBonus( iBonus );
+			iBonus = listBonus.erase( iBonus );
 			pCounter->Increment( 100 );
 		}
 		else 
 			// kasuj gdy wyjdzie za ekran
 			if ((*iBonus)->vPosition.y - (*iBonus)->vSize.y/2 > BOARD_B )
-				iBonus = RemoveBonus( iBonus );
+				iBonus = listBonus.erase( iBonus );
 			else
 				iBonus++;
 	}
@@ -324,21 +364,23 @@ void CGameEngine::CollideBallBrick( CBall* pBall, const POINT & pos )
 			pBrick->dwDurability--;
 
 	if (pBrick->dwDurability == 0)
-		if (frand(0,1) < BONUS_PROB)
-			InsertBonus( new CBonus( static_cast<CBonus::TYPE>(rand()%CBonus::MAX_TYPE), 
-				pBonusTextures, pBall->vPosition, pBall->vSpeed/2 ) );
+		if (frand(0,1) < BONUS_PROB) {
+			CBonus* pBonus = new CBonus( static_cast<CBonus::TYPE>(rand()%CBonus::MAX_TYPE), 
+				pBonusTextures, pBall->vPosition, pBall->vSpeed/2 );
+			listBonus.push_back( pBonus );
+		}
 
 
 	if (! bThruBrick ) {
 		pBrick->ReflectBall( pBall, vSide );
-		pBall->CreateSparkles( vSide, &listRender, &listFrameMove, pSparkTex );
+		pBall->CreateSparkles( vSide, &listRender, &listEffect, pSparkTex );
 	}
 
 	if (pBrick->dwDurability == 0) {
 		// znikanie cegie³ki
-		CEffectSprite* se = pBrick->CreateEffect();
-		listRender.push_front( se );
-		listFrameMove.push_front( se );
+		CEffectSprite* es = pBrick->CreateEffect();
+		listRender.push_front( es );
+		listEffect.push_front( es );
 
 		RemoveBrick( pos );
 	}
@@ -361,7 +403,7 @@ void CGameEngine::CollideBallPaddle( CBall* pBall )
 		pPaddle->CatchBall( pBall );
 	else {
 		pPaddle->LaunchBall( pBall );
-		pBall->CreateSparkles( vSide, &listRender, &listFrameMove, pSparkTex );
+		pBall->CreateSparkles( vSide, &listRender, &listEffect, pSparkTex );
 	}
 
 	//TODO: funkcja
@@ -381,15 +423,16 @@ void CGameEngine::CollideBallPaddle( CBall* pBall )
 void CGameEngine::DestroyObjects()
 {
 	list<CMovingSprite*>::iterator	iMovingSprite;
+	list<CEffectSprite*>::iterator	iEffect;
 	list<CSprite*>::iterator		iSprite;
 
-	// Kasujemy z listy obiektów ruchomych
-	iMovingSprite = listFrameMove.begin(); 
-	while (iMovingSprite != listFrameMove.end()) {
-		if ((*iMovingSprite)->bDeleteMe)
-			iMovingSprite = listFrameMove.erase( iMovingSprite );
+	// Kasujemy z listy efektów
+	iEffect = listEffect.begin(); 
+	while (iEffect != listEffect.end()) {
+		if ((*iEffect)->bDeleteMe)
+			iEffect = listEffect.erase( iEffect );
 		else
-			iMovingSprite++;
+			iEffect++;
 	}
 
 	// Kasujemy z listy renderowania i usuwamy obiekt
@@ -410,30 +453,3 @@ void CGameEngine::InsertPaddle( CPaddle* Paddle )
 	listRender.push_front( pPaddle );
 }
 
-void CGameEngine::InsertBall( CBall* pBall )
-{
-	listRender.push_front( pBall );
-	listFrameMove.push_front( pBall );
-	listBall.push_front( pBall );
-}
-
-list<CBall*>::iterator CGameEngine::RemoveBall( list<CBall*>::iterator iBall )
-{
-	listRender.remove( *iBall );
-	listFrameMove.remove( *iBall );
-	return listBall.erase( iBall );
-}
-
-void CGameEngine::InsertBonus( CBonus* pBonus )
-{
-	listRender.push_back( pBonus );
-	listFrameMove.push_back( pBonus );
-	listBonus.push_back( pBonus );
-}
-
-list<CBonus*>::iterator CGameEngine::RemoveBonus( list<CBonus*>::iterator iBonus )
-{
-	listRender.remove( *iBonus );
-	listFrameMove.remove( *iBonus );
-	return listBonus.erase( iBonus );
-}

@@ -76,7 +76,7 @@ void CPaddle::CatchBall( CBall* pBall )
 void CPaddle::LaunchBall( CBall* pBall )
 {
 	pBall->vOldPosition.y = pBall->vPosition.y = vPosition.y - vSize.y/2 - pBall->vSize.y/2 - 0.001f;	//TODO: dok³adnoœæ :(
-	D3DXVECTOR2 vDirection = pBall->vPosition - D3DXVECTOR2(vPosition.x, vPosition.y + vPosition.x/64 );
+	D3DXVECTOR2 vDirection = pBall->vPosition - D3DXVECTOR2(vPosition.x, vPosition.y + vPosition.x/32 );
 	D3DXVec2Normalize( &vDirection, &vDirection );
 	pBall->vSpeed = vDirection * D3DXVec2Length( &pBall->vSpeed );
 	pBall->bCatched = false;

@@ -19,13 +19,10 @@ public:
 
 	HRESULT InitDeviceObjects();
 	HRESULT RenderLoop();
+	HRESULT DeleteDeviceObjects();
 
 private:
-	void InsertBall( CBall* pBall );
-	list<CBall*>::iterator CGameEngine::RemoveBall( list<CBall*>::iterator iBall );
 	void InsertPaddle( CPaddle* Paddle );
-	void InsertBonus( CBonus* pBonus );
-	list<CBonus*>::iterator CGameEngine::RemoveBonus( list<CBonus*>::iterator iBonus );
 
 	void MoveObjects( FLOAT fElapsedTime );
 	void CollideObjects();
@@ -35,9 +32,9 @@ private:
 	void CollideBallBrick( CBall* pBall, const POINT & pos );
 	void CollideBallPaddle( CBall* pBall );
 	
-	list<CMovingSprite*>	listFrameMove;
 	list<CBall*>			listBall;
 	list<CBonus*>			listBonus;
+	list<CEffectSprite*>	listEffect;
 	CCounter*				pCounter; 
 	CPaddle*				pPaddle;
 

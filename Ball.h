@@ -9,6 +9,8 @@
 #include <list>
 using namespace std;
 
+class CEffectSprite;
+
 class CBall :
 	public CMovingSprite  
 {
@@ -17,7 +19,7 @@ public:
 	virtual ~CBall();
 
 	HRESULT FrameMove( FLOAT fElapsedTime );
-	void CreateSparkles( const D3DXVECTOR2 & vSize, list<CSprite*>* pListRender, list<CMovingSprite*>* pListFrameMove, LPDIRECT3DTEXTURE8 pSparkTexture );
+	void CreateSparkles( const D3DXVECTOR2 & vSize, list<CSprite*>* pListRender, list<CEffectSprite*>* pListEffect, LPDIRECT3DTEXTURE8 pSparkTexture );
 
 	void MultiplySpeed( float fFactor );
 
