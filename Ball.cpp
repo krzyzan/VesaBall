@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////
 
 CBall::CBall( LPDIRECT3DTEXTURE8 iTexture, D3DXVECTOR2 iPosition, D3DXVECTOR2 iDirection, list<CSprite*>* ipListRender, LPDIRECT3DTEXTURE8 iSparkTexture )
-: CSprite( iTexture, D3DXVECTOR2(0.3f, 0.3f), 0, iPosition, 0xFFFFFFFF )
+: CSprite( iTexture, D3DXVECTOR2(1.0f/64, 1.0f/64), 0, iPosition, 0xFFFFFFFF )
 {
 	pListRender = ipListRender;
 	vDirection = iDirection;

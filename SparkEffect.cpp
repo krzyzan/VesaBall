@@ -2,7 +2,7 @@
 #include "sparkeffect.h"
 
 CSparkEffect::CSparkEffect( LPDIRECT3DTEXTURE8 iTexture, D3DXVECTOR2 iPosition, D3DXVECTOR2 iDirection, FLOAT iDuration  )
-: CSprite( iTexture, D3DXVECTOR2(1.0f, 1.0f), 0, iPosition, 0xFFFFFFFF )
+: CSprite( iTexture, D3DXVECTOR2(1.0f/256, 1.0f/256), 0, iPosition, 0xFFFFFFFF )
 {
 	vDirection = iDirection;
 	fDuration = fRemaining = iDuration;

@@ -5,9 +5,8 @@
 
 #pragma once
 
-#define RES_X		800
-#define RES_Y		600
-#define	DECK_Y		0.75f - 0.75f * 8 / 768
+#define RES_X		640
+#define RES_Y		480
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 // Windows Header Files:

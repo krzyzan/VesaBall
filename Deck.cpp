@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////
 
 CDeck::CDeck( LPDIRECT3DTEXTURE8 iTexture, LPDIRECTINPUTDEVICE8 ipDIDevice)
- : CSprite( iTexture, D3DXVECTOR2(1,1), 0, D3DXVECTOR2(0.5f, DECK_Y), 0xFFFFFFFF)
+ : CSprite( iTexture, D3DXVECTOR2(1.0f/8, 1.0f/64), 0, D3DXVECTOR2(0.5f, 0.75f-0.5f/64), 0xFFFFFFFF)
 {
 	pDIDevice = ipDIDevice;
 }

@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////
 
 CBrick::CBrick( LPDIRECT3DTEXTURE8 iTexture, D3DXVECTOR2 iPosition )
-: CSprite( iTexture, D3DXVECTOR2(1.0f, 1.0f), 0, iPosition, 0xFFFFFFFF )
+: CSprite( iTexture, D3DXVECTOR2(1.0f/BRICK_X, 1.0f/BRICK_Y), 0, iPosition, 0xFFFFFFFF )
 {
 
 }

@@ -6,6 +6,9 @@
 
 #include "Sprite.h"
 
+#define BRICK_X		20
+#define BRICK_Y		40
+
 class CBrick : public CSprite  
 {
 public:

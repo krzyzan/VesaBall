@@ -43,6 +43,9 @@ v0.15
 	- Dodana klasa CBrick
 	- Iskry przy odbiciu
 	- Poczatek kodu Game Over (na razie wy³¹czony)
+v0.16
+	- CSprite::CSprite pobiera teraz Size a nie Scaling =>
+		ca³kowita niezale¿noœæ od rozdzielczoœci i rozmiarów tekstur
   
 ToDo:
 	- Zrobic wspólna klasê bazow¹ np. CMovingObject
@@ -91,6 +94,8 @@ public:
 	LPD3DXSPRITE			pSprite;
 	list<CSprite*>			listRender;
 	list<CBall*>			listBall;
+
+	CSprite*				pBackground;
 	
 	CTimer					timerFrameMove;
 	FLOAT					fTimeToRender;

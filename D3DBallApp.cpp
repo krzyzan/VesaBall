@@ -21,9 +21,6 @@ CD3DBallApp::CD3DBallApp()
 
 CD3DBallApp::~CD3DBallApp()
 {
-	char str[100];
-	_itoa((INT)(numFrameMove/numRender),str,10);
-	DXTRACE_ERR(str,0);
 }
 
 
@@ -62,6 +59,8 @@ HRESULT CD3DBallApp::InitDeviceObjects()
 	LoadTexture( "gfx/Cellbluegren.png",	30 );
 	LoadTexture( "gfx/SparkEffect.png",		50 );
 
+	pBackground = new CSprite( pTex[2], D3DXVECTOR2(1.0f, 0.75f), 0, D3DXVECTOR2(1.0f/2, 0.75f/2), 0xFF7F7F7F );
+
 	//Tworzymy deskê
 	CDeck* pDeck;
 	pDeck = new CDeck( pTex[1], pDIDevice );
@@ -69,16 +68,14 @@ HRESULT CD3DBallApp::InitDeviceObjects()
 
 	//Tworzymy cegie³ki
 	CBrick* pBrick;
-	for (int j=1; j<5; j++) {
-		for (int i=1; i<10; i++) {
-			pBrick = new CBrick( pTex[22], D3DXVECTOR2( 0.01f*(rand()%100+1), 0.01f*(rand()%50+1) ) );
-			listRender.push_back( pBrick );
-		}
+	for (int i=1; i<128; i++) {
+		pBrick = new CBrick( pTex[22], D3DXVECTOR2( 1.0f/BRICK_X*(0.5f+(rand()%BRICK_X)), 1.0f/BRICK_Y*(0.5f+(rand()%(BRICK_Y/2))) ) );
+		listRender.push_back( pBrick );
 	}
 
 	//Tworzymy kulki
 	CBall* pBall;
-	for (int i=0; i<10; i++) {
+	for (int i=0; i<4; i++) {
 		pBall = new CBall( pTex[6], 
 			D3DXVECTOR2( FLOAT((rand()%1000-200)+100)/1000, FLOAT((rand()%750-200)+100)/1000 ),
 			D3DXVECTOR2( 1.0f*(rand()%2000-1000), 1.0f*(rand()%2000-1000))/2000,
@@ -132,8 +129,8 @@ HRESULT CD3DBallApp::FrameMove()
 	}
 
 	// GAME OVER !!!!
-	if (listBall.empty())
-		return E_FAIL;
+	//if (listBall.empty())
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -153,7 +150,7 @@ HRESULT CD3DBallApp::Render()
 	pSprite->Begin();
 
 	// t³o
-	pSprite->Draw( pTex[2], NULL, &D3DXVECTOR2((FLOAT)RES_X/1024, (FLOAT)RES_Y/512), NULL, 0, NULL, 0xFF7F7F7F );
+	pBackground->Render( pSprite );
 
 	list<CSprite*>::iterator iSprite;
 	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
@@ -184,6 +181,11 @@ HRESULT CD3DBallApp::DeleteDeviceObjects()
 {
 	for (int i=0; i<256; i++)
 		SAFE_RELEASE( pTex[i] );
+
+	char str[100];
+	_itoa((INT)(numFrameMove/numRender),str,10);
+	MessageBox( hWnd, str, "numFrameMove/numRender", MB_OK );
+
 	return S_OK;
 }
 

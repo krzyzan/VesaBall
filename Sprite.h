@@ -14,12 +14,12 @@ class CBall;		//TMP
 class CSprite  
 {
 public:
-	CSprite( LPDIRECT3DTEXTURE8 Texture, D3DXVECTOR2 Scaling, 
-			FLOAT Rotation, D3DXVECTOR2 Position, D3DCOLOR Blending );
+	CSprite( LPDIRECT3DTEXTURE8 Texture, D3DXVECTOR2 Size, 
+				 float Rotation, D3DXVECTOR2 Position, D3DCOLOR Blending );
 	virtual ~CSprite();
 
 	virtual void Render( LPD3DXSPRITE pSprite );
-	virtual void FrameMove( FLOAT fElapsedTime ) = 0;
+	virtual void FrameMove( FLOAT fElapsedTime );
 	virtual void Collide( list<CBall*>* pListBall );
 
 	LPDIRECT3DTEXTURE8	pTexture;

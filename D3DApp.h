@@ -75,7 +75,7 @@ private:
 	HRESULT Resize3DEnvironment();
 	HRESULT	Cleanup3DEnvironment();
 
-private:
+protected:
 	INT xRes;
 	INT yRes;
 
