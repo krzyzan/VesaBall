@@ -1,0 +1,25 @@
+# Visual Studio / Visual C++ build output and IDE-user state
+Debug/
+Release/
+*.suo
+*.ncb
+*.opt
+*.aps
+*.plg
+*.idb
+*.pdb
+*.ilk
+*.exp
+*.obj
+*.pch
+*.res
+*.exe
+*.dll
+BuildLog.htm
+
+# Doxygen-generated documentation (regenerate from Doxyfile with `doxygen`)
+html/
+
+# OS cruft
+Thumbs.db
+.DS_Store
