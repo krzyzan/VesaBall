@@ -14,7 +14,8 @@ using namespace std;
 
 class CMovingSprite;		//TMP
 
-class CBrick : public CSprite  
+class CBrick :
+	public CSprite  
 {
 public:
 	CBrick( LPDIRECT3DTEXTURE8 Texture,  const D3DXVECTOR2 & Position, list<CSprite*>* ListRender, list<CMovingSprite*>* ListFrameMove );

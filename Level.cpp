@@ -2,7 +2,7 @@
 #include "level.h"
 
 CLevel::CLevel( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice )
-	: CD3DAppStage( d3dDevice, DIDevice )
+	: CD3DAppScene( d3dDevice, DIDevice )
 {  
 	ZeroMemory( pTex, sizeof(pTex) );
 	pSprite			= NULL;
@@ -18,16 +18,16 @@ HRESULT CLevel::InitDeviceObjects()
 {
 	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Bg_tree.jpg",		&pTex[0]  );
 	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Paddle.png",		&pTex[40] );
+	//D3DXCreateTextureFromFile( pd3dDevice, "gfx/Lightning.png",		&pTex[40] );	//TMP
 	D3DXCreateTextureFromFile( pd3dDevice, "gfx/SparkEffect.png",	&pTex[50] );
 	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Brick1.png",		&pTex[51] );
-	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Brick6.png",		&pTex[52] );
+	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Brick5.png",		&pTex[52] );
 	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Bonus_Fireball.png",&pTex[60] );
 	D3DXCreateTextureFromFile( pd3dDevice, "gfx/Ball_alu.png",		&pTex[70] );
 
-
 	//Tworzymy t³o
-	CSprite* pBackground = new CSprite( pTex[0], D3DXVECTOR2(1.0f, 0.75f), 0, D3DXVECTOR2(1.0f/2, 0.75f/2), 0xFF3F3F3F );
-	listRender.push_back( pBackground );
+	//CSprite* pBackground = new CSprite( pTex[0], D3DXVECTOR2(1.0f, 0.75f), 0, D3DXVECTOR2(1.0f/2, 0.75f/2), 0xFF3F3F3F );
+	//listRender.push_back( pBackground );
 	
 	//Tworzymy deskê
 	CPaddle* pPaddle = new CPaddle( pTex[40], pDIDevice );
@@ -53,12 +53,14 @@ HRESULT CLevel::InitDeviceObjects()
 	}
 
 	bThruBrick = FALSE;
+	
 	return S_OK;
 }
 
 HRESULT CLevel::RestoreDeviceObjects()
 {
 	D3DXCreateSprite( pd3dDevice, &pSprite );
+
 	return S_OK;
 }
 
@@ -116,6 +118,8 @@ HRESULT CLevel::FrameMove( FLOAT fElapsedTime )
 
 HRESULT CLevel::Render()
 {
+	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x00,0x00,0x00), 1.0f, 0 );
+
 	pd3dDevice->BeginScene();
 	pSprite->Begin();
 
@@ -133,6 +137,7 @@ HRESULT CLevel::Render()
 HRESULT CLevel::InvalidateDeviceObjects()
 {
 	SAFE_RELEASE( pSprite );
+
 	return S_OK;
 }
 

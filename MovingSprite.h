@@ -1,7 +1,8 @@
 #pragma once
 #include "Sprite.h"
 
-class CMovingSprite : public CSprite
+class CMovingSprite :
+	public CSprite
 {
 public:
 	CMovingSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, float Rotation, 

@@ -9,7 +9,8 @@
 #include <list>
 using namespace std;
 
-class CBall : public CMovingSprite  
+class CBall :
+	public CMovingSprite  
 {
 public:
 	CBall( LPDIRECT3DTEXTURE8 Texture, 

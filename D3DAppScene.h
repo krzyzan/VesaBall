@@ -8,11 +8,11 @@ using namespace std;
 
 #include "sprite.h"
 
-class CD3DAppStage
+class CD3DAppScene
 {
 public:
-	CD3DAppStage( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
-	virtual ~CD3DAppStage();
+	CD3DAppScene( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
+	virtual ~CD3DAppScene();
 
 	virtual HRESULT InitDeviceObjects()				= 0;
 	virtual HRESULT RestoreDeviceObjects()			= 0;

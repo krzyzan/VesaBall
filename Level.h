@@ -1,11 +1,12 @@
 #pragma once
 
-#include "D3DAppStage.h"
+#include "D3DAppScene.h"
 #include "Paddle.h"		//TMP
 #include "Brick.h"		//TMP
 #include "Ball.h"
 
-class CLevel : public CD3DAppStage
+class CLevel :
+	public CD3DAppScene
 {
 public:
 	CLevel( LPDIRECT3DDEVICE8 pd3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );

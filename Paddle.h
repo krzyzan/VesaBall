@@ -6,7 +6,8 @@
 #include <dinput.h>
 #include "MovingSprite.h"
 
-class CPaddle : public CMovingSprite  
+class CPaddle : 
+	public CMovingSprite  
 {
 public:
 	CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice );

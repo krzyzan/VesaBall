@@ -122,10 +122,13 @@
 				RelativePath=".\Brick.cpp">
 			</File>
 			<File
+				RelativePath=".\Cursor.cpp">
+			</File>
+			<File
 				RelativePath=".\D3DApp.cpp">
 			</File>
 			<File
-				RelativePath=".\D3DAppStage.cpp">
+				RelativePath=".\D3DAppScene.cpp">
 			</File>
 			<File
 				RelativePath=".\D3DBallApp.cpp">
@@ -138,6 +141,9 @@
 			</File>
 			<File
 				RelativePath=".\Level.cpp">
+			</File>
+			<File
+				RelativePath=".\MenuItem.cpp">
 			</File>
 			<File
 				RelativePath=".\MovingSprite.cpp">
@@ -169,10 +175,13 @@
 				RelativePath=".\Brick.h">
 			</File>
 			<File
+				RelativePath=".\Cursor.h">
+			</File>
+			<File
 				RelativePath=".\D3DApp.h">
 			</File>
 			<File
-				RelativePath=".\D3DAppStage.h">
+				RelativePath=".\D3DAppScene.h">
 			</File>
 			<File
 				RelativePath=".\D3DBallApp.h">
@@ -185,6 +194,9 @@
 			</File>
 			<File
 				RelativePath=".\Level.h">
+			</File>
+			<File
+				RelativePath=".\MenuItem.h">
 			</File>
 			<File
 				RelativePath=".\MovingSprite.h">

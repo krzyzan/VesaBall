@@ -19,7 +19,7 @@ void CEffectSprite::FrameMove( FLOAT fElapsedTime )
 	vSpeed += vAccel * fElapsedTime;
 	vPosition += vSpeed * fElapsedTime;
 
-	dwBlending &= 0x00FFFFFF;
+	dwBlending = 0x00FFFFFF;
 	dwBlending += ((DWORD)(fRemaining/fDuration * 0xFF) << 24);
 
 	fRemaining -= fElapsedTime;

@@ -5,6 +5,8 @@
 
 #include "stdafx.h"
 #include "D3DBallApp.h"
+#include "GameMenu.h"
+#include "Level.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -14,13 +16,13 @@ CD3DBallApp::CD3DBallApp()
 	srand( (INT)Timer.GetTime() );
 	numFrameMove	= 0;
 	numRender		= 0;
-	pLevel			= NULL;
+	pScene			= NULL;
 }
 
 HRESULT CD3DBallApp::InitDeviceObjects()
 {
-	pLevel = new CLevel( pd3dDevice, pDIDevice );
-	pLevel->InitDeviceObjects();
+	pScene = new CGameMenu( pd3dDevice, pDIDevice );
+	pScene->InitDeviceObjects();
 
 	timerFrameMove.Start();
 	fTimeToRender = 0;
@@ -30,7 +32,7 @@ HRESULT CD3DBallApp::InitDeviceObjects()
 
 HRESULT CD3DBallApp::RestoreDeviceObjects()
 {
-	pLevel->RestoreDeviceObjects();
+	pScene->RestoreDeviceObjects();
 
 	return S_OK;
 }
@@ -45,7 +47,17 @@ HRESULT CD3DBallApp::FrameMove()
 	if ( fElapsedTime > 0.1 ) return S_OK;	
 	numFrameMove++;
 
-	return pLevel->FrameMove( fElapsedTime );
+	if ( FAILED( pScene->FrameMove( fElapsedTime ) ) ) {
+		pScene->InvalidateDeviceObjects();
+		pScene->DeleteDeviceObjects();
+		delete pScene;
+		
+		pScene = new CLevel( pd3dDevice, pDIDevice );
+		pScene->InitDeviceObjects();
+		pScene->RestoreDeviceObjects();
+	}
+
+	return S_OK;
 }
 
 
@@ -57,9 +69,7 @@ HRESULT CD3DBallApp::Render()
 	fTimeToRender = 1.0f/110;
 	numRender++;
 
-	//pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
-
-	pLevel->Render();
+	pScene->Render();
 
 	// Show the frame on the primary surface.
 	pd3dDevice->Present( NULL, NULL, NULL, NULL );
@@ -69,14 +79,14 @@ HRESULT CD3DBallApp::Render()
 
 HRESULT CD3DBallApp::InvalidateDeviceObjects()
 {
-	pLevel->InvalidateDeviceObjects();
+	pScene->InvalidateDeviceObjects();
 	return S_OK;
 }
 
 HRESULT CD3DBallApp::DeleteDeviceObjects()
 {
-	pLevel->DeleteDeviceObjects();
-	delete pLevel;
+	pScene->DeleteDeviceObjects();
+	delete pScene;
 	return S_OK;
 }
 

@@ -28,7 +28,6 @@ CSprite::CSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
 	dwBlending		= Blending;
     
 	bDeleteMe		= FALSE;
-
 }
 
 CSprite::~CSprite()
@@ -37,7 +36,7 @@ CSprite::~CSprite()
 
 void CSprite::Render( LPD3DXSPRITE pSprite ) const
 {
-	D3DXVECTOR2 Position = (vPosition-vSize/2)*RES_X;
+	D3DXVECTOR2 Position = (vPosition - vSize/2) * RES_X;
 	pSprite->Draw( pTexture, NULL, &vScaling, &vRotationCenter, fRotation, &Position, dwBlending );
 }
 

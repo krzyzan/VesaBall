@@ -62,12 +62,24 @@ v0.18
 	- Poprawione sta³e w celu zwiêkszenia grywalnoœci
 	- Klasa CLevel
 
+v0.20
+	
+
+v0.30
+	- Klasa CD3DAppScene
+	- Klasa CGameMenu
+
+	
 ToDo:
-	- Zmieniæ na CD3DAppScene
+	- Zrobiæ dzia³aj¹ce menu (AddMenuItem, enum/uid w CD3DBallApp)
+	- Skasowaæ Render i FrameMove
+	- Wywaliæ niepotrzebne argumenty z konstruktorów
+	- Zmieniæ mo¿e ¿eby kulki sprawdza³y w co trafiaj¹, ( lista pListBouncing w CBall itp. )
+		du¿a zmiana wiêc zrobiæ kopiê projektu
 	- Zrobiæ menu
 	- Zrobiæ porzadek z destruktorami ( wykasowaæ niepotrzebne, wszystkie musz¹ byæ virtual )
 	- Zrobic start pi³ki z deski
-	- Rzeczy niezwi¹zane z ruchem (np. blending efekty) wrzucic do Render
+	- Rzeczy niezwi¹zane z ruchem (np. blending, efekty) wrzucic do Render
 	- Zrobiæ Game Over
 	- Co robiæ gdy wjedziemy bokiem deski w kulkê???
 	- zrobiæ CBrickArray
@@ -89,14 +101,15 @@ ToDo:
 #include <d3dx8.h>
 
 #include "D3DApp.h"
-#include "Level.h"
+#include "D3DAppScene.h"
 
 #include "Paddle.h"		//TMP
 #include "Brick.h"		//TMP
 
 using namespace std;
 
-class CD3DBallApp : public CD3DApp  
+class CD3DBallApp :
+	public CD3DApp  
 {
 public:
 	CD3DBallApp();
@@ -114,5 +127,5 @@ public:
 
 	DWORD			numFrameMove, numRender;
 
-	CD3DAppStage*	pLevel;
+	CD3DAppScene*	pScene;
 };

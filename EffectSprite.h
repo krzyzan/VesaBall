@@ -1,7 +1,8 @@
 #pragma once
 #include "MovingSprite.h"
 
-class CEffectSprite : public CMovingSprite
+class CEffectSprite :
+	public CMovingSprite
 {
 public:
 	CEffectSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 

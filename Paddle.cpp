@@ -11,7 +11,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice)
+CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice )
  : CMovingSprite( Texture, D3DXVECTOR2(1.0f/8, 1.0f/64), 0, 
 		D3DXVECTOR2(0.5f, 0.75f-1.0f/64), D3DXVECTOR2(0, 0), 
 		D3DXVECTOR2(0, 0), 0xFFFFFFFF)
