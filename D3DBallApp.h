@@ -1,5 +1,5 @@
 // D3DBallApp.h: interface for the CD3DBallApp class.
-// v0.15
+// v0.18
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -7,12 +7,12 @@
 Changelog:
 
 v0.10
-	- Wersja poczatkowa (zrobiona u ZIKO)
+	- Wersja poczatkowa dziedziczona od CD3DApp
 
 v0.11
 	- Dodana klasa CSprite
 	- Dodana klasa CBall
-	- Dodana klasa CDeck
+	- Dodana klasa CPaddle
 
 v0.12
 	- G³ówna tablica spritów jest teraz list¹ (szybko kasuje w œrodku)
@@ -34,8 +34,9 @@ v0.14
 	- CSprite::FrameMove() jest teraz CSprite::FrameMove( FLOAT fElapsedTime )
 		i wszystkie obiekty dostaj¹ wspólny czas z timerFrameMove
 	- Poprawne obliczanie odbiæ
-	- ZIKO: Ustawianie RotationCenter na œrodku
+	- ZIKO: Ustawianie RotationCenter na œrodku sprita
 	- ZIKO: Nowa grafika
+
 v0.15
 	- Na brzegach deska odbija kulki pod innym k¹tem
 	- Obliczanie kolizji obiektów w osobnej pêtli (po wykonaniu ruchów)
@@ -43,22 +44,37 @@ v0.15
 	- Dodana klasa CBrick
 	- Iskry przy odbiciu
 	- Poczatek kodu Game Over (na razie wy³¹czony)
+
 v0.16
-	- CSprite::CSprite pobiera teraz Size a nie Scaling =>
-		ca³kowita niezale¿noœæ od rozdzielczoœci i rozmiarów tekstur
-  
-ToDo:
-	- Zrobic wspólna klasê bazow¹ np. CMovingObject
-	- CBall::Bounce przenieœæ do CDeck i do CBrick
-	- Zrobiæ Game Over
-	- CSprite::CSprite() pobiera vSize, a nie oblicza z tekstury 
-	- Podzieliæ CSprite::FrameMove() na virtual CSprite::Move() i virtual CSprite::Bounce()
-	- Co robiæ gdy wjedziemy bokiem deski w kulkê???
-	- zrobiæ cegie³ki czyli CBrick
-	- zrobiæ CBrickArray
-	- zrobiæ obs³ugê dŸwiêku (np. kasuj¹c niepotrzebny kod z sampli do DSound )
+	- CSprite::CSprite pobiera teraz Size, a nie oblicza z rozmiarów tekstury
+	- Wspólna klasa bazowa dla ruchomych sprite'ów: CMovingSprite
+
+v0.17
+	- Przystosowanie do nowej wersji CD3DApp, która poprawnie wykrywa 
+		w³aœciwoœci kart graficznych => dzia³a na zabytkowych S3 VIRGE
+	- Refaktoryzacja i optymalizacja kodu oraz ogólne porz¹dki
+	- ZIKO: Znikaj¹ce cegie³ki
+	- ZIKO: siê zmêczy³ :)
+	- Zmiana nazwy klasy CSparkEffect na CEffectSprite
+	- P³ynnie znikajace cegie³ki :)
+
+v0.18
+	- Poprawione sta³e w celu zwiêkszenia grywalnoœci
+	- Klasa CLevel
 
 ToDo:
+	- Zrobic start pi³ki z deski
+	- Zrobic start pi³ki z deski
+	- Rzeczy niezwi¹zane z ruchem (np. blending efekty) wrzucic do Render
+	- Zrobiæ Game Over
+	- Co robiæ gdy wjedziemy bokiem deski w kulkê???
+	- zrobiæ CBrickArray
+	- zrobiæ obs³ugê dŸwiêku (np. kasuj¹c niepotrzebny kod z sampli do DSound )
+	- Porz¹dek z protected, public, private
+	- Przyspieszanie pi³ki przy odbiciu (a¿ do 1.0f ?)
+
+ToDo:
+	- Poœwiata/ogon dla fireballa
 	- Gumowa deska
 	- Deska, która losowo odbija 
 */
@@ -66,13 +82,14 @@ ToDo:
 
 #pragma once
 
-#include <list>
+#include <list>			//TMP
 #include "D3DApp.h"
+#include "Level.h"
 
-#include "Deck.h"
-#include "Ball.h"
-#include "Brick.h"
-#include "SparkEffect.h"	//TMP
+#include "Paddle.h"		//TMP
+#include "Brick.h"		//TMP
+
+
 
 using namespace std;
 
@@ -80,7 +97,6 @@ class CD3DBallApp : public CD3DApp
 {
 public:
 	CD3DBallApp();
-	virtual ~CD3DBallApp();
 
 	HRESULT LoadTexture( LPCTSTR nameTexture, DWORD numTex );
 	HRESULT InitDeviceObjects();
@@ -89,16 +105,15 @@ public:
 	HRESULT RestoreDeviceObjects();
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
+	HRESULT	FinalCleanup();
 
 	LPDIRECT3DTEXTURE8		pTex[256];
 	LPD3DXSPRITE			pSprite;
-	list<CSprite*>			listRender;
-	list<CBall*>			listBall;
-
-	CSprite*				pBackground;
 	
 	CTimer					timerFrameMove;
 	FLOAT					fTimeToRender;
 
-	FLOAT					numFrameMove, numRender;
+	DWORD					numFrameMove, numRender;
+
+	CLevel*					pLevel;
 };

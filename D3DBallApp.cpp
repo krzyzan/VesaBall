@@ -1,5 +1,5 @@
 // D3DBallApp.cpp: implementation of the CD3DBallApp class.
-// v0.15
+// v0.18
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -10,7 +10,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 CD3DBallApp::CD3DBallApp()
-: CD3DApp( RES_X, RES_Y )
 {	
 	srand( (INT)Timer.GetTime() );
 	numFrameMove	= 0;
@@ -19,70 +18,35 @@ CD3DBallApp::CD3DBallApp()
 	ZeroMemory( pTex, sizeof(pTex) );
 }
 
-CD3DBallApp::~CD3DBallApp()
-{
-}
-
-
 HRESULT CD3DBallApp::InitDeviceObjects()
 {
-	LoadTexture( "gfx/Deckzatruta.png",		0 );
-	LoadTexture( "gfx/Decknormalna.png",	1 );
-	LoadTexture( "gfx/Tree2.jpg",			2 );
-	LoadTexture( "gfx/kulkaa.png",			3 );
-	LoadTexture( "gfx/kulkab.png",			4 );
-	LoadTexture( "gfx/kulkac.png",			5 );
-	LoadTexture( "gfx/kulkad.png",			6 );
-	LoadTexture( "gfx/kulkae.png",			7 );
-	LoadTexture( "gfx/kulkaf.png",			8 );
-	LoadTexture( "gfx/kulkag.png",			9 );
-	LoadTexture( "gfx/kulkah.png",			10 );
-	LoadTexture( "gfx/kulkai.png",			11 );
-	LoadTexture( "gfx/kulkaj.png",			12 );
-	LoadTexture( "gfx/kulkak.png",			13 );
-	LoadTexture( "gfx/kulkal.png",			14 );
-	LoadTexture( "gfx/kulkam.png",			15 );
-	LoadTexture( "gfx/kulkan.png",			16 );
-	LoadTexture( "gfx/kulkao.png",			17 );
-	LoadTexture( "gfx/Cellblue.png",		18 );
-	LoadTexture( "gfx/Cellred.png",			19 );
-	LoadTexture( "gfx/Cellgren.png",		20 );
-	LoadTexture( "gfx/Cellmetala.png",		21 );
-	LoadTexture( "gfx/Cellmetalb.png",		22 );
-	LoadTexture( "gfx/Cellfoliaa.png",		23 );
-	LoadTexture( "gfx/Cellfoliab.png",		24 );
-	LoadTexture( "gfx/Cellfoliac.png",		25 );
-	LoadTexture( "gfx/Cellfoliad.png",		26 );
-	LoadTexture( "gfx/Cellwybucha.png",		27 );
-	LoadTexture( "gfx/Cellwybuchb.png",		28 );
-	LoadTexture( "gfx/Cellcool.png",		29 );
-	LoadTexture( "gfx/Cellbluegren.png",	30 );
+	LoadTexture( "gfx/Bg_tree.jpg",			0 );
+	LoadTexture( "gfx/Paddle.png",			40 );
 	LoadTexture( "gfx/SparkEffect.png",		50 );
+	LoadTexture( "gfx/Brick1.png",			51 );
+	LoadTexture( "gfx/Brick6.png",			52 );
+	LoadTexture( "gfx/Bonus_Fireball.png",	60 );
+	LoadTexture( "gfx/Ball_alu.png",		70 );
 
-	pBackground = new CSprite( pTex[2], D3DXVECTOR2(1.0f, 0.75f), 0, D3DXVECTOR2(1.0f/2, 0.75f/2), 0xFF7F7F7F );
+	pLevel = new CLevel();
+
+	//Tworzymy t³o
+	new CSprite( pLevel, pTex[0], D3DXVECTOR2(1.0f, 0.75f), 0, D3DXVECTOR2(1.0f/2, 0.75f/2), 0xFF3F3F3F );
 
 	//Tworzymy deskê
-	CDeck* pDeck;
-	pDeck = new CDeck( pTex[1], pDIDevice );
-	listRender.push_back( pDeck );
+	new CPaddle( pLevel, pTex[40], pDIDevice );
 
 	//Tworzymy cegie³ki
-	CBrick* pBrick;
-	for (int i=1; i<128; i++) {
-		pBrick = new CBrick( pTex[22], D3DXVECTOR2( 1.0f/BRICK_X*(0.5f+(rand()%BRICK_X)), 1.0f/BRICK_Y*(0.5f+(rand()%(BRICK_Y/2))) ) );
-		listRender.push_back( pBrick );
-	}
+	for (int y=0; y<BRICK_Y/2; y++)
+		for (int x=0; x<BRICK_X; x++)
+			if (rand()%4>0)
+				new CBrick( pLevel, pTex[52], D3DXVECTOR2( 1.0f/BRICK_X*(0.5f+x), 1.0f/BRICK_Y*(0.5f+y) ) );
 
 	//Tworzymy kulki
-	CBall* pBall;
-	for (int i=0; i<4; i++) {
-		pBall = new CBall( pTex[6], 
-			D3DXVECTOR2( FLOAT((rand()%1000-200)+100)/1000, FLOAT((rand()%750-200)+100)/1000 ),
-			D3DXVECTOR2( 1.0f*(rand()%2000-1000), 1.0f*(rand()%2000-1000))/2000,
-			&listRender, pTex[50] );
-		listRender.push_back( pBall );
-		listBall.push_back( pBall );
-	}
+	for (int i=0; i<2; i++)
+		new CBall( pLevel, pTex[70], D3DXVECTOR2( frand(0.1f,0.9f), frand(0.1f,0.65f) ),
+				0.5f * (*D3DXVec2Normalize( &D3DXVECTOR2(), &D3DXVECTOR2( frand(-1,1), frand(-1,1) ) ) ), 
+				pTex[50] );
 
 	timerFrameMove.Start();
 	fTimeToRender = 0;
@@ -96,41 +60,55 @@ HRESULT CD3DBallApp::FrameMove()
 	FLOAT fElapsedTime = timerFrameMove.GetElapsedTime();
 	fTimeToRender -= fElapsedTime;
 
-	//TMP: u mnie czasem zawiesza siê timer na 2 sek.
+	// TMP: nie wiem czemu u mnie na starcie timer zawiesza siê na 2 sek. 
+	// mo¿e czas wymieniæ BIOS??? :(
 	if ( fElapsedTime > 0.1 ) return S_OK;	
 	numFrameMove++;
 
-	list<CSprite*>::iterator iSprite;
+	list<CMovingSprite*>::iterator	iMovingSprite;
+	list<CSprite*>::iterator		iSprite;
+	list<CBall*>::iterator			iBall;
 
-	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
-		(*iSprite)->FrameMove( fElapsedTime );
+	// wykonujemy ruch dla wszystkich obiektów
+	for (iMovingSprite = pLevel->listFrameMove.begin(); iMovingSprite != pLevel->listFrameMove.end(); iMovingSprite++)
+		(*iMovingSprite)->FrameMove( fElapsedTime );
 
-	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
-		(*iSprite)->Collide( &listBall );
+	// wykonujemy odbicia dla wszystkich obiektów
+	for (iSprite = pLevel->listRender.begin(); iSprite != pLevel->listRender.end(); iSprite++)
+		(*iSprite)->Collide( &pLevel->listBall );
 
+	// Kasujemy z listy obiektów ruchomych
+	iMovingSprite = pLevel->listFrameMove.begin(); 
+	while (iMovingSprite != pLevel->listFrameMove.end()) {
+		if ((*iMovingSprite)->bDeleteMe)
+			iMovingSprite = pLevel->listFrameMove.erase( iMovingSprite );
+		else
+			iMovingSprite++;
+	}
 
-	// Kasujemy obiekty
-	list<CBall*>::iterator iBall = listBall.begin(); 
-	while (iBall != listBall.end()) {
+	// Kasujemy z listy kulek
+	iBall = pLevel->listBall.begin(); 
+	while (iBall != pLevel->listBall.end()) {
 		if ((*iBall)->bDeleteMe)
-			iBall = listBall.erase( iBall );
+			iBall = pLevel->listBall.erase( iBall );
 		else
 			iBall++;
 	}
 
-	iSprite = listRender.begin();
-	while (iSprite != listRender.end()) {
+	// Kasujemy z listy renderowania
+	iSprite = pLevel->listRender.begin();
+	while (iSprite != pLevel->listRender.end()) {
 		if ((*iSprite)->bDeleteMe) {
 			delete (*iSprite);
-			iSprite = listRender.erase( iSprite );
+			iSprite = pLevel->listRender.erase( iSprite );
 		}
 		else
 			iSprite++;
 	}
 
-	// GAME OVER !!!!
-	//if (listBall.empty())
-	//	return E_FAIL;
+	//GAME OVER !!!!
+	if (pLevel->listBall.empty())
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -141,19 +119,16 @@ HRESULT CD3DBallApp::Render()
 	if (fTimeToRender > 0) 
 		return S_OK;
 
-	fTimeToRender = 1.0f/100;
+	fTimeToRender = 1.0f/110;
 	numRender++;
+
 	//pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
 
 	pd3dDevice->BeginScene();
-
 	pSprite->Begin();
 
-	// t³o
-	pBackground->Render( pSprite );
-
 	list<CSprite*>::iterator iSprite;
-	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
+	for (iSprite = pLevel->listRender.begin(); iSprite != pLevel->listRender.end(); iSprite++)
 		(*iSprite)->Render( pSprite );
 
 	pSprite->End();
@@ -179,12 +154,26 @@ HRESULT CD3DBallApp::InvalidateDeviceObjects()
 
 HRESULT CD3DBallApp::DeleteDeviceObjects()
 {
+	delete pLevel;
+
 	for (int i=0; i<256; i++)
 		SAFE_RELEASE( pTex[i] );
 
-	char str[100];
-	_itoa((INT)(numFrameMove/numRender),str,10);
-	MessageBox( hWnd, str, "numFrameMove/numRender", MB_OK );
+	return S_OK;
+}
+
+HRESULT	CD3DBallApp::FinalCleanup()
+{
+	char str[100] = "FrameMove() / Render(): ";
+	char* p = str + strlen(str);
+	_gcvt(((FLOAT)numFrameMove)/numRender, 4, p);
+	p = str + strlen(str);
+	strcat( p, "\nRender() / sec: ");
+	p = str + strlen(str);
+	_gcvt(numRender/Timer.GetTime(), 4, p);
+
+	MessageBox( hWnd, str, 
+		"Internal counters", MB_OK );
 
 	return S_OK;
 }

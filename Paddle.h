@@ -1,16 +1,16 @@
-// Deck.h: interface for the CDeck class.
+// Paddle.h: interface for the CPaddle class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #pragma once
 #include <dinput.h>
-#include "Sprite.h"
+#include "MovingSprite.h"
 
-class CDeck : public CSprite  
+class CPaddle : public CMovingSprite  
 {
 public:
-	CDeck::CDeck( LPDIRECT3DTEXTURE8 iTexture, LPDIRECTINPUTDEVICE8 ipDIDevice );
-	virtual ~CDeck();
+	CPaddle::CPaddle( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice );
+	virtual ~CPaddle();
 
 	void FrameMove( FLOAT fElapsedTime );
 	void Collide( list<CBall*>* pListBall );

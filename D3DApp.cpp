@@ -3,13 +3,15 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "D3DApp.h"
 
 //-----------------------------------------------------------------------------
 // Global access to the app (needed for the global WndProc())
 //-----------------------------------------------------------------------------
-CD3DApp* CD3DApp::s_pCurD3DApp = NULL;
+CD3DApp* CD3DApp::s_pD3DApp = NULL;
+
+
 
 //-----------------------------------------------------------------------------
 // Name: WndProc()
@@ -17,31 +19,273 @@ CD3DApp* CD3DApp::s_pCurD3DApp = NULL;
 //-----------------------------------------------------------------------------
 LRESULT CALLBACK CD3DApp::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	return s_pCurD3DApp->MsgProc( hWnd, uMsg, wParam, lParam );
+	return s_pD3DApp->MsgProc( hWnd, uMsg, wParam, lParam );
 }
+
+
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CD3DApp::CD3DApp( INT ResX, INT ResY )
+
+CD3DApp::CD3DApp()
 {
-	s_pCurD3DApp	= this;
-	pd3dDevice		= NULL;
+	s_pD3DApp			= this;
 
-	xRes			= ResX;
-	yRes			= ResY;
+	bActive				= FALSE;
+	bReady				= FALSE;
+	CreateFlags			= 0L;
 
-	bActive			= FALSE;
-	bReady			= FALSE;
+	strWindowTitle		= _T("Earth");
+	MinDepthBits		= 16;
+	MinStencilBits		= 0;
 }
 
+HRESULT CD3DApp::Cleanup3DEnvironment()
+{
+	bActive = FALSE;
+	bReady  = FALSE;
+
+	if ( pd3dDevice ) {
+        InvalidateDeviceObjects();
+		DeleteDeviceObjects();
+	}
+    
+	SAFE_RELEASE( pd3dDevice );
+	SAFE_RELEASE( pD3D );
+	SAFE_RELEASE( pDIDevice );
+	SAFE_RELEASE( pDI );
+
+	// Clean up everything and exit the app
+	//UnregisterClass( strWindowTitle, hInstance );
+
+	FinalCleanup();
+
+	return S_OK;
+}
+
+//-----------------------------------------------------------------------------
+// Name: BuildDeviceList()
+// Desc:
+//-----------------------------------------------------------------------------
+HRESULT CD3DApp::BuildDeviceList()
+{
+	const DWORD dwNumDeviceTypes = 2;
+	const TCHAR* strDeviceDescs[] = { _T("HAL"), _T("REF") };
+	const D3DDEVTYPE DeviceTypes[] = { D3DDEVTYPE_HAL, D3DDEVTYPE_REF };
+
+	BOOL bHALExists	= FALSE;
+	BOOL bHALIsDesktopCompatible = FALSE;
+	BOOL bHALIsSampleCompatible = FALSE;
+
+	// Fill in adapter info
+	D3DAdapterInfo* pAdapter = &Adapter;
+	pD3D->GetAdapterIdentifier( D3DADAPTER_DEFAULT, 0, &pAdapter->d3dAdapterIdentifier );
+	pD3D->GetAdapterDisplayMode( D3DADAPTER_DEFAULT, &pAdapter->d3ddmDesktop );
+	pAdapter->dwNumDevices = 0;
+	pAdapter->dwCurrentDevice = 0;
+
+	// Enumerate all display modes on this adapter
+	D3DDISPLAYMODE modes[100];
+	D3DFORMAT formats[20];
+	DWORD dwNumFormats = 0;
+	DWORD dwNumModes = 0;
+	DWORD dwNumAdapterModes = pD3D->GetAdapterModeCount( D3DADAPTER_DEFAULT );
+
+	// Add the adapter's current desktop format to the list of formats
+	formats[dwNumFormats++] = pAdapter->d3ddmDesktop.Format;
+
+	for( UINT iMode = 0; iMode < dwNumAdapterModes; iMode++ )
+	{
+		// Get the display mode attributes
+		D3DDISPLAYMODE DisplayMode;
+		pD3D->EnumAdapterModes( D3DADAPTER_DEFAULT, iMode, &DisplayMode );
+
+		// Filter out low-resolution modes
+		//if( DisplayMode.Width < 640 || DisplayMode.Height < 400 )
+		//	continue;
+
+		// Check if the mode already exists (to filter out refresh rates)
+		for( DWORD m=0L; m<dwNumModes; m++ )
+		{
+			if( ( modes[m].Width  == DisplayMode.Width	) &&
+				( modes[m].Height == DisplayMode.Height ) &&
+				( modes[m].Format == DisplayMode.Format ) )
+			{
+				modes[m].RefreshRate = DisplayMode.RefreshRate;
+				break;
+			}
+		}
+
+		// If we found a new mode, add it to the list of modes
+		if( m == dwNumModes )
+		{
+			modes[dwNumModes++] = DisplayMode;
+			
+			// Check if the mode's format already exists
+			for( DWORD f=0; f<dwNumFormats; f++ )
+			{
+				if( DisplayMode.Format == formats[f] )
+					break;
+			}
+
+			// If the format is new, add it to the list
+			if( f== dwNumFormats )
+				formats[dwNumFormats++] = DisplayMode.Format;
+		}
+	}
+
+   
+
+	// Add devices to adapter
+	for( UINT iDevice = 0; iDevice < dwNumDeviceTypes; iDevice++ )
+	{
+		// Fill in device info
+		D3DDeviceInfo* pDevice;
+		pDevice 				= &pAdapter->devices[pAdapter->dwNumDevices];
+		pDevice->DeviceType 	= DeviceTypes[iDevice];
+		pD3D->GetDeviceCaps( D3DADAPTER_DEFAULT, DeviceTypes[iDevice], &pDevice->d3dCaps );
+		pDevice->strDesc		= strDeviceDescs[iDevice];
+		pDevice->dwNumModes 	= 0;
+		pDevice->dwCurrentMode	= 0;
+		pDevice->MultiSampleType = D3DMULTISAMPLE_NONE;
+
+		// Examine each format supported by the adapter to see if it will
+		// work with this device and meets the needs of the application.
+		BOOL  bFormatConfirmed[20];
+		DWORD dwBehavior[20];
+		D3DFORMAT fmtDepthStencil[20];
+
+		for( DWORD f=0; f<dwNumFormats; f++ )
+		{
+			bFormatConfirmed[f] = FALSE;
+			fmtDepthStencil[f] = D3DFMT_UNKNOWN;
+
+			// Skip formats that cannot be used as render targets on this device
+			if( FAILED( pD3D->CheckDeviceType( D3DADAPTER_DEFAULT, pDevice->DeviceType,
+												 formats[f], formats[f], FALSE ) ) )
+				continue;
+
+			if( pDevice->DeviceType == D3DDEVTYPE_HAL )
+			{
+				// This system has a HAL device
+				bHALExists = TRUE;
+			}
+
+			// Confirm the device/format for HW vertex processing
+			if( pDevice->d3dCaps.DevCaps&D3DDEVCAPS_HWTRANSFORMANDLIGHT )
+			{
+				if( pDevice->d3dCaps.DevCaps&D3DDEVCAPS_PUREDEVICE )
+				{
+					dwBehavior[f] = D3DCREATE_HARDWARE_VERTEXPROCESSING |
+									D3DCREATE_PUREDEVICE;
+					bFormatConfirmed[f] = TRUE;
+				}
+
+				if ( FALSE == bFormatConfirmed[f] )
+				{
+					dwBehavior[f] = D3DCREATE_HARDWARE_VERTEXPROCESSING;
+					bFormatConfirmed[f] = TRUE;
+				}
+
+				if ( FALSE == bFormatConfirmed[f] )
+				{
+					dwBehavior[f] = D3DCREATE_MIXED_VERTEXPROCESSING;
+					bFormatConfirmed[f] = TRUE;
+				}
+			}
+
+			// Confirm the device/format for SW vertex processing
+			if( FALSE == bFormatConfirmed[f] )
+			{
+				dwBehavior[f] = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+				bFormatConfirmed[f] = TRUE;
+			}
+
+			// Find a suitable depth/stencil buffer format for this device/format
+			if( bFormatConfirmed[f] )
+			{
+				if( !FindDepthStencilFormat( D3DADAPTER_DEFAULT, pDevice->DeviceType,
+					formats[f], &fmtDepthStencil[f] ) )
+				{
+					bFormatConfirmed[f] = FALSE;
+				}
+			}
+		}
+
+		// Add all enumerated display modes with confirmed formats to the
+		// device's list of valid modes
+		for( DWORD m=0L; m<dwNumModes; m++ )
+		{
+			for( DWORD f=0; f<dwNumFormats; f++ )
+			{
+				if( modes[m].Format == formats[f] )
+				{
+					if( bFormatConfirmed[f] == TRUE )
+					{
+						// Add this mode to the device's list of valid modes
+						pDevice->modes[pDevice->dwNumModes].Width		= modes[m].Width;
+						pDevice->modes[pDevice->dwNumModes].Height		= modes[m].Height;
+						pDevice->modes[pDevice->dwNumModes].Format		= modes[m].Format;
+						pDevice->modes[pDevice->dwNumModes].RefreshRate = modes[m].RefreshRate;
+						pDevice->modes[pDevice->dwNumModes].dwBehavior	= dwBehavior[f];
+						pDevice->modes[pDevice->dwNumModes].DepthStencilFormat = fmtDepthStencil[f];
+						pDevice->dwNumModes++;
+
+						if( pDevice->DeviceType == D3DDEVTYPE_HAL )
+							bHALIsSampleCompatible = TRUE;
+					}
+				}
+			}
+		}
+
+		// Select any RES_X x RES_Y mode for default (but prefer a 32-bit mode)
+		for( m=0; m<pDevice->dwNumModes; m++ )
+		{
+			if( pDevice->modes[m].Width==RES_X && pDevice->modes[m].Height==RES_Y )
+			{
+				pDevice->dwCurrentMode = m;
+
+				if( pDevice->modes[m].Format == D3DFMT_X8R8G8B8) break;
+
+				if( pDevice->modes[m].Format == D3DFMT_R5G6B5 ||
+					pDevice->modes[m].Format == D3DFMT_X1R5G5B5 ||
+					pDevice->modes[m].Format == D3DFMT_A1R5G5B5 )
+				{
+					break;
+				}
+			}
+		}
+
+		// If valid modes were found, keep this device
+		if( pDevice->dwNumModes > 0 )
+			pAdapter->dwNumDevices++;
+	}
+
+	// Return an error if no compatible devices were found
+	if( 0L == pAdapter->dwNumDevices )
+		return D3DAPPERR_NOCOMPATIBLEDEVICES;
+
+	// Pick a default device that can render into a window
+	// (This code assumes that the HAL device comes before the REF
+	// device in the device array).
+	Adapter.dwCurrentDevice = 0;
+
+	return S_OK;
+}
+
+
+
+//-----------------------------------------------------------------------------
+// Name: Run()
+// Desc:
+//-----------------------------------------------------------------------------
 HRESULT CD3DApp::Run()
 {
 	// Now we're ready to recieve and process Windows messages.
 	BOOL bGotMsg;
 	MSG  msg;
-	msg.message = WM_NULL;
 	PeekMessage( &msg, NULL, 0U, 0U, PM_NOREMOVE );
 
 	while( WM_QUIT != msg.message  )
@@ -72,23 +316,158 @@ HRESULT CD3DApp::Run()
 	return (INT)msg.wParam;
 }
 
+
+//-----------------------------------------------------------------------------
+// Name: FindDepthStencilFormat()
+// Desc: Finds a depth/stencil format for the given device that is compatible
+//		 with the render target format and meets the needs of the app.
+//-----------------------------------------------------------------------------
+BOOL CD3DApp::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
+	D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat )
+{
+	if( MinDepthBits <= 16 && MinStencilBits == 0 )
+	{
+		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D16 ) ) )
+		{
+			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+				TargetFormat, TargetFormat, D3DFMT_D16 ) ) )
+			{
+				*pDepthStencilFormat = D3DFMT_D16;
+				return TRUE;
+			}
+		}
+	}
+
+	if( MinDepthBits <= 15 && MinStencilBits <= 1 )
+	{
+		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D15S1 ) ) )
+		{
+			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+				TargetFormat, TargetFormat, D3DFMT_D15S1 ) ) )
+			{
+				*pDepthStencilFormat = D3DFMT_D15S1;
+				return TRUE;
+			}
+		}
+	}
+
+	if( MinDepthBits <= 24 && MinStencilBits == 0 )
+	{
+		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24X8 ) ) )
+		{
+			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+				TargetFormat, TargetFormat, D3DFMT_D24X8 ) ) )
+			{
+				*pDepthStencilFormat = D3DFMT_D24X8;
+				return TRUE;
+			}
+		}
+	}
+
+	if( MinDepthBits <= 24 && MinStencilBits <= 8 )
+	{
+		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24S8 ) ) )
+		{
+			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+				TargetFormat, TargetFormat, D3DFMT_D24S8 ) ) )
+			{
+				*pDepthStencilFormat = D3DFMT_D24S8;
+				return TRUE;
+			}
+		}
+	}
+
+	if( MinDepthBits <= 24 && MinStencilBits <= 4 )
+	{
+		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24X4S4 ) ) )
+		{
+			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+				TargetFormat, TargetFormat, D3DFMT_D24X4S4 ) ) )
+			{
+				*pDepthStencilFormat = D3DFMT_D24X4S4;
+				return TRUE;
+			}
+		}
+	}
+
+	if( MinDepthBits <= 32 && MinStencilBits == 0 )
+	{
+		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D32 ) ) )
+		{
+			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+				TargetFormat, TargetFormat, D3DFMT_D32 ) ) )
+			{
+				*pDepthStencilFormat = D3DFMT_D32;
+				return TRUE;
+			}
+		}
+	}
+
+	return FALSE;
+}
+
+
 //-----------------------------------------------------------------------------
 // Name: MsgProc()
 // Desc: Message proc function to handle key and menu input
 //-----------------------------------------------------------------------------
-LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
+									LPARAM lParam )
 {
-    switch( uMsg )
-    {
+	switch( uMsg )
+	{
 		case WM_ACTIVATE:
-			if( pDIDevice ) return InitDI();
+			if( pDIDevice ) return InitializeMouseInput();
 
-		case WM_SETCURSOR:
+  		case WM_SETCURSOR:
 			// Turn off Windows cursor in fullscreen mode
 			if( bActive && bReady )
 			{
 				SetCursor( NULL );
 				return TRUE; // prevent Windows from setting cursor to window class cursor
+			}
+			break;
+
+		case WM_POWERBROADCAST:
+			switch( wParam )
+			{
+				#ifndef PBT_APMQUERYSUSPEND
+					#define PBT_APMQUERYSUSPEND 0x0000
+				#endif
+				case PBT_APMQUERYSUSPEND:
+					// At this point, the app should save any data for open
+					// network connections, files, etc., and prepare to go into
+					// a suspended mode.
+					return TRUE;
+
+				#ifndef PBT_APMRESUMESUSPEND
+					#define PBT_APMRESUMESUSPEND 0x0007
+				#endif
+				case PBT_APMRESUMESUSPEND:
+					// At this point, the app should recover any data, network
+					// connections, files, etc., and resume running from when
+					// the app was suspended.
+					return TRUE;
+			}
+			break;
+
+		case WM_SYSCOMMAND:
+			// Prevent moving/sizing and power loss in fullscreen mode
+			switch( wParam )
+			{
+				case SC_MOVE:
+				case SC_SIZE:
+				case SC_MAXIMIZE:
+				case SC_KEYMENU:
+				case SC_MONITORPOWER:
+				  return 1;
+					break;
 			}
 			break;
 
@@ -102,56 +481,73 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 			break;
 
 		case WM_CLOSE:
-            Cleanup3DEnvironment();
-            //DestroyMenu( GetMenu(hWnd) );
-            DestroyWindow( hWnd );
+			Cleanup3DEnvironment();
+			DestroyWindow( hWnd );
             PostQuitMessage(0);
             return 0;
-
-    }
+	}
 
 	return DefWindowProc( hWnd, uMsg, wParam, lParam );
 }
 
 //-----------------------------------------------------------------------------
-// Name: InitD3D()
-// Desc: Initializes Direct3D
+// Name: Initialize3DEnvironment()
+// Desc:
 //-----------------------------------------------------------------------------
-HRESULT CD3DApp::InitD3D()
+HRESULT CD3DApp::Initialize3DEnvironment()
 {
-	// Get the current desktop display mode, so we can set up a back
-	// buffer of the same format
-	D3DDISPLAYMODE d3ddm;
-	if( FAILED( pD3D->GetAdapterDisplayMode( D3DADAPTER_DEFAULT, &d3ddm ) ) )
-		return E_FAIL;
 
-	// Set up the structure used to create the D3DDevice
+	HRESULT hr;
+
+	D3DAdapterInfo* pAdapterInfo = &Adapter;
+	D3DDeviceInfo*	pDeviceInfo  = &pAdapterInfo->devices[pAdapterInfo->dwCurrentDevice];
+	D3DModeInfo*	pModeInfo	 = &pDeviceInfo->modes[pDeviceInfo->dwCurrentMode];
+
+	// Set up the presentation parameters
 	ZeroMemory( &d3dpp, sizeof(d3dpp) );
 	d3dpp.Windowed							= FALSE;
-	d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
-	d3dpp.BackBufferFormat					= d3ddm.Format;
-	d3dpp.BackBufferWidth					= xRes;
-	d3dpp.BackBufferHeight					= yRes;
-	d3dpp.EnableAutoDepthStencil			= TRUE;
-	d3dpp.AutoDepthStencilFormat			= D3DFMT_D16;
 	d3dpp.BackBufferCount					= 2;
-	//d3dpp.Flags							= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
-	d3dpp.FullScreen_RefreshRateInHz		= D3DPRESENT_RATE_DEFAULT;
+	d3dpp.MultiSampleType					= pDeviceInfo->MultiSampleType;
+	d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
+	d3dpp.EnableAutoDepthStencil			= TRUE;
+	d3dpp.AutoDepthStencilFormat			= pModeInfo->DepthStencilFormat;
+	d3dpp.hDeviceWindow						= hWnd;
+	d3dpp.BackBufferWidth					= pModeInfo->Width;
+	d3dpp.BackBufferHeight					= pModeInfo->Height;
+	d3dpp.BackBufferFormat					= pModeInfo->Format;
+	d3dpp.FullScreen_RefreshRateInHz		= pModeInfo->RefreshRate;
 	d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
 
-	// Create the D3DDevice
-	if( FAILED( pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
-									  D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-									  &d3dpp, &pd3dDevice ) ) )
-		return E_FAIL;
 
-	// Clear D3DDevice
-	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
-	pd3dDevice->Present( NULL, NULL, NULL, NULL );
+	
+	// Create the device
+	hr = pD3D->CreateDevice( 0, pDeviceInfo->DeviceType,
+							   hWnd, pModeInfo->dwBehavior, &d3dpp,
+							   &pd3dDevice );
 
-	return S_OK;
+	if( SUCCEEDED(hr) )
+	{
+		// Clear the viewport
+		pd3dDevice->Present(NULL, NULL, NULL, NULL);
+
+		// When moving from fullscreen to windowed mode, it is important to
+		// adjust the window size after recreating the device rather than
+		// beforehand to ensure that you get the window size you want.	For
+		// example, when switching from 640x480 fullscreen to windowed with
+		// a 1000x600 window on a 1024x768 desktop, it is impossible to set
+		// the window size to 1000x600 until after the display mode has
+		// changed to 1024x768, because windows cannot be larger than the
+		// desktop.
+
+		// Store device Caps
+		pd3dDevice->GetDeviceCaps( &d3dCaps );
+		CreateFlags = pModeInfo->dwBehavior;
+
+		return S_OK;
+	}
+
+	return hr;
 }
-
 
 //-----------------------------------------------------------------------------
 // Name: Render3DEnvironment()
@@ -177,6 +573,10 @@ HRESULT CD3DApp::Render3DEnvironment()
 		return hr;
 	}
 	
+	// Store the time for the app
+	//fTime 	   = Timer.GetTime();
+	//fElapsedTime = Timer.GetElapsedTime();
+
 	// Frame move the scene
 	if( FAILED( hr = FrameMove() ) )
 		return hr;
@@ -184,6 +584,14 @@ HRESULT CD3DApp::Render3DEnvironment()
 	// Render the scene as normal
 	if( FAILED( hr = Render() ) )
 		return hr;
+
+/*
+	// Keep track of the frame count
+	static FLOAT fLastTime = 0.0f;
+	static DWORD dwFrames  = 0L;
+	FLOAT fTime = Timer.GetAbsoluteTime();
+	++dwFrames;
+*/
 
 	return S_OK;
 }
@@ -216,12 +624,13 @@ HRESULT CD3DApp::Resize3DEnvironment()
 // Name:
 // Desc:
 //-----------------------------------------------------------------------------
-HRESULT CD3DApp::InitDI()
+HRESULT CD3DApp::InitializeMouseInput()
 {
 	pDI->CreateDevice( GUID_SysMouse, &pDIDevice, NULL );
 	pDIDevice->SetDataFormat( &c_dfDIMouse2 );
-	pDIDevice->SetCooperativeLevel( hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND );
+	pDIDevice->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND );
 	pDIDevice->SetEventNotification( CreateEvent(NULL, FALSE, FALSE, NULL) );
+
 
 	DIPROPDWORD dipdw;
     dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
@@ -231,6 +640,7 @@ HRESULT CD3DApp::InitDI()
     dipdw.dwData            = DIPROPAXISMODE_REL;
 
 	pDIDevice->SetProperty( DIPROP_AXISMODE , &dipdw.diph );
+	
 	pDIDevice->Acquire(); 
 
 	return S_OK;
@@ -238,38 +648,48 @@ HRESULT CD3DApp::InitDI()
 
 //-----------------------------------------------------------------------------
 // Name: Create()
-// Desc: Create objects thru InitDeviceObjects() and RestoreDeviceObjects()
+// Desc:
 //-----------------------------------------------------------------------------
 HRESULT CD3DApp::Create( HINSTANCE hInstance )
 {
+	HRESULT hr;
 	// Create the Direct3D object
 	pD3D = Direct3DCreate8( D3D_SDK_VERSION );
 
+	// Build a list of Direct3D adapters, modes and devices.
+	BuildDeviceList();
+
+
 	// Create the DirectInput object
-	DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&pDI, NULL); 
+	DirectInput8Create( hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&pDI, NULL ); 
 	// Initialize mouse input
-	InitDI();
+	InitializeMouseInput();
 
-
-    // Register the window class
-	WNDCLASS wc = { 0, WndProc, 0, 0, hInstance, NULL, NULL, NULL, NULL,
-					  _T("D3D Window") };
-	RegisterClass( &wc );
+	// Register the windows class
+	//WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,
+	//					  LoadIcon( hInstance, MAKEINTRESOURCE(IDI_MAIN_ICON) ),
+	//					  LoadCursor( NULL, IDC_ARROW ),
+	//					  (HBRUSH)GetStockObject(WHITE_BRUSH), 
+	//					  NULL, strWindowTitle };
+	WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,
+						  NULL, NULL, NULL, 
+						  NULL, strWindowTitle };
+	RegisterClass( &wndClass );
 
 	// Create the render window 
-	hWnd = CreateWindow( _T("D3D Window"), _T("VesaBall"), WS_POPUP|WS_SYSMENU|WS_VISIBLE,
-						   CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
-						   NULL, NULL, hInstance, 0L );
+	hWnd = CreateWindow( strWindowTitle, strWindowTitle, 
+			WS_POPUP|WS_SYSMENU|WS_VISIBLE,	
+			CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, hInstance, 0L );
 
-	InitD3D();
+	// Initialize the 3D environment for the app
+	Initialize3DEnvironment();
 
-	HRESULT hr;
 	// Initialize the app's device-dependent objects
  	hr = InitDeviceObjects();
- 	if( SUCCEEDED(hr) )
+ 	if ( SUCCEEDED(hr) )
  	{
  		hr = RestoreDeviceObjects();
- 		if( SUCCEEDED(hr) )
+ 		if ( SUCCEEDED(hr) )
  		{
  			Timer.Start();
  			// The app is ready to go
@@ -279,26 +699,6 @@ HRESULT CD3DApp::Create( HINSTANCE hInstance )
  			return S_OK;
  		}
  	}
+ 
  	return hr;
-}
-
-HRESULT CD3DApp::Cleanup3DEnvironment()
-{
-	bActive = FALSE;
-	bReady  = FALSE;
-
-	if ( pd3dDevice ) {
-        InvalidateDeviceObjects();
-		DeleteDeviceObjects();
-	}
-    
-	SAFE_RELEASE( pd3dDevice );
-	SAFE_RELEASE( pD3D );
-	SAFE_RELEASE( pDIDevice );
-	SAFE_RELEASE( pDI );
-
-	// Clean up everything and exit the app
-	//UnregisterClass( "Ball Game", hInst );
-
-	return S_OK;
 }

@@ -5,23 +5,21 @@
 #pragma once
 
 #include <list>
-#include "Sprite.h"
+#include "MovingSprite.h"
 
 using namespace std;
 
-class CBall : public CSprite  
+class CBall : public CMovingSprite  
 {
 public:
-	CBall( LPDIRECT3DTEXTURE8 iTexture, D3DXVECTOR2 iPosition, D3DXVECTOR2 iDirection, list<CSprite*>* pListRender, LPDIRECT3DTEXTURE8 iSparkTexture );
+	CBall( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, 
+		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, 
+		LPDIRECT3DTEXTURE8 SparkTexture );
 	virtual ~CBall();
 
 	void FrameMove( FLOAT fElapsedTime );
-	void Bounce( CSprite* pDeck );
+	void ThrowSparkles( const D3DXVECTOR2 & vPositionFromCenter );
 
 protected:
-	D3DXVECTOR2	vDirection;
-	D3DXVECTOR2	vOldPosition;
-
-	list<CSprite*>* pListRender;
 	LPDIRECT3DTEXTURE8 pSparkTexture;
 };

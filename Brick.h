@@ -12,9 +12,8 @@
 class CBrick : public CSprite  
 {
 public:
-	CBrick( LPDIRECT3DTEXTURE8 iTexture, D3DXVECTOR2 iPosition );
+	CBrick( CLevel* Level, LPDIRECT3DTEXTURE8 Texture,  const D3DXVECTOR2 & Position );
 	virtual ~CBrick();
 
-	void FrameMove( FLOAT fElapsedTime );
 	void Collide( list<CBall*>* pListBall );
 };

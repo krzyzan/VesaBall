@@ -2,17 +2,22 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Sprite.h"
-#include "Ball.h"
+#include "Level.h"
+
+#include "Ball.h"	//TMP
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CSprite::CSprite( LPDIRECT3DTEXTURE8 Texture, D3DXVECTOR2 Size, 
-				 float Rotation, D3DXVECTOR2 Position, D3DCOLOR Blending )
+CSprite::CSprite( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
+				 float Rotation, const D3DXVECTOR2 & Position, D3DCOLOR Blending )
 {
+	pLevel			= Level;
+	pLevel->listRender.push_back( this );
+	
 	pTexture		= Texture;
 	vSize			= Size;
 
@@ -26,24 +31,19 @@ CSprite::CSprite( LPDIRECT3DTEXTURE8 Texture, D3DXVECTOR2 Size,
 	dwBlending		= Blending;
     
 	bDeleteMe		= FALSE;
+
 }
 
 CSprite::~CSprite()
 {
-
 }
 
-void CSprite::Render( LPD3DXSPRITE pSprite )
+void CSprite::Render( LPD3DXSPRITE pSprite ) const
 {
-	pSprite->Draw( pTexture, NULL, &vScaling, &vRotationCenter, fRotation, &((vPosition-vSize/2)*RES_X), dwBlending );
-}
-
-void CSprite::FrameMove( FLOAT fElapsedTime )
-{
-
+	D3DXVECTOR2 Position = (vPosition-vSize/2)*RES_X;
+	pSprite->Draw( pTexture, NULL, &vScaling, &vRotationCenter, fRotation, &Position, dwBlending );
 }
 
 void CSprite::Collide( list<CBall*>* pListBall )
 {
-
 }

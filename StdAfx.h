@@ -5,15 +5,15 @@
 
 #pragma once
 
-#define RES_X		640
-#define RES_Y		480
+#define RES_X		1024
+#define RES_Y		768
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
 // C RunTime Header Files
 #include <stdlib.h>
-#include <malloc.h>
+//#include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
 
@@ -22,5 +22,9 @@
 
 #include <list>
 using namespace std;
+
+inline float frand( float i, float j ) {
+	return ((float)rand()/RAND_MAX)*(j-i)+i;
+};
 
 // TODO: reference additional headers your program requires here

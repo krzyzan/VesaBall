@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // Name: WinMain()
 // Desc: The application's entry point
-
+//-----------------------------------------------------------------------------
 
 
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )

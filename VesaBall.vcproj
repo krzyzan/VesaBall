@@ -72,26 +72,20 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="4"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				Detect64BitPortabilityProblems="TRUE"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib winmm.lib"
-				OutputFile="$(OutDir)/VesaBall.exe"
-				LinkIncremental="1"
 				AdditionalLibraryDirectories="d3d8.lib d3dx8.lib"
 				IgnoreDefaultLibraryNames="libci.lib"
-				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				EnableCOMDATFolding="2"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -134,10 +128,16 @@
 				RelativePath=".\D3DBallApp.cpp">
 			</File>
 			<File
-				RelativePath=".\Deck.cpp">
+				RelativePath=".\EffectSprite.cpp">
 			</File>
 			<File
-				RelativePath=".\SparkEffect.cpp">
+				RelativePath=".\Level.cpp">
+			</File>
+			<File
+				RelativePath=".\MovingSprite.cpp">
+			</File>
+			<File
+				RelativePath=".\Paddle.cpp">
 			</File>
 			<File
 				RelativePath=".\Sprite.cpp">
@@ -169,10 +169,16 @@
 				RelativePath=".\D3DBallApp.h">
 			</File>
 			<File
-				RelativePath=".\Deck.h">
+				RelativePath=".\EffectSprite.h">
 			</File>
 			<File
-				RelativePath=".\SparkEffect.h">
+				RelativePath=".\Level.h">
+			</File>
+			<File
+				RelativePath=".\MovingSprite.h">
+			</File>
+			<File
+				RelativePath=".\Paddle.h">
 			</File>
 			<File
 				RelativePath=".\Sprite.h">

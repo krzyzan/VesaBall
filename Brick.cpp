@@ -2,32 +2,65 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "StdAfx.h"
 #include "Brick.h"
-#include "Ball.h"
+#include "Level.h"
+#include "EffectSprite.h"			//TMP
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBrick::CBrick( LPDIRECT3DTEXTURE8 iTexture, D3DXVECTOR2 iPosition )
-: CSprite( iTexture, D3DXVECTOR2(1.0f/BRICK_X, 1.0f/BRICK_Y), 0, iPosition, 0xFFFFFFFF )
+CBrick::CBrick( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position )
+: CSprite( Level, Texture, D3DXVECTOR2(1.0f/BRICK_X, 1.0f/BRICK_Y), 0, Position, (DWORD)(rand()%192+64) | (DWORD)(rand()%192+64)*0x000100 | (DWORD)(rand()%192+64)*0x010000 | 0xFF000000 )
 {
-
 }
 
 CBrick::~CBrick()
 {
-
-}
-
-void CBrick::FrameMove( FLOAT fElapsedTime )
-{
-
+	new CEffectSprite( pLevel, pTexture, vSize, vPosition, D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), 0.25f, dwBlending );
 }
 
 void CBrick::Collide( list<CBall*>* pListBall )
 {
 	list<CBall*>::iterator iBall;
-	for (iBall = pListBall->begin(); iBall != pListBall->end(); iBall++)
-		(*iBall)->Bounce( this );
+	for (iBall = pListBall->begin(); iBall != pListBall->end(); iBall++) {
+		CBall* pBall = (*iBall);
+
+		if (fabs(pBall->vOldPosition.x - vPosition.x) < pBall->vSize.x/2 + vSize.x/2 &&
+			fabs(pBall->vPosition.y - vPosition.y) < pBall->vSize.y/2 + vSize.y/2 )
+		{
+			bDeleteMe = TRUE;
+			if (!pLevel->bThruBrick) {
+				if (pBall->vSpeed.y > 0) {
+					pBall->vSpeed.y *= -1;
+					pBall->ThrowSparkles( D3DXVECTOR2( 0,  pBall->vSize.y/2 ) );
+					pBall->vPosition.y = 2*(vPosition.y - vSize.y/2) - pBall->vPosition.y - pBall->vSize.y;
+				} 
+				else {
+					pBall->vSpeed.y *= -1;
+					pBall->ThrowSparkles( D3DXVECTOR2( 0, -pBall->vSize.y/2 ) );
+					pBall->vPosition.y = 2*(vPosition.y + vSize.y/2) - pBall->vPosition.y + pBall->vSize.y;
+				}
+			}
+		}
+		else
+		if (fabs(pBall->vOldPosition.y - vPosition.y) < pBall->vSize.y/2 + vSize.y/2 &&
+			fabs(pBall->vPosition.x - vPosition.x) < pBall->vSize.x/2 + vSize.x/2 )
+		{
+			bDeleteMe = TRUE;
+			if (!pLevel->bThruBrick) {
+				if (pBall->vSpeed.x > 0) {
+					pBall->vSpeed.x *= -1;
+					pBall->ThrowSparkles( D3DXVECTOR2( 0,  pBall->vSize.x/2 ) );
+					pBall->vPosition.x = 2*(vPosition.x - vSize.x/2) - pBall->vPosition.x - pBall->vSize.x;
+				} 
+				else {
+					pBall->vSpeed.x *= -1;
+					pBall->ThrowSparkles( D3DXVECTOR2( 0, -pBall->vSize.x/2 ) );
+					pBall->vPosition.x = 2*(vPosition.x + vSize.x/2) - pBall->vPosition.x + pBall->vSize.x;
+				}
+			}
+		}
+	}
 };
