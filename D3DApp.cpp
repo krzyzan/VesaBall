@@ -3,11 +3,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "stdafx.h"
 #include "D3DApp.h"
-
-#define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
-#define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
 //-----------------------------------------------------------------------------
 // Global access to the app (needed for the global WndProc())
@@ -27,54 +24,16 @@ LRESULT CALLBACK CD3DApp::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-LPDIRECT3DDEVICE8	CD3DApp::pd3dDevice	= NULL;
-
-CD3DApp::CD3DApp( HINSTANCE hInstance, INT ResX, INT ResY )
+CD3DApp::CD3DApp( INT ResX, INT ResY )
 {
 	s_pCurD3DApp	= this;
+	pd3dDevice		= NULL;
 
 	xRes			= ResX;
 	yRes			= ResY;
 
 	bActive			= FALSE;
 	bReady			= FALSE;
-
-////////////////////////////
-
-	// Create the Direct3D object
-	pD3D = Direct3DCreate8( D3D_SDK_VERSION );
-
-	// Create the DirectInput object
-	DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&pDI, NULL); 
-	// Initialize mouse input
-	InitDI();
-
-
-    // Register the window class
-	WNDCLASS wc = { 0, WndProc, 0, 0, hInstance, NULL, NULL, NULL, NULL,
-					  _T("D3D Window") };
-	RegisterClass( &wc );
-
-	// Create the render window 
-	hWnd = CreateWindow( _T("D3D Window"), _T("VesaBall"), WS_POPUP|WS_SYSMENU|WS_VISIBLE,
-						   CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
-						   NULL, NULL, hInstance, 0L );
-
-	InitD3D();
-}
-
-CD3DApp::~CD3DApp()
-{
-	bActive = FALSE;
-	bReady  = FALSE;
-
-	// Clean up everything and exit the app
-	//UnregisterClass( "Ball Game", hInst );
-
-	SAFE_RELEASE( pd3dDevice );
-	SAFE_RELEASE( pD3D );
-	SAFE_RELEASE( pDIDevice );
-	SAFE_RELEASE( pDI );
 }
 
 HRESULT CD3DApp::Run()
@@ -82,6 +41,7 @@ HRESULT CD3DApp::Run()
 	// Now we're ready to recieve and process Windows messages.
 	BOOL bGotMsg;
 	MSG  msg;
+	msg.message = WM_NULL;
 	PeekMessage( &msg, NULL, 0U, 0U, PM_NOREMOVE );
 
 	while( WM_QUIT != msg.message  )
@@ -132,18 +92,22 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 			}
 			break;
 
-        case WM_DESTROY:
-            PostQuitMessage( 0 );
-            return 0;
-
 		case WM_KEYDOWN:
 			switch( wParam )
 			{
 				case VK_ESCAPE:
-					PostQuitMessage( 0 );
+					SendMessage( hWnd, WM_CLOSE, 0, 0 );
 					break;
 			}
 			break;
+
+		case WM_CLOSE:
+            Cleanup3DEnvironment();
+            //DestroyMenu( GetMenu(hWnd) );
+            DestroyWindow( hWnd );
+            PostQuitMessage(0);
+            return 0;
+
     }
 
 	return DefWindowProc( hWnd, uMsg, wParam, lParam );
@@ -155,10 +119,6 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 //-----------------------------------------------------------------------------
 HRESULT CD3DApp::InitD3D()
 {
-	// Create the D3D object.
-	if (NULL == ( pD3D = Direct3DCreate8( D3D_SDK_VERSION )))
-		return E_FAIL;
-
 	// Get the current desktop display mode, so we can set up a back
 	// buffer of the same format
 	D3DDISPLAYMODE d3ddm;
@@ -175,19 +135,19 @@ HRESULT CD3DApp::InitD3D()
 	d3dpp.EnableAutoDepthStencil			= TRUE;
 	d3dpp.AutoDepthStencilFormat			= D3DFMT_D16;
 	d3dpp.BackBufferCount					= 2;
-	d3dpp.Flags								= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
+	//d3dpp.Flags							= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 	d3dpp.FullScreen_RefreshRateInHz		= D3DPRESENT_RATE_DEFAULT;
 	d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
 
 	// Create the D3DDevice
 	if( FAILED( pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
-									  D3DCREATE_HARDWARE_VERTEXPROCESSING,
+									  D3DCREATE_SOFTWARE_VERTEXPROCESSING,
 									  &d3dpp, &pd3dDevice ) ) )
 		return E_FAIL;
 
 	// Clear D3DDevice
+	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
 	pd3dDevice->Present( NULL, NULL, NULL, NULL );
-
 
 	return S_OK;
 }
@@ -271,7 +231,6 @@ HRESULT CD3DApp::InitDI()
     dipdw.dwData            = DIPROPAXISMODE_REL;
 
 	pDIDevice->SetProperty( DIPROP_AXISMODE , &dipdw.diph );
-	
 	pDIDevice->Acquire(); 
 
 	return S_OK;
@@ -281,8 +240,29 @@ HRESULT CD3DApp::InitDI()
 // Name: Create()
 // Desc: Create objects thru InitDeviceObjects() and RestoreDeviceObjects()
 //-----------------------------------------------------------------------------
-HRESULT CD3DApp::Create()
+HRESULT CD3DApp::Create( HINSTANCE hInstance )
 {
+	// Create the Direct3D object
+	pD3D = Direct3DCreate8( D3D_SDK_VERSION );
+
+	// Create the DirectInput object
+	DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&pDI, NULL); 
+	// Initialize mouse input
+	InitDI();
+
+
+    // Register the window class
+	WNDCLASS wc = { 0, WndProc, 0, 0, hInstance, NULL, NULL, NULL, NULL,
+					  _T("D3D Window") };
+	RegisterClass( &wc );
+
+	// Create the render window 
+	hWnd = CreateWindow( _T("D3D Window"), _T("VesaBall"), WS_POPUP|WS_SYSMENU|WS_VISIBLE,
+						   CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
+						   NULL, NULL, hInstance, 0L );
+
+	InitD3D();
+
 	HRESULT hr;
 	// Initialize the app's device-dependent objects
  	hr = InitDeviceObjects();
@@ -300,4 +280,25 @@ HRESULT CD3DApp::Create()
  		}
  	}
  	return hr;
+}
+
+HRESULT CD3DApp::Cleanup3DEnvironment()
+{
+	bActive = FALSE;
+	bReady  = FALSE;
+
+	if ( pd3dDevice ) {
+        InvalidateDeviceObjects();
+		DeleteDeviceObjects();
+	}
+    
+	SAFE_RELEASE( pd3dDevice );
+	SAFE_RELEASE( pD3D );
+	SAFE_RELEASE( pDIDevice );
+	SAFE_RELEASE( pDI );
+
+	// Clean up everything and exit the app
+	//UnregisterClass( "Ball Game", hInst );
+
+	return S_OK;
 }

@@ -5,18 +5,22 @@
 #pragma once
 
 #include <d3dx8.h>
-#include "Globals.h"
+#include <list>
+
+using namespace std;
+
+class CBall;		//TMP
 
 class CSprite  
 {
 public:
 	CSprite( LPDIRECT3DTEXTURE8 Texture, D3DXVECTOR2 Scaling, 
-				 D3DXVECTOR2 RotationCenter, float Rotation, 
-				 D3DXVECTOR2 Position, D3DCOLOR Blending );
+			FLOAT Rotation, D3DXVECTOR2 Position, D3DCOLOR Blending );
 	virtual ~CSprite();
 
 	virtual void Render( LPD3DXSPRITE pSprite );
 	virtual void FrameMove( FLOAT fElapsedTime ) = 0;
+	virtual void Collide( list<CBall*>* pListBall );
 
 	LPDIRECT3DTEXTURE8	pTexture;
 	D3DXVECTOR2			vScaling;

@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="Ball"
+	Name="VesaBall"
 	ProjectGUID="{04F8231C-3600-4F1A-BAB3-EF181905A63C}"
+	RootNamespace="VesaBall"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -23,7 +24,8 @@
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -31,8 +33,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib"
-				OutputFile="$(OutDir)/Ball.exe"
+				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib dxerr9.lib"
+				OutputFile="$(OutDir)/VesaBall.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="libci.lib"
@@ -71,7 +73,8 @@
 				Name="VCCLCompilerTool"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="4"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
@@ -79,8 +82,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib"
-				OutputFile="$(OutDir)/Ball.exe"
+				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib winmm.lib"
+				OutputFile="$(OutDir)/VesaBall.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="d3d8.lib d3dx8.lib"
 				IgnoreDefaultLibraryNames="libci.lib"
@@ -122,6 +125,9 @@
 				RelativePath=".\Ball.cpp">
 			</File>
 			<File
+				RelativePath=".\Brick.cpp">
+			</File>
+			<File
 				RelativePath=".\D3DApp.cpp">
 			</File>
 			<File
@@ -131,7 +137,16 @@
 				RelativePath=".\Deck.cpp">
 			</File>
 			<File
+				RelativePath=".\SparkEffect.cpp">
+			</File>
+			<File
 				RelativePath=".\Sprite.cpp">
+			</File>
+			<File
+				RelativePath=".\StdAfx.cpp">
+			</File>
+			<File
+				RelativePath=".\Timer.cpp">
 			</File>
 			<File
 				RelativePath=".\VesaBall.cpp">
@@ -145,6 +160,9 @@
 				RelativePath=".\Ball.h">
 			</File>
 			<File
+				RelativePath=".\Brick.h">
+			</File>
+			<File
 				RelativePath=".\D3DApp.h">
 			</File>
 			<File
@@ -154,10 +172,13 @@
 				RelativePath=".\Deck.h">
 			</File>
 			<File
-				RelativePath=".\Globals.h">
+				RelativePath=".\SparkEffect.h">
 			</File>
 			<File
 				RelativePath=".\Sprite.h">
+			</File>
+			<File
+				RelativePath=".\StdAfx.h">
 			</File>
 			<File
 				RelativePath=".\Timer.h">

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "D3DBallApp.h"
 
 //-----------------------------------------------------------------------------
@@ -8,8 +9,8 @@
 
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 {
-	CD3DBallApp app(hInst);
-	app.Create();
+	CD3DBallApp app;
+	app.Create( hInst );
 	return app.Run();
 }
 

@@ -1,10 +1,10 @@
-# Microsoft Developer Studio Project File - Name="Slampi" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="VesaBall" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Application" 0x0101
 
-CFG=Slampi - Win32 Debug
+CFG=VesaBall - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,12 +13,12 @@ CFG=Slampi - Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "VesaBall.mak" CFG="Slampi - Win32 Debug"
+!MESSAGE NMAKE /f "VesaBall.mak" CFG="VesaBall - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "Slampi - Win32 Release" (based on "Win32 (x86) Application")
-!MESSAGE "Slampi - Win32 Debug" (based on "Win32 (x86) Application")
+!MESSAGE "VesaBall - Win32 Release" (based on "Win32 (x86) Application")
+!MESSAGE "VesaBall - Win32 Debug" (based on "Win32 (x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -29,7 +29,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "Slampi - Win32 Release"
+!IF  "$(CFG)" == "VesaBall - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -56,7 +56,7 @@ LINK32=link.exe
 # ADD LINK32 d3d8.lib d3dx8.lib dinput8.lib dxguid.lib dxerr8.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
 # SUBTRACT LINK32 /profile
 
-!ELSEIF  "$(CFG)" == "Slampi - Win32 Debug"
+!ELSEIF  "$(CFG)" == "VesaBall - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -87,14 +87,18 @@ LINK32=link.exe
 
 # Begin Target
 
-# Name "Slampi - Win32 Release"
-# Name "Slampi - Win32 Debug"
+# Name "VesaBall - Win32 Release"
+# Name "VesaBall - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
 SOURCE=.\Ball.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Brick.cpp
 # End Source File
 # Begin Source File
 
@@ -116,10 +120,6 @@ SOURCE=.\Sprite.cpp
 
 SOURCE=.\VesaBall.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=.\winmain.rc
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -127,6 +127,10 @@ SOURCE=.\winmain.rc
 # Begin Source File
 
 SOURCE=.\Ball.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Brick.h
 # End Source File
 # Begin Source File
 

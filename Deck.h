@@ -3,8 +3,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #pragma once
-#define DIRECTINPUT_VERSION  0x0800
-
 #include <dinput.h>
 #include "Sprite.h"
 
@@ -14,7 +12,8 @@ public:
 	CDeck::CDeck( LPDIRECT3DTEXTURE8 iTexture, LPDIRECTINPUTDEVICE8 ipDIDevice );
 	virtual ~CDeck();
 
-	virtual void FrameMove( FLOAT fElapsedTime );
+	void FrameMove( FLOAT fElapsedTime );
+	void Collide( list<CBall*>* pListBall );
 
 private:
 	LPDIRECTINPUTDEVICE8	pDIDevice;

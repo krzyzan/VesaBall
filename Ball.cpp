@@ -3,18 +3,19 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "Ball.h"
-#include <Dxerr8.h>
+#include "Deck.h"
+#include "SparkEffect.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBall::CBall( LPDIRECT3DTEXTURE8 iTexture, D3DXVECTOR2 iPosition, CDeck* ipDeck )
-: CSprite( iTexture, D3DXVECTOR2(0.2f, 0.2f), D3DXVECTOR2(7.5f,7.5f), 0, 
-		  iPosition, 0xFFFFFFFF )
+CBall::CBall( LPDIRECT3DTEXTURE8 iTexture, D3DXVECTOR2 iPosition, D3DXVECTOR2 iDirection, list<CSprite*>* ipListRender, LPDIRECT3DTEXTURE8 iSparkTexture )
+: CSprite( iTexture, D3DXVECTOR2(0.3f, 0.3f), 0, iPosition, 0xFFFFFFFF )
 {
-	vDirection = D3DXVECTOR2(0.0001f*(rand()%2000-1000),0.0001f*(rand()%2000-1000));
-	pDeck = ipDeck;
+	pListRender = ipListRender;
+	vDirection = iDirection;
+	pSparkTexture = iSparkTexture;
 }
 
 CBall::~CBall()
@@ -24,8 +25,10 @@ CBall::~CBall()
 
 void CBall::FrameMove( FLOAT fElapsedTime )
 {
-	D3DXVECTOR2 vOldPosition = vPosition;
+	vOldPosition = vPosition;
 	vPosition += vDirection*fElapsedTime;
+
+	fRotation += 10.0f*fElapsedTime;
 
 	if (vPosition.y > 0.75f + vSize.y/2 ) {
 		bDeleteMe = TRUE;	
@@ -54,41 +57,51 @@ void CBall::FrameMove( FLOAT fElapsedTime )
 		vDirection.y *= -1;
 	}
 	*/
+}
 
-	if (abs(vOldPosition.x - pDeck->vPosition.x) < vSize.x/2 + pDeck->vSize.x/2 &&
-		abs(vPosition.y - pDeck->vPosition.y) < vSize.y/2 + pDeck->vSize.y/2 )
+void CBall::Bounce( CSprite* pDeck )
+{
+    D3DXVECTOR2 vSparkPosition(0.0f, 0.0f);
+
+	if (fabs(vOldPosition.x - pDeck->vPosition.x) < vSize.x/2 + pDeck->vSize.x/2 &&
+		fabs(vPosition.y - pDeck->vPosition.y) < vSize.y/2 + pDeck->vSize.y/2 )
 	{
 		if (vDirection.y > 0) {
+			vSparkPosition = vPosition + D3DXVECTOR2( 0, vSize.y/2 );
 			vPosition.y = 2*(pDeck->vPosition.y - pDeck->vSize.y/2) - vPosition.y - vSize.y;
-			vDirection.y *= -1;
 		} 
 		else {
+			vSparkPosition = vPosition - D3DXVECTOR2( 0, vSize.y/2 );
 			vPosition.y = 2*(pDeck->vPosition.y + pDeck->vSize.y/2) - vPosition.y + vSize.y;
-			vDirection.y *= -1;
 		}
-		return;
-	}
+		vDirection.y *= -1;
 
-	if (abs(vOldPosition.y - pDeck->vPosition.y) < vSize.y/2 + pDeck->vSize.y/2 &&
-		abs(vPosition.x - pDeck->vPosition.x) < vSize.x/2 + pDeck->vSize.x/2 )
+		//kod na krzywe odbicie od deski
+		FLOAT speed = D3DXVec2Length( &vDirection );
+		vDirection.x += (vPosition.x - pDeck->vPosition.x) * 5;
+		vDirection *= speed / D3DXVec2Length( &vDirection );
+	}
+	else
+	if (fabs(vOldPosition.y - pDeck->vPosition.y) < vSize.y/2 + pDeck->vSize.y/2 &&
+		fabs(vPosition.x - pDeck->vPosition.x) < vSize.x/2 + pDeck->vSize.x/2 )
 	{
 		if (vDirection.x > 0) {
+			vSparkPosition = vPosition + D3DXVECTOR2( vSize.x/2, 0 );
 			vPosition.x = 2*(pDeck->vPosition.x - pDeck->vSize.x/2) - vPosition.x - vSize.x;
-			vDirection.x *= -1;
 		}
 		else {
+			vSparkPosition = vPosition - D3DXVECTOR2( vSize.x/2, 0 );
 			vPosition.x = 2*(pDeck->vPosition.x + pDeck->vSize.x/2) - vPosition.x + vSize.x;
-			vDirection.x *= -1;
 		}
-		return;
+		vDirection.x *= -1;
 	}
-
-	//kod na krzywe odbicie od deski
-	
-	//vDirection.y *= -1;
-	//FLOAT speed = D3DXVec2Length( &vDirection );
-	//vDirection.x += (vPosition.x - pDeck->vPosition.x) / 10000;
-	//FLOAT newspeed = D3DXVec2Length( &vDirection );
-	//vDirection.x *= speed / newspeed;
-	//vDirection.y *= speed / newspeed;
+    
+	// Iskry przy odbiciu
+	if ( vSparkPosition != D3DXVECTOR2(0.0f, 0.0f) ) {
+		for ( int i=0; i<8; i++ ) {
+			D3DXVECTOR2 vSparkDirection = vDirection/4 + D3DXVECTOR2(0.001f*(rand()%256-128), 0.001f*(rand()%256-128) );
+			CSparkEffect* se = new CSparkEffect( pSparkTexture, vSparkPosition, vSparkDirection, 0.1f*(rand()%8+8) );
+			pListRender->push_back( se );
+		}
+	}
 }

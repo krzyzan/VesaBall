@@ -1,83 +1,94 @@
 // D3DBallApp.cpp: implementation of the CD3DBallApp class.
-// v1.14
+// v0.15
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "stdafx.h"
 #include "D3DBallApp.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CD3DBallApp::CD3DBallApp( HINSTANCE hInstance )
-: CD3DApp( hInstance, RES_X, RES_Y)
+CD3DBallApp::CD3DBallApp()
+: CD3DApp( RES_X, RES_Y )
 {	
+	srand( (INT)Timer.GetTime() );
 	numFrameMove	= 0;
 	numRender		= 0;
+	pSprite			= NULL;
+	ZeroMemory( pTex, sizeof(pTex) );
 }
 
 CD3DBallApp::~CD3DBallApp()
 {
-	//char str[100];
-	//_itoa(numFrameMove/numRender,str,10);
-	//DXTRACE_ERR(str,0);
+	char str[100];
+	_itoa((INT)(numFrameMove/numRender),str,10);
+	DXTRACE_ERR(str,0);
 }
 
 
 HRESULT CD3DBallApp::InitDeviceObjects()
 {
-	LoadTexture( "gfx/plank.png",	0 );
-	LoadTexture( "gfx/red.png",		1 );
-	LoadTexture( "gfx/Br¹z.png",	2 );
-	LoadTexture( "gfx/Fiolet.png",	3 );
-	LoadTexture( "gfx/tree2.jpg",	4 );
+	LoadTexture( "gfx/Deckzatruta.png",		0 );
+	LoadTexture( "gfx/Decknormalna.png",	1 );
+	LoadTexture( "gfx/Tree2.jpg",			2 );
+	LoadTexture( "gfx/kulkaa.png",			3 );
+	LoadTexture( "gfx/kulkab.png",			4 );
+	LoadTexture( "gfx/kulkac.png",			5 );
+	LoadTexture( "gfx/kulkad.png",			6 );
+	LoadTexture( "gfx/kulkae.png",			7 );
+	LoadTexture( "gfx/kulkaf.png",			8 );
+	LoadTexture( "gfx/kulkag.png",			9 );
+	LoadTexture( "gfx/kulkah.png",			10 );
+	LoadTexture( "gfx/kulkai.png",			11 );
+	LoadTexture( "gfx/kulkaj.png",			12 );
+	LoadTexture( "gfx/kulkak.png",			13 );
+	LoadTexture( "gfx/kulkal.png",			14 );
+	LoadTexture( "gfx/kulkam.png",			15 );
+	LoadTexture( "gfx/kulkan.png",			16 );
+	LoadTexture( "gfx/kulkao.png",			17 );
+	LoadTexture( "gfx/Cellblue.png",		18 );
+	LoadTexture( "gfx/Cellred.png",			19 );
+	LoadTexture( "gfx/Cellgren.png",		20 );
+	LoadTexture( "gfx/Cellmetala.png",		21 );
+	LoadTexture( "gfx/Cellmetalb.png",		22 );
+	LoadTexture( "gfx/Cellfoliaa.png",		23 );
+	LoadTexture( "gfx/Cellfoliab.png",		24 );
+	LoadTexture( "gfx/Cellfoliac.png",		25 );
+	LoadTexture( "gfx/Cellfoliad.png",		26 );
+	LoadTexture( "gfx/Cellwybucha.png",		27 );
+	LoadTexture( "gfx/Cellwybuchb.png",		28 );
+	LoadTexture( "gfx/Cellcool.png",		29 );
+	LoadTexture( "gfx/Cellbluegren.png",	30 );
+	LoadTexture( "gfx/SparkEffect.png",		50 );
 
-	CDeck* deck;
-	deck = new CDeck( pTex[0], pDIDevice );
-	listSprite.push_back( deck );
+	//Tworzymy deskê
+	CDeck* pDeck;
+	pDeck = new CDeck( pTex[1], pDIDevice );
+	listRender.push_back( pDeck );
 
-	//Tworzymy sprite'y
-	CSprite* sprite;
-	for (int i=0; i<10; i++)
-		for (int j=0; j<10; j++) {
-			sprite = new CBall( pTex[1], 
-				D3DXVECTOR2( FLOAT((rand()%1000-200)+100)/1000, FLOAT((rand()%750-200)+100)/1000 ),
-				deck );
-			listSprite.push_back( sprite );
+	//Tworzymy cegie³ki
+	CBrick* pBrick;
+	for (int j=1; j<5; j++) {
+		for (int i=1; i<10; i++) {
+			pBrick = new CBrick( pTex[22], D3DXVECTOR2( 0.01f*(rand()%100+1), 0.01f*(rand()%50+1) ) );
+			listRender.push_back( pBrick );
 		}
+	}
 
-	timerRender.Start();
+	//Tworzymy kulki
+	CBall* pBall;
+	for (int i=0; i<10; i++) {
+		pBall = new CBall( pTex[6], 
+			D3DXVECTOR2( FLOAT((rand()%1000-200)+100)/1000, FLOAT((rand()%750-200)+100)/1000 ),
+			D3DXVECTOR2( 1.0f*(rand()%2000-1000), 1.0f*(rand()%2000-1000))/2000,
+			&listRender, pTex[50] );
+		listRender.push_back( pBall );
+		listBall.push_back( pBall );
+	}
+
 	timerFrameMove.Start();
-
-	return S_OK;
-}
-
-
-HRESULT CD3DBallApp::Render()
-{
-	if (timerRender.GetAppTime() < 1.0f/120) 
-		return S_OK;
-
-	numRender++;
-	//pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
-
-	pd3dDevice->BeginScene();
-	pSprite->Begin();
-
-//temp
-	pSprite->Draw( pTex[4], NULL, &D3DXVECTOR2((FLOAT)RES_X/1024, (FLOAT)RES_Y/512), NULL, 0, NULL, 0xFF7F7F7F );
-//koniec temp
-
-
-	list<CSprite*>::iterator iSprite;
-	for (iSprite = listSprite.begin(); iSprite != listSprite.end(); iSprite++)
-		(*iSprite)->Render( pSprite );
-
-	pSprite->End();
-	pd3dDevice->EndScene();
-
-	// Show the frame on the primary surface.
-	pd3dDevice->Present( NULL, NULL, NULL, NULL );
-	timerRender.Reset();
+	fTimeToRender = 0;
 
 	return S_OK;
 }
@@ -86,19 +97,73 @@ HRESULT CD3DBallApp::Render()
 HRESULT CD3DBallApp::FrameMove()
 {
 	FLOAT fElapsedTime = timerFrameMove.GetElapsedTime();
+	fTimeToRender -= fElapsedTime;
+
+	//TMP: u mnie czasem zawiesza siê timer na 2 sek.
+	if ( fElapsedTime > 0.1 ) return S_OK;	
 	numFrameMove++;
 
 	list<CSprite*>::iterator iSprite;
-	for (iSprite = listSprite.begin(); iSprite != listSprite.end(); iSprite++)
+
+	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
 		(*iSprite)->FrameMove( fElapsedTime );
 
-	// Kasujemy sprite'y
-	for (iSprite = listSprite.begin(); iSprite != listSprite.end(); iSprite++)
+	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
+		(*iSprite)->Collide( &listBall );
+
+
+	// Kasujemy obiekty
+	list<CBall*>::iterator iBall = listBall.begin(); 
+	while (iBall != listBall.end()) {
+		if ((*iBall)->bDeleteMe)
+			iBall = listBall.erase( iBall );
+		else
+			iBall++;
+	}
+
+	iSprite = listRender.begin();
+	while (iSprite != listRender.end()) {
 		if ((*iSprite)->bDeleteMe) {
 			delete (*iSprite);
-			iSprite = listSprite.erase( iSprite );
-			iSprite--;
+			iSprite = listRender.erase( iSprite );
 		}
+		else
+			iSprite++;
+	}
+
+	// GAME OVER !!!!
+	if (listBall.empty())
+		return E_FAIL;
+
+	return S_OK;
+}
+
+
+HRESULT CD3DBallApp::Render()
+{
+	if (fTimeToRender > 0) 
+		return S_OK;
+
+	fTimeToRender = 1.0f/100;
+	numRender++;
+	//pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
+
+	pd3dDevice->BeginScene();
+
+	pSprite->Begin();
+
+	// t³o
+	pSprite->Draw( pTex[2], NULL, &D3DXVECTOR2((FLOAT)RES_X/1024, (FLOAT)RES_Y/512), NULL, 0, NULL, 0xFF7F7F7F );
+
+	list<CSprite*>::iterator iSprite;
+	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
+		(*iSprite)->Render( pSprite );
+
+	pSprite->End();
+	pd3dDevice->EndScene();
+
+	// Show the frame on the primary surface.
+	pd3dDevice->Present( NULL, NULL, NULL, NULL );
 
 	return S_OK;
 }
@@ -115,12 +180,18 @@ HRESULT CD3DBallApp::InvalidateDeviceObjects()
 	return S_OK;
 }
 
+HRESULT CD3DBallApp::DeleteDeviceObjects()
+{
+	for (int i=0; i<256; i++)
+		SAFE_RELEASE( pTex[i] );
+	return S_OK;
+}
+
 HRESULT CD3DBallApp::LoadTexture( LPCTSTR nameTexture, DWORD numTex )
 {
 	D3DXCreateTextureFromFileEx( pd3dDevice, nameTexture, D3DX_DEFAULT, D3DX_DEFAULT,
-		D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED , D3DX_DEFAULT,
-		D3DX_DEFAULT , 0x00FF00FF,NULL,NULL, &pTex[numTex] );
+		D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED ,D3DX_DEFAULT,
+		D3DX_DEFAULT ,0x00FF00FF, NULL, NULL, &pTex[numTex] );
 
 	return S_OK;
-
 }

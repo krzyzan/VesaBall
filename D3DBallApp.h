@@ -1,5 +1,5 @@
 // D3DBallApp.h: interface for the CD3DBallApp class.
-// v0.14
+// v0.15
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -7,27 +7,26 @@
 Changelog:
 
 v0.10
-	- Wersja poczatkowa (zrobiona u Laski)
-	- obs³uga Direct3D
+	- Wersja poczatkowa (zrobiona u ZIKO)
 
 v0.11
 	- Dodana klasa CSprite
 	- Dodana klasa CBall
 	- Dodana klasa CDeck
 
-v1.12
-	- G³ówna tablica spritów jest teraz list¹ (mozna kasowaæ w œrodku)
+v0.12
+	- G³ówna tablica spritów jest teraz list¹ (szybko kasuje w œrodku)
 	- CSprite::Draw() podzielone na Render() i FrameMove()
 	- CSprite'y s¹ usuwane z listy w CD3DBallApp::FrameMove() je¿eli bDeleteMe = TRUE;
 	- CBall kasuje siê gdy wyleci za dolna krawêdŸ ekranu
 	- Grafika przeniesiona do katalogu gfx
 
-v1.13
+v0.13
 	- Kana³ alpha w teksturach
 	- CSprite::vPosition jest na œrodku obiektu (by³ w rogu)
 	- Ruch kulek niezale¿ny od czasu
 
-v1.14
+v0.14
 	- Skalowanie obiektów i t³a zale¿nie od rozdzielczoœci
 	- CSprite::vPosition jest typu FLOAT od 0.0f do 1.0f (!)
 	- dodany Reset() w konstruktorze CTimer, 
@@ -35,18 +34,30 @@ v1.14
 	- CSprite::FrameMove() jest teraz CSprite::FrameMove( FLOAT fElapsedTime )
 		i wszystkie obiekty dostaj¹ wspólny czas z timerFrameMove
 	- Poprawne obliczanie odbiæ
-    
+	- ZIKO: Ustawianie RotationCenter na œrodku
+	- ZIKO: Nowa grafika
+v0.15
+	- Na brzegach deska odbija kulki pod innym k¹tem
+	- Obliczanie kolizji obiektów w osobnej pêtli (po wykonaniu ruchów)
+	- Obs³uga "Precompiled Headers" i ogólne porzadki z plikami projektu :)
+	- Dodana klasa CBrick
+	- Iskry przy odbiciu
+	- Poczatek kodu Game Over (na razie wy³¹czony)
+  
 ToDo:
+	- Zrobic wspólna klasê bazow¹ np. CMovingObject
+	- CBall::Bounce przenieœæ do CDeck i do CBrick
+	- Zrobiæ Game Over
+	- CSprite::CSprite() pobiera vSize, a nie oblicza z tekstury 
+	- Podzieliæ CSprite::FrameMove() na virtual CSprite::Move() i virtual CSprite::Bounce()
 	- Co robiæ gdy wjedziemy bokiem deski w kulkê???
-	- Przerzuciæ odbicia do osobnej funkcji ( virtual Collide?? )
-	- zrobiæ cegie³ki czyli CCell
-	- zrobiæ CCellArray
+	- zrobiæ cegie³ki czyli CBrick
+	- zrobiæ CBrickArray
 	- zrobiæ obs³ugê dŸwiêku (np. kasuj¹c niepotrzebny kod z sampli do DSound )
 
 ToDo:
-	- Iskry przy odbiciu
 	- Gumowa deska
-	- Deska co losowo odbija 
+	- Deska, która losowo odbija 
 */
 
 
@@ -57,28 +68,32 @@ ToDo:
 
 #include "Deck.h"
 #include "Ball.h"
+#include "Brick.h"
+#include "SparkEffect.h"	//TMP
 
 using namespace std;
 
 class CD3DBallApp : public CD3DApp  
 {
 public:
+	CD3DBallApp();
+	virtual ~CD3DBallApp();
+
 	HRESULT LoadTexture( LPCTSTR nameTexture, DWORD numTex );
 	HRESULT InitDeviceObjects();
 	HRESULT FrameMove();
+	HRESULT Render();
 	HRESULT RestoreDeviceObjects();
 	HRESULT InvalidateDeviceObjects();
-	HRESULT Render();
-	CD3DBallApp( HINSTANCE hInstance );
-	virtual ~CD3DBallApp();
+	HRESULT DeleteDeviceObjects();
 
 	LPDIRECT3DTEXTURE8		pTex[256];
 	LPD3DXSPRITE			pSprite;
-	list<CSprite*>			listSprite;
+	list<CSprite*>			listRender;
+	list<CBall*>			listBall;
 	
 	CTimer					timerFrameMove;
-	CTimer					timerRender;
+	FLOAT					fTimeToRender;
 
-	FLOAT					numFrameMove;
-	FLOAT					numRender;
+	FLOAT					numFrameMove, numRender;
 };
