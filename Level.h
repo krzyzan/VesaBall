@@ -1,7 +1,7 @@
 #pragma once
 
 #define BRICK_X		20
-#define BRICK_Y		40
+#define BRICK_Y		30
 
 #include "D3DAppScene.h"
 #include "timer.h"

@@ -113,15 +113,19 @@ HRESULT CD3DBallApp::CreateLevel()
 	pLevel->LoadTexture( "gfx/Ball_alu.png", &pBallTex );
 	pLevel->LoadTexture( "gfx/SparkEffect.png", &pSparkTex );
 	pLevel->LoadTexture( "gfx/Lightning.png", &pLightningTex );
+
+	//TODO: gdy dodajemy kulke po desce b³yskawica pojawia sie w z³ym mejscu
 	pLevel->AddPaddle( pPaddleTex, pLightningTex, pBallTex, pSparkTex );
 
 	//Tworzymy cegie³ki
 	pLevel->LoadTexture( "gfx/Brick5.png", &pBrickTex );
-	int x, y;
-	for (y=0; y<BRICK_Y/2; y++)
-		for (x=0; x<BRICK_X; x++)
+
+	float x, y;
+	for (y=BOARD_T+BOARD_H/2/BRICK_Y; y<BOARD_T+BOARD_H*0.75; y+=BOARD_H/BRICK_Y)
+		for (x=BOARD_L+BOARD_W/2/BRICK_X; x<BOARD_R; x+=BOARD_W/BRICK_X)
 			if (rand()%4>0)
-				pLevel->AddBrick( pBrickTex, D3DXVECTOR2( (0.5f+x)/BRICK_X, (0.5f+y)/BRICK_Y ), D3DXVECTOR2(1.0f/BRICK_X, 1.0f/BRICK_Y) );
+				pLevel->AddBrick( pBrickTex, D3DXVECTOR2( x, y ), 
+					D3DXVECTOR2( BOARD_W/BRICK_X, BOARD_H/BRICK_Y) );
 
 
 	return S_OK;

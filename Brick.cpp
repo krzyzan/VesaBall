@@ -9,7 +9,7 @@
 
 
 CBrick::CBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size, list<CSprite*>* ListRender, list<CMovingSprite*>* ListFrameMove )
-: CSprite( Texture, Size, 0, Position, (DWORD)(rand()%192+64) | (DWORD)(rand()%192+64)*0x000100 | (DWORD)(rand()%192+64)*0x010000 | 0xFF000000 )
+: CSprite( Texture, Size, 0, Position, D3DXCOLOR( frand(0.5f,1.0f), frand(0.5f,1.0f), frand(0.5f,1.0f), 1.0f) )
 {
 	pListRender = ListRender;
 	pListFrameMove = ListFrameMove;
@@ -18,13 +18,14 @@ CBrick::CBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const 
 CBrick::~CBrick()
 {
 	CEffectSprite* pEffectSprite = new CEffectSprite( pTexture, vSize, vPosition, D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), 0.25f, 0xFFFFFFFF );
-	pListFrameMove->push_back( pEffectSprite );
-	pListRender->push_back( pEffectSprite );
+	pListFrameMove->push_front( pEffectSprite );
+	pListRender->push_front( pEffectSprite );
 }
 
 void CBrick::BallHits( CBall* pBall, const D3DXVECTOR2 & vSide )
 {
-	//TODO: kod jest szybki ale nawet ja ju¿ go nie rozumiem :(
+	/*
+	//TODO: przegladn¹æ
 	if (vSide.y){
 		pBall->vSpeed.y *= -1;
 		pBall->vPosition.y = 2*(vPosition.y + vSide.y) - pBall->vPosition.y;
@@ -38,5 +39,6 @@ void CBrick::BallHits( CBall* pBall, const D3DXVECTOR2 & vSide )
 	}
 
 	pBall->StrikeSparkles( vSide );
+	*/
 	bDeleteMe = TRUE;
 };

@@ -33,7 +33,6 @@ CLevel::~CLevel()
 	*/
 }
 
-
 HRESULT CLevel::InitDeviceObjects()
 {
 	timerRenderLimiter.Start();
@@ -60,9 +59,8 @@ HRESULT CLevel::RenderLoop()
 		return S_OK;	
 	numFrameMove++;
 
-	MoveObjects( fElapsedTime );
-	
 	DestroyObjects();
+	MoveObjects( fElapsedTime );
 
 ///////////////////////////////////////
 	
@@ -76,9 +74,6 @@ HRESULT CLevel::RenderLoop()
 ///////////////////////////////////////
 
 	RenderObjects();
-
-	// Show the frame on the primary surface.
-	pd3dDevice->Present( NULL, NULL, NULL, NULL );
 
 	return S_OK;
 }
@@ -168,6 +163,9 @@ HRESULT CLevel::RenderObjects()
 	pSprite->End();
 	pd3dDevice->EndScene();
 
+	// Show the frame on the primary surface.
+	pd3dDevice->Present( NULL, NULL, NULL, NULL );
+
 	return S_OK;
 }
 
@@ -175,8 +173,8 @@ HRESULT CLevel::RenderObjects()
 CBall* CLevel::AddBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, LPDIRECT3DTEXTURE8 SparkTexture )
 {
 	CBall* pBall = new CBall( Texture, Position, Speed, &listBallObst,  &listRender, &listFrameMove, SparkTexture );
-	listRender.push_back( pBall );
-	listFrameMove.push_back( pBall );
+	listRender.push_front( pBall );
+	listFrameMove.push_front( pBall );
 
 	return pBall;
 }
@@ -194,13 +192,13 @@ CBrick* CLevel::AddBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Positi
 CPaddle* CLevel::AddPaddle( LPDIRECT3DTEXTURE8 PaddleTex, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECT3DTEXTURE8 BallTex, LPDIRECT3DTEXTURE8 SparkleTex )
 {
 	CPaddle* pPaddle = new CPaddle( PaddleTex, LightningTex, pDIDevice );
-	CBall* pBall = AddBall( BallTex, pPaddle->vPosition + D3DXVECTOR2(0.01f, 0), D3DXVECTOR2(), SparkleTex );
-	pBall->vPosition.y = pPaddle->vPosition.y - pPaddle->vSize.y/2 - pBall->vSize.y/2;	//TODO: TMP
-	pPaddle->CatchBall( pBall );
-
 	listRender.push_back( pPaddle );
 	listFrameMove.push_back( pPaddle );
 	listBallObst.push_back( pPaddle );
+
+	CBall* pBall = AddBall( BallTex, pPaddle->vPosition + D3DXVECTOR2(0.01f, 0), D3DXVECTOR2(), SparkleTex );
+	pBall->vPosition.y = pPaddle->vPosition.y - pPaddle->vSize.y/2 - pBall->vSize.y/2;	//TODO: TMP
+	pPaddle->CatchBall( pBall );
 
 	return pPaddle;
 }

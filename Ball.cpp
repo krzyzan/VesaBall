@@ -44,30 +44,31 @@ HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 	vOldPosition = vPosition;
 	vPosition += vSpeed*fElapsedTime;
 
-	if (vPosition.y > 0.75f + vSize.y/2 ) {
+	// kasuj gdy wyjdzie za ekran
+	if (vPosition.y > BOARD_B + vSize.y/2 ) {
 		bDeleteMe = TRUE;	
 		return S_OK;
 	}
 
-	//odbicia od œcian
-	if (vPosition.x - vSize.x/2 < 0.0f) {
-		vPosition.x = 2*0.00f - vPosition.x + vSize.x;
+	// odbicia od œcian
+	if (vPosition.x - vSize.x/2 < BOARD_L) {
+		vPosition.x = 2*BOARD_L - vPosition.x + vSize.x;
 		vSpeed.x *= -1;
 	}
 
-	if (vPosition.y - vSize.y/2 < 0.0f) {
-		vPosition.y = 2*0.00f - vPosition.y + vSize.y;
+	if (vPosition.x + vSize.x/2 > BOARD_R) {
+		vPosition.x = 2*BOARD_R - vPosition.x - vSize.x;
+		vSpeed.x *= -1;
+	}
+
+	if (vPosition.y - vSize.y/2 < BOARD_T) {
+		vPosition.y = 2*BOARD_T - vPosition.y + vSize.y;
 		vSpeed.y *= -1;
 	}
 
-	if (vPosition.x + vSize.x/2 > 1.0f) {
-		vPosition.x = 2*1.00f - vPosition.x - vSize.x;
-		vSpeed.x *= -1;
-	}
-
 	/*
-	if (vPosition.y + vSize.y/2 > 0.75f) {
-		vPosition.y = 2*0.75f - vPosition.y - vSize.y;
+	if (vPosition.y + vSize.y/2 > BOARD_B) {
+		vPosition.y = 2*BOARD_B - vPosition.y - vSize.y;
 		vSpeed.y *= -1;
 	}
 	*/
@@ -76,7 +77,8 @@ HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 	list<CSprite*>::iterator iObst;
 	for (iObst = pListObst->begin(); iObst != pListObst->end(); iObst++) {
 		D3DXVECTOR2 vSide = IsColliding( *iObst );
-		if (vSide == D3DXVECTOR2(0,0)) continue;
+		if (vSide == D3DXVECTOR2(0,0)) 
+			continue;
 		(*iObst)->BallHits( this, vSide );
 	}
 
@@ -84,15 +86,16 @@ HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 }
 
 // Iskry przy odbiciu
-void CBall::StrikeSparkles( const D3DXVECTOR2 & vPositionFromCenter )
+void CBall::StrikeSparkles( const D3DXVECTOR2 & vSide )
 {
 	D3DXVECTOR2 vSparkSize		= D3DXVECTOR2(1.0f/256, 1.0f/256);
-	D3DXVECTOR2 vSparkPosition	= vPositionFromCenter + vPosition;
+	D3DXVECTOR2 vSparkPosition	= vPosition + vSide;
 	D3DXVECTOR2 vSparkGravity	= D3DXVECTOR2( 0.0f, 0.4f );
 	for (int i=0; i<8; i++) {
-			FLOAT fSparkDuration	= frand(0.4f, 1.0f);
+			FLOAT fSparkDuration = frand(0.4f, 1.0f);
 			D3DXVECTOR2 vSparkSpeed = D3DXVECTOR2( frand(-1.0f, 1.0f), frand(-1.0f, 1.0f) )/10 + vSpeed/4;
-			CEffectSprite* pEffectSprite = new CEffectSprite( pSparkTexture, vSparkSize, vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
+			CEffectSprite* pEffectSprite = new CEffectSprite( pSparkTexture, vSparkSize, 
+				vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
 			pListFrameMove->push_back( pEffectSprite );
 			pListRender->push_back( pEffectSprite );
 	}

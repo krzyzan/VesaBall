@@ -9,8 +9,8 @@
 
 CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECTINPUTDEVICE8 DIDevice )
 	: CMovingSprite( Texture, D3DXVECTOR2(1.0f/8, 1.0f/64), 0, 
-		D3DXVECTOR2(0.5f, 0.75f-1.0f/64), D3DXVECTOR2(0, 0), 
-		D3DXVECTOR2(0, 0), 0xFFFFFFFF)
+		D3DXVECTOR2(BOARD_L+BOARD_W/2, BOARD_B-1.0f/64), 
+		D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), 0xFFFFFFFF)
 {
 	pLightningPaddle = new CSprite( LightningTex, D3DXVECTOR2( vSize.x, vSize.y*2), fRotation, vPosition - D3DXVECTOR2(0,vSize.y/2), dwBlending );
 	pLightningBall = new CSprite( LightningTex, vSize, fRotation, vPosition - D3DXVECTOR2(0,vSize.y), dwBlending );
@@ -35,15 +35,17 @@ HRESULT CPaddle::FrameMove( FLOAT fElapsedTime )
 		pDIDevice->Acquire();
 
 	// obliczamy 
-	FLOAT fHorizMovement = (FLOAT)dims2.lX * 1.5f / RES_X;
-	if (vPosition.x + fHorizMovement < 0.0f + vSize.x/2) fHorizMovement = 0.0f + vSize.x/2 - vPosition.x;
-	if (vPosition.x + fHorizMovement > 1.0f - vSize.x/2) fHorizMovement = 1.0f - vSize.x/2 - vPosition.x;
-	vPosition.x	+= fHorizMovement;
+	// TODO: CMovingSprite::FrameMove?
+	vOldPosition = vPosition;
+	vPosition.x += (FLOAT)dims2.lX * 1.5f / RES_X;
+
+	vPosition.x = max( vPosition.x, BOARD_L + vSize.x/2 );
+	vPosition.x = min( vPosition.x, BOARD_R - vSize.x/2 );
 
 	// przesuwamy z³apane pi³ki razem z desk¹
 	list<CBall*>::iterator iBall;
 	for (iBall = listCatchedBalls.begin(); iBall != listCatchedBalls.end(); iBall++) {
-		(*iBall)->vPosition.x += fHorizMovement;
+		(*iBall)->vPosition.x += vPosition.x - vOldPosition.x;
 	}
 
 	// startujemy pi³ki
@@ -91,14 +93,15 @@ void CPaddle::Render( LPD3DXSPRITE pSprite ) const
 
 void CPaddle::CatchBall( CBall* pBall )
 {
-	//TODO: Minimize, Maximize ¿eby pi³ka by³a na desce :)
+	pBall->vPosition.x = min(pBall->vPosition.x, vPosition.x + vSize.x/3);
+	pBall->vPosition.x = max(pBall->vPosition.x, vPosition.x - vSize.x/3);
 	pBall->vSpeed = D3DXVECTOR2(0,0);
 	listCatchedBalls.push_back( pBall );
 }
 
 void CPaddle::LaunchBall( CBall* pBall, FLOAT speed )
 {
-	D3DXVECTOR2 vDirection = pBall->vPosition - D3DXVECTOR2(vPosition.x, 0.75f);
+	D3DXVECTOR2 vDirection = pBall->vPosition - D3DXVECTOR2(vPosition.x, BOARD_B );
 	D3DXVec2Normalize( &vDirection, &vDirection );
 	pBall->vSpeed = vDirection * speed;
 }

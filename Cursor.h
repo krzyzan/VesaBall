@@ -21,4 +21,7 @@ public:
 private:
 	LPDIRECTINPUTDEVICE8	pDIDevice;
 	list<CMenuItem*>*		pListMenuItem;
+	CMenuItem*				pOldMenuItem;
+	CMenuItem*				pPressedMenuItem;
+	BOOL					bOldButtonState;
 };

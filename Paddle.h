@@ -28,7 +28,7 @@ public:
 private:
 	LPDIRECTINPUTDEVICE8 pDIDevice;
 	CSprite* pLightningPaddle;
-	CSprite* pLightningBall;
+	CSprite* pLightningBall;							//TODO?
 	FLOAT fTimeToLightningChange;
 
 
