@@ -29,7 +29,7 @@ void CCounter::Render( LPD3DXSPRITE pSprite ) const
 {
 	D3DXVECTOR2 Position = (vPosition - vSize/2);
 	for (int r=dwNumRollers-1; r>=0; r--) {
-		CONST RECT SrcRect = {0, (LONG)(fmod(pRoller[r],10)*dwDigitHeight), 64, (LONG)((fmod(pRoller[r],10)+1)*dwDigitHeight) };
+		CONST RECT SrcRect = {0, ((LONG)pRoller[r]%10)*dwDigitHeight, 64, ((LONG)pRoller[r]%10 + 1)*dwDigitHeight };
 		pSprite->Draw( pTexture, &SrcRect, &vScaling, &vRotationCenter, fRotation, &(Position * RES_X), dwBlending );
 		Position.x += vSize.x/dwNumRollers;
 	}

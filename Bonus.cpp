@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "bonus.h"
+#include "StdAfx.h"
+#include "Bonus.h"
 
 LPDIRECT3DTEXTURE8*	CBonus::s_pTextures;
 
@@ -18,12 +18,6 @@ CBonus::~CBonus()
 HRESULT CBonus::FrameMove( FLOAT fElapsedTime )
 {
 	CMovingSprite::FrameMove( fElapsedTime );
-
-	// kasuj gdy wyjdzie za ekran
-	if (vPosition.y > BOARD_B + vSize.y/2 ) {
-		bDeleteMe = TRUE;	
-		return S_OK;
-	}
 
 	// odbicia od œcian
 	if (vPosition.x - vSize.x/2 < BOARD_L) {

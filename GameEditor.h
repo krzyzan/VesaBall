@@ -1,10 +1,20 @@
 #pragma once
-#include "d3dappscene.h"
+#include "GameBoard.h"
+
+class CCursor;
 
 class CGameEditor :
-	public CD3DAppScene
+	public CGameBoard
 {
 public:
 	CGameEditor( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
-	virtual ~CGameEditor(void);
+	virtual ~CGameEditor();
+
+	HRESULT InitDeviceObjects();
+	HRESULT RenderLoop();
+	HRESULT DeleteDeviceObjects();
+
+protected:
+	CCursor*	pCursor;
+	BYTE		curType;
 };

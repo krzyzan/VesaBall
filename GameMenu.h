@@ -29,9 +29,7 @@ public:
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
 
-	HRESULT AddMenuTitle( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position, D3DCOLOR Blending );
-	HRESULT AddMenuItem( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position, D3DCOLOR Blending, HRESULT UID );
-	HRESULT AddCursor( LPDIRECT3DTEXTURE8 pTex );
+	CMenuItem*			GetPointedMenuItem();
 
 	LPD3DXSPRITE		pSprite;
 
@@ -41,5 +39,4 @@ public:
 
 	CMenuItem*			pOldMenuItem;
 	CMenuItem*			pPressedMenuItem;
-	BOOL				bOldButtonState;
 };

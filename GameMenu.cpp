@@ -12,27 +12,36 @@ CGameMenu::CGameMenu( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice
 
 	pOldMenuItem = NULL;
 	pPressedMenuItem = NULL;
-	bOldButtonState = false;
 }
 
 HRESULT CGameMenu::InitDeviceObjects()
 {
 	LPDIRECT3DTEXTURE8 pTex;
 
+	CMenuItem* pMenuItem;
 	LoadTexture( "gfx/Menu_title.png", &pTex );
-    AddMenuTitle( pTex, D3DXVECTOR2( 0.8f, 0.2f ), D3DXVECTOR2( 0.5f, 0.15f ),	0xFFFFFFFF );
+	pMenuItem = new CMenuItem( pTex, D3DXVECTOR2( 0.8f, 0.2f ), D3DXVECTOR2( 0.5f, 0.15f ), 0xFFFFFFFF, 0 );
+	listRender.push_back( pMenuItem );
 
 	LoadTexture( "gfx/Menu_start.png", &pTex );
-	AddMenuItem( pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.4f ), 0xFFFFCC00, UID_START );
+	pMenuItem = new CMenuItem( pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.4f ), 0xFFFFCC00, UID_START );
+	listRender.push_back( pMenuItem );
+	listMenuItem.push_back( pMenuItem );
 
 	LoadTexture( "gfx/Menu_editor.png", &pTex );
-	AddMenuItem( pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.5f ), 0xFFFFCC00, UID_EDITOR );
+	pMenuItem = new CMenuItem( 	pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.5f ), 0xFFFFCC00, UID_EDITOR );
+	listRender.push_back( pMenuItem );
+	listMenuItem.push_back( pMenuItem );
 
 	LoadTexture( "gfx/Menu_quit.png", &pTex );
-	AddMenuItem( pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.6f ), 0xFFFFCC00, UID_QUIT );
+	pMenuItem = new CMenuItem( 	pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.6f ), 0xFFFFCC00, UID_QUIT );
+	listRender.push_back( pMenuItem );
+	listMenuItem.push_back( pMenuItem );
 
 	LoadTexture( "gfx/Cursor_arrow.png", &pTex );
-	AddCursor( pTex );
+	pCursor = new CCursor( pTex );
+	listRender.push_back( pCursor );
+
 
 	return S_OK;
 }
@@ -45,66 +54,83 @@ HRESULT CGameMenu::RestoreDeviceObjects()
 	return S_OK;
 }
 
+CMenuItem* CGameMenu::GetPointedMenuItem()
+{
+	list<CMenuItem*>::iterator iMenuItem;
+	for (iMenuItem = listMenuItem.begin(); iMenuItem != listMenuItem.end(); iMenuItem++)
+		if (fabs((*iMenuItem)->vPosition.y - pCursor->vPosition.y) < (*iMenuItem)->vSize.y/2 &&
+				fabs((*iMenuItem)->vPosition.x - pCursor->vPosition.x) < (*iMenuItem)->vSize.x/2 )
+			break;
+	return (iMenuItem != listMenuItem.end()) ? *iMenuItem : NULL;
+}
+
 
 HRESULT CGameMenu::RenderLoop()
 {
+    DIDEVICEOBJECTDATA didod[ MOUSE_BUFFER_SIZE ];  // Receives buffered data 
+    DWORD              dwElements;
+    HRESULT            hr;
 
-////////
+    if (NULL == pDIDevice) 
+        return S_OK;
+    
+    dwElements = MOUSE_BUFFER_SIZE;
+    if (FAILED( hr = pDIDevice->GetDeviceData( sizeof(DIDEVICEOBJECTDATA),
+                                     didod, &dwElements, 0 ) ) )
+        return hr;
 
-	DIMOUSESTATE2 dims2;
-	ZeroMemory( &dims2, sizeof(dims2) );
-	pDIDevice->GetDeviceState( sizeof(DIMOUSESTATE2), &dims2 );
+	CMenuItem* pCurMenuItem = GetPointedMenuItem();
+	if (pCurMenuItem) pCurMenuItem->SetHighlighted( true );
 
-	pCursor->MouseMove( &dims2 );
-
-	CMenuItem* pCurMenuItem; 
-	if ( pPressedMenuItem ) {
-		if (fabs(pPressedMenuItem->vPosition.y - pCursor->vPosition.y) < pPressedMenuItem->vSize.y/2 &&
-				fabs(pPressedMenuItem->vPosition.x - pCursor->vPosition.x) < pPressedMenuItem->vSize.x/2 )
-			pCurMenuItem = pPressedMenuItem;
-		else
-			pCurMenuItem = NULL;
-	}
-	else {
-		list<CMenuItem*>::iterator iMenuItem;
-		for (iMenuItem = listMenuItem.begin(); iMenuItem != listMenuItem.end(); iMenuItem++)
-			if (fabs((*iMenuItem)->vPosition.y - pCursor->vPosition.y) < (*iMenuItem)->vSize.y/2 &&
-					fabs((*iMenuItem)->vPosition.x - pCursor->vPosition.x) < (*iMenuItem)->vSize.x/2 )
+	for (DWORD i=0; i<dwElements; i++) {
+		switch (didod[ i ].dwOfs) {
+			case DIMOFS_X:
+				pCursor->Move( D3DXVECTOR2( MOUSE_SPEED * (int)didod[ i ].dwData, 0 ) );
 				break;
-		pCurMenuItem = (iMenuItem != listMenuItem.end()) ? *iMenuItem : NULL;
-	}
-
-	BOOL bCurButtonState = dims2.rgbButtons[0];
-
-	if (pCurMenuItem != pOldMenuItem) {
-		if (pOldMenuItem)
-			pOldMenuItem->SetHighlighted( false );
-		if (pCurMenuItem)
-			pCurMenuItem->SetHighlighted( true );
-	}
-
-	// przycisk wcisniety
-	if (pCurMenuItem && !bOldButtonState &&  bCurButtonState ) {
-		pPressedMenuItem = pCurMenuItem; 
-		pPressedMenuItem->SetPressed( true );
-	}
-
-	// przycisk puszczony
-	if (pPressedMenuItem && bOldButtonState && !bCurButtonState ) {
-		pPressedMenuItem->SetPressed( false );
-		if (pCurMenuItem == pPressedMenuItem) {
-			pPressedMenuItem = NULL;
-			return pCurMenuItem->GetUID();
+			case DIMOFS_Y:
+				pCursor->Move( D3DXVECTOR2( 0, MOUSE_SPEED * (int)didod[ i ].dwData ) );
+				break;
 		}
-		pPressedMenuItem = NULL;
-	}
 
-	pOldMenuItem = pCurMenuItem;
-	bOldButtonState = bCurButtonState;
+		switch (didod[ i ].dwOfs)
+        {
+            case DIMOFS_X:
+            case DIMOFS_Y:
+				pOldMenuItem = pCurMenuItem;
+				pCurMenuItem = GetPointedMenuItem();
+				if (pPressedMenuItem && pCurMenuItem != pPressedMenuItem)
+					pCurMenuItem = NULL;
+				if (pCurMenuItem != pOldMenuItem) {
+					if (pOldMenuItem)
+						pOldMenuItem->SetHighlighted( false );
+					if (pCurMenuItem)
+						pCurMenuItem->SetHighlighted( true );
+				}
+                break;
+
+            case DIMOFS_BUTTON0:
+				if (didod[ i ].dwData & 0x80) {		// przycisk nacisniety
+						if ( pCurMenuItem ) {
+						pPressedMenuItem = pCurMenuItem; 
+						pPressedMenuItem->SetPressed( true );
+					}
+				}
+				else {
+					if (pPressedMenuItem ) {		// przycisk puszczony
+						pPressedMenuItem->SetPressed( false );
+						if (pCurMenuItem == pPressedMenuItem) {
+							pPressedMenuItem = NULL;		//TODO: TMP
+							return pCurMenuItem->GetUID();
+						}
+						pPressedMenuItem = NULL;
+					}
+				}
+				break;
+        }
+	}
 
 ////////	
 	
-	// renderujemy
 	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(58,110,145), 1.0f, 0 );
 
 	pd3dDevice->BeginScene();
@@ -142,35 +168,6 @@ HRESULT CGameMenu::DeleteDeviceObjects()
 	return S_OK;
 }
 
-
-HRESULT CGameMenu::AddMenuItem( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, 
-	const D3DXVECTOR2 & Position, D3DCOLOR Blending, HRESULT UID )
-{
-	CMenuItem* pMenuItem = new CMenuItem( pTex, Size, Position, Blending, UID );
-	listRender.push_back( pMenuItem );
-	listMenuItem.push_back( pMenuItem );
-
-	return S_OK;
-}
-
-
-HRESULT CGameMenu::AddMenuTitle( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, 
-	const D3DXVECTOR2 & Position, D3DCOLOR Blending )
-{
-	CMenuItem* pMenuItem = new CMenuItem( pTex, Size, Position, Blending, 0 );
-	listRender.push_back( pMenuItem );
-
-	return S_OK;
-}
-
-
-HRESULT CGameMenu::AddCursor( LPDIRECT3DTEXTURE8 pTex )
-{
-	pCursor = new CCursor( pTex );
-	listRender.push_back( pCursor );
-
-	return S_OK;
-}
 
 CGameMenu::~CGameMenu()
 {

@@ -21,12 +21,12 @@ CTimer::CTimer()
 //--------------------------------------------------------------------------------------
 void CTimer::Reset()
 {
-    if( !m_bUsingQPF )
+    if ( !m_bUsingQPF )
         return;
 
     // Get either the current time or the stop time
     LARGE_INTEGER qwTime;
-    if( m_llStopTime != 0 )
+    if ( m_llStopTime != 0 )
         qwTime.QuadPart = m_llStopTime;
     else
         QueryPerformanceCounter( &qwTime );
@@ -41,14 +41,14 @@ void CTimer::Reset()
 //--------------------------------------------------------------------------------------
 void CTimer::Start()
 {
-    if( !m_bUsingQPF )
+    if ( !m_bUsingQPF )
         return;
 
     // Get the current time
     LARGE_INTEGER qwTime;
     QueryPerformanceCounter( &qwTime );
 
-    if( m_bTimerStopped )
+    if ( m_bTimerStopped )
         m_llBaseTime += qwTime.QuadPart - m_llStopTime;
     m_llStopTime = 0;
     m_llLastElapsedTime = qwTime.QuadPart;
@@ -59,14 +59,14 @@ void CTimer::Start()
 //--------------------------------------------------------------------------------------
 void CTimer::Stop()
 {
-    if( !m_bUsingQPF )
+    if ( !m_bUsingQPF )
         return;
 
-    if( !m_bTimerStopped )
+    if ( !m_bTimerStopped )
     {
         // Get either the current time or the stop time
         LARGE_INTEGER qwTime;
-        if( m_llStopTime != 0 )
+        if ( m_llStopTime != 0 )
             qwTime.QuadPart = m_llStopTime;
         else
             QueryPerformanceCounter( &qwTime );
@@ -81,7 +81,7 @@ void CTimer::Stop()
 //--------------------------------------------------------------------------------------
 void CTimer::Advance()
 {
-    if( !m_bUsingQPF )
+    if ( !m_bUsingQPF )
         return;
 
     m_llStopTime += m_llQPFTicksPerSec/10;
@@ -91,12 +91,12 @@ void CTimer::Advance()
 //--------------------------------------------------------------------------------------
 FLOAT CTimer::GetAbsoluteTime()
 {
-    if( !m_bUsingQPF )
+    if ( !m_bUsingQPF )
         return -1.0;
 
     // Get either the current time or the stop time
     LARGE_INTEGER qwTime;
-    if( m_llStopTime != 0 )
+    if ( m_llStopTime != 0 )
         qwTime.QuadPart = m_llStopTime;
     else
         QueryPerformanceCounter( &qwTime );
@@ -110,12 +110,12 @@ FLOAT CTimer::GetAbsoluteTime()
 //--------------------------------------------------------------------------------------
 FLOAT CTimer::GetTime()
 {
-    if( !m_bUsingQPF )
+    if ( !m_bUsingQPF )
         return -1.0;
 
     // Get either the current time or the stop time
     LARGE_INTEGER qwTime;
-    if( m_llStopTime != 0 )
+    if ( m_llStopTime != 0 )
         qwTime.QuadPart = m_llStopTime;
     else
         QueryPerformanceCounter( &qwTime );
@@ -129,12 +129,12 @@ FLOAT CTimer::GetTime()
 //--------------------------------------------------------------------------------------
 FLOAT CTimer::GetElapsedTime()
 {
-    if( !m_bUsingQPF )
+    if ( !m_bUsingQPF )
         return -1.0;
 
     // Get either the current time or the stop time
     LARGE_INTEGER qwTime;
-    if( m_llStopTime != 0 )
+    if ( m_llStopTime != 0 )
         qwTime.QuadPart = m_llStopTime;
     else
         QueryPerformanceCounter( &qwTime );

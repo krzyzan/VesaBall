@@ -143,6 +143,9 @@
 				RelativePath=".\EffectSprite.cpp">
 			</File>
 			<File
+				RelativePath=".\GameBoard.cpp">
+			</File>
+			<File
 				RelativePath=".\GameEditor.cpp">
 			</File>
 			<File
@@ -203,6 +206,9 @@
 			</File>
 			<File
 				RelativePath=".\EffectSprite.h">
+			</File>
+			<File
+				RelativePath=".\GameBoard.h">
 			</File>
 			<File
 				RelativePath=".\GameEditor.h">

@@ -26,14 +26,10 @@ CBall::~CBall()
 
 HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 {
-	if (!bCatched)
-		CMovingSprite::FrameMove( fElapsedTime );
-
-	// kasuj gdy wyjdzie za ekran
-	if (vPosition.y > BOARD_B + vSize.y/2 ) {
-		bDeleteMe = TRUE;	
+	if (bCatched)
 		return S_OK;
-	}
+		
+	CMovingSprite::FrameMove( fElapsedTime );
 
 	// odbicia od œcian
 	if (vPosition.x - vSize.x/2 < BOARD_L) {
@@ -57,7 +53,6 @@ HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 		vSpeed.y *= -1;
 	}
 	*/
-
 
 	return S_OK;
 } 

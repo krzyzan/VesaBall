@@ -8,9 +8,9 @@
 #include "Bonus.h"
 
 CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECT3DTEXTURE8 LightningTex )
-	: CSprite( Texture, D3DXVECTOR2(1.0f/8, 1.0f/64), 0, 
-		D3DXVECTOR2(BOARD_L+BOARD_W/2, BOARD_B-1.0f/64), 
-		0xFFFFFFFF)
+	: CSprite( Texture, D3DXVECTOR2( 1.0f/8, 1.0f/64 ), 0, 
+		D3DXVECTOR2( BOARD_L+BOARD_W/2, BOARD_B-1.0f/64 ), 
+		0xFFFFFFFF )
 {
 	bGrabPaddle = false;
 	pLightning = new CSprite( LightningTex, D3DXVECTOR2(vSize.x, vSize.y*2), 0, vPosition - D3DXVECTOR2(0,vSize.y/2), dwBlending );
@@ -67,8 +67,8 @@ void CPaddle::CatchBall( CBall* pBall )
 	if (pBall->bCatched)
 		return;
 
-	pBall->vPosition.x = max(pBall->vPosition.x, vPosition.x - vSize.x/3);
-	pBall->vPosition.x = min(pBall->vPosition.x, vPosition.x + vSize.x/3);
+	pBall->vPosition.x = max(pBall->vPosition.x, (vPosition.x - vSize.x/3)*frand(0.99f, 1.0f));
+	pBall->vPosition.x = min(pBall->vPosition.x, (vPosition.x + vSize.x/3)*frand(0.99f, 1.0f));
 	listCatchedBalls.push_back( pBall );
 	pBall->bCatched = true;
 }
@@ -82,14 +82,15 @@ void CPaddle::LaunchBall( CBall* pBall )
 	pBall->bCatched = false;
 }
 
-void CPaddle::MultiplyWidth( float fFactor )
+void CPaddle::SetWidth( float fNewWidth )
 {
-	list<CBall*>::iterator iBall;
-	for (iBall = listCatchedBalls.begin(); iBall != listCatchedBalls.end(); iBall++)
-		(*iBall)->vPosition.x = ((*iBall)->vPosition.x - vPosition.x) * fFactor - vPosition.x;
-	
-	float fNewWidth = vSize.x * fFactor;
 	fNewWidth = max( fNewWidth, MIN_PADDLE_WIDTH );
 	fNewWidth = min( fNewWidth, MAX_PADDLE_WIDTH );
+
+	list<CBall*>::iterator iBall;
+	for (iBall = listCatchedBalls.begin(); iBall != listCatchedBalls.end(); iBall++)
+		(*iBall)->vPosition.x = ((*iBall)->vPosition.x - vPosition.x) * fNewWidth/vSize.x + vPosition.x;
+	
 	SetSize( D3DXVECTOR2( fNewWidth, vSize.y) );
+	pLightning->SetSize( D3DXVECTOR2( fNewWidth, pLightning->vSize.y) );
 }

@@ -14,10 +14,9 @@ CCursor::~CCursor()
 {
 }
 
-HRESULT CCursor::MouseMove( DIMOUSESTATE2* dims2 )
+HRESULT CCursor::Move( const D3DXVECTOR2 & vMovement )
 {
-	vPosition += D3DXVECTOR2( (FLOAT)dims2->lX, (FLOAT)dims2->lY ) * 0.002f;
-
+	vPosition += vMovement;
 	D3DXVec2Maximize( &vPosition, &vPosition, &D3DXVECTOR2( 0.00f, 0.00f ) );
 	D3DXVec2Minimize( &vPosition, &vPosition, &D3DXVECTOR2( 1.00f, 0.75f ) );
 

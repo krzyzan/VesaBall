@@ -8,10 +8,11 @@
 #include "Bonus.h"
 #include "EffectSprite.h"
 
-
-CBrick::CBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size )
-	: CSprite( Texture, Size, 0, Position, D3DXCOLOR( frand(0.5f,1.0f), frand(0.5f,1.0f), frand(0.5f,1.0f), 1.0f) )
+CBrick::CBrick( BYTE Type, LPDIRECT3DTEXTURE8* Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size )
+	: CSprite( Texture[Type], Size, 0, Position, brickDescTable[Type].dwBlending )
 {
+	dwType = Type;
+	dwDurability = brickDescTable[Type].dwDurability;
 }
 
 

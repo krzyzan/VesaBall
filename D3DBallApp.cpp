@@ -7,6 +7,7 @@
 #include "D3DBallApp.h"
 #include "GameMenu.h"
 #include "GameEngine.h"
+#include "GameEditor.h"
 
 
 CD3DBallApp::CD3DBallApp()
@@ -41,9 +42,20 @@ HRESULT CD3DBallApp::RenderLoop()
 			pScene->InitDeviceObjects();
 			pScene->RestoreDeviceObjects();
 			break;
+
+		case CGameMenu::UID_EDITOR:
+			pScene->InvalidateDeviceObjects();
+			pScene->DeleteDeviceObjects();
+			SAFE_DELETE( pScene );
+			pScene = new CGameEditor( pd3dDevice, pDIDevice );
+			pScene->InitDeviceObjects();
+			pScene->RestoreDeviceObjects();
+			break;
+
 		case CGameMenu::UID_QUIT:
 			SendMessage( hWnd, WM_CLOSE, 0, 0 );
 			break;
+
 		case E_FAIL:
 			SendMessage( hWnd, WM_CLOSE, 0, 0 );
 			break;

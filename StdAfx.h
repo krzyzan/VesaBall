@@ -5,6 +5,8 @@
 
 #pragma once
 
+#define	MOUSE_BUFFER_SIZE 16
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -27,9 +29,9 @@ using namespace std;
 //-----------------------------------------------------------------------------
 // Miscellaneous helper functions
 //-----------------------------------------------------------------------------
-#define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
-#define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
+#define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
+#define SAFE_DELETE_ARRAY(p) { if (p) { delete[] (p);   (p)=NULL; } }
+#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 
 // Global defines
 const int RES_X = 1024;
@@ -37,13 +39,13 @@ const int RES_Y = 768;
 
 const float BOARD_L = 0.025f;				// left
 const float BOARD_R = 0.975f;				// right
-const float BOARD_T = 0.05f;				// top
+const float BOARD_T = 0.00f;				// top
 const float BOARD_B = 0.75f;				// bottom
 
 const float BOARD_W	= (BOARD_R-BOARD_L);	//width
 const float BOARD_H	= (BOARD_B-BOARD_T);	//height
 
-const float BONUS_PROB = 0.1f;
+const float BONUS_PROB = 0.3f;
 
 const float MIN_BALL_SIZE = 1.0f / 128;
 const float MAX_BALL_SIZE = 1.0f / 48;

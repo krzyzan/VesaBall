@@ -11,6 +11,7 @@ using namespace std;
 
 class CBall;
 
+//TODO: jeœli przytrzymujê klawisz b³yskawica znika
 
 class CPaddle : 
 	public CSprite  
@@ -25,7 +26,7 @@ public:
 	void LaunchBall( CBall* pBall );
 	void CatchBall( CBall* pBall );
 
-	void MultiplyWidth( float fFactor );
+	void SetWidth( float fNewWidth );
 
 	BOOL bGrabPaddle;
 

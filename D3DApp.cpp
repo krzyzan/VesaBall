@@ -37,7 +37,7 @@ CD3DApp::CD3DApp()
 	bReady				= FALSE;
 	CreateFlags			= 0L;
 
-	strWindowTitle		= _T("Earth");
+	strWindowTitle		= _T("VesaBall");
 	MinDepthBits		= 16;
 	MinStencilBits		= 0;
 }
@@ -103,13 +103,13 @@ HRESULT CD3DApp::BuildDeviceList()
 		pD3D->EnumAdapterModes( D3DADAPTER_DEFAULT, iMode, &DisplayMode );
 
 		// Filter out low-resolution modes
-		//if( DisplayMode.Width < 640 || DisplayMode.Height < 400 )
+		//if ( DisplayMode.Width < 640 || DisplayMode.Height < 400 )
 		//	continue;
 
 		// Check if the mode already exists (to filter out refresh rates)
 		for( DWORD m=0L; m<dwNumModes; m++ )
 		{
-			if( ( modes[m].Width  == DisplayMode.Width	) &&
+			if ( ( modes[m].Width  == DisplayMode.Width	) &&
 				( modes[m].Height == DisplayMode.Height ) &&
 				( modes[m].Format == DisplayMode.Format ) )
 			{
@@ -119,19 +119,19 @@ HRESULT CD3DApp::BuildDeviceList()
 		}
 
 		// If we found a new mode, add it to the list of modes
-		if( m == dwNumModes )
+		if ( m == dwNumModes )
 		{
 			modes[dwNumModes++] = DisplayMode;
 			
 			// Check if the mode's format already exists
 			for( DWORD f=0; f<dwNumFormats; f++ )
 			{
-				if( DisplayMode.Format == formats[f] )
+				if ( DisplayMode.Format == formats[f] )
 					break;
 			}
 
 			// If the format is new, add it to the list
-			if( f== dwNumFormats )
+			if ( f== dwNumFormats )
 				formats[dwNumFormats++] = DisplayMode.Format;
 		}
 	}
@@ -163,20 +163,20 @@ HRESULT CD3DApp::BuildDeviceList()
 			fmtDepthStencil[f] = D3DFMT_UNKNOWN;
 
 			// Skip formats that cannot be used as render targets on this device
-			if( FAILED( pD3D->CheckDeviceType( D3DADAPTER_DEFAULT, pDevice->DeviceType,
+			if ( FAILED( pD3D->CheckDeviceType( D3DADAPTER_DEFAULT, pDevice->DeviceType,
 												 formats[f], formats[f], FALSE ) ) )
 				continue;
 
-			if( pDevice->DeviceType == D3DDEVTYPE_HAL )
+			if ( pDevice->DeviceType == D3DDEVTYPE_HAL )
 			{
 				// This system has a HAL device
 				bHALExists = TRUE;
 			}
 
 			// Confirm the device/format for HW vertex processing
-			if( pDevice->d3dCaps.DevCaps&D3DDEVCAPS_HWTRANSFORMANDLIGHT )
+			if ( pDevice->d3dCaps.DevCaps&D3DDEVCAPS_HWTRANSFORMANDLIGHT )
 			{
-				if( pDevice->d3dCaps.DevCaps&D3DDEVCAPS_PUREDEVICE )
+				if ( pDevice->d3dCaps.DevCaps&D3DDEVCAPS_PUREDEVICE )
 				{
 					dwBehavior[f] = D3DCREATE_HARDWARE_VERTEXPROCESSING |
 									D3DCREATE_PUREDEVICE;
@@ -197,16 +197,16 @@ HRESULT CD3DApp::BuildDeviceList()
 			}
 
 			// Confirm the device/format for SW vertex processing
-			if( FALSE == bFormatConfirmed[f] )
+			if ( FALSE == bFormatConfirmed[f] )
 			{
 				dwBehavior[f] = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 				bFormatConfirmed[f] = TRUE;
 			}
 
 			// Find a suitable depth/stencil buffer format for this device/format
-			if( bFormatConfirmed[f] )
+			if ( bFormatConfirmed[f] )
 			{
-				if( !FindDepthStencilFormat( D3DADAPTER_DEFAULT, pDevice->DeviceType,
+				if ( !FindDepthStencilFormat( D3DADAPTER_DEFAULT, pDevice->DeviceType,
 					formats[f], &fmtDepthStencil[f] ) )
 				{
 					bFormatConfirmed[f] = FALSE;
@@ -220,9 +220,9 @@ HRESULT CD3DApp::BuildDeviceList()
 		{
 			for( DWORD f=0; f<dwNumFormats; f++ )
 			{
-				if( modes[m].Format == formats[f] )
+				if ( modes[m].Format == formats[f] )
 				{
-					if( bFormatConfirmed[f] == TRUE )
+					if ( bFormatConfirmed[f] == TRUE )
 					{
 						// Add this mode to the device's list of valid modes
 						pDevice->modes[pDevice->dwNumModes].Width		= modes[m].Width;
@@ -233,7 +233,7 @@ HRESULT CD3DApp::BuildDeviceList()
 						pDevice->modes[pDevice->dwNumModes].DepthStencilFormat = fmtDepthStencil[f];
 						pDevice->dwNumModes++;
 
-						if( pDevice->DeviceType == D3DDEVTYPE_HAL )
+						if ( pDevice->DeviceType == D3DDEVTYPE_HAL )
 							bHALIsSampleCompatible = TRUE;
 					}
 				}
@@ -243,13 +243,13 @@ HRESULT CD3DApp::BuildDeviceList()
 		// Select any RES_X x RES_Y mode for default (but prefer a 32-bit mode)
 		for( m=0; m<pDevice->dwNumModes; m++ )
 		{
-			if( pDevice->modes[m].Width==RES_X && pDevice->modes[m].Height==RES_Y )
+			if ( pDevice->modes[m].Width==RES_X && pDevice->modes[m].Height==RES_Y )
 			{
 				pDevice->dwCurrentMode = m;
 
-				if( pDevice->modes[m].Format == D3DFMT_X8R8G8B8) break;
+				if ( pDevice->modes[m].Format == D3DFMT_X8R8G8B8) break;
 
-				if( pDevice->modes[m].Format == D3DFMT_R5G6B5 ||
+				if ( pDevice->modes[m].Format == D3DFMT_R5G6B5 ||
 					pDevice->modes[m].Format == D3DFMT_X1R5G5B5 ||
 					pDevice->modes[m].Format == D3DFMT_A1R5G5B5 )
 				{
@@ -259,12 +259,12 @@ HRESULT CD3DApp::BuildDeviceList()
 		}
 
 		// If valid modes were found, keep this device
-		if( pDevice->dwNumModes > 0 )
+		if ( pDevice->dwNumModes > 0 )
 			pAdapter->dwNumDevices++;
 	}
 
 	// Return an error if no compatible devices were found
-	if( 0L == pAdapter->dwNumDevices )
+	if ( 0L == pAdapter->dwNumDevices )
 		return D3DAPPERR_NOCOMPATIBLEDEVICES;
 
 	// Pick a default device that can render into a window
@@ -292,12 +292,12 @@ HRESULT CD3DApp::Run()
 	{
 		// Use PeekMessage() if the app is active, so we can use idle time to
 		// render the scene. Else, use GetMessage() to avoid eating CPU time.
-		if( bActive )
+		if ( bActive )
 			bGotMsg = PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE );
 		else
 			bGotMsg = GetMessage( &msg, NULL, 0U, 0U );
 
-		if( bGotMsg )
+		if ( bGotMsg )
 		{
 			TranslateMessage( &msg );
 			DispatchMessage( &msg );
@@ -305,9 +305,9 @@ HRESULT CD3DApp::Run()
 		else
 		{
 			// Render a frame during idle time (no messages are waiting)
-			if( bActive && bReady )
+			if ( bActive && bReady )
 			{
-				if( FAILED( Render3DEnvironment() ) )
+				if ( FAILED( Render3DEnvironment() ) )
 					SendMessage( hWnd, WM_CLOSE, 0, 0 );
 			}
 		}
@@ -325,12 +325,12 @@ HRESULT CD3DApp::Run()
 BOOL CD3DApp::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
 	D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat )
 {
-	if( MinDepthBits <= 16 && MinStencilBits == 0 )
+	if ( MinDepthBits <= 16 && MinStencilBits == 0 )
 	{
-		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+		if ( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
 			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D16 ) ) )
 		{
-			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+			if ( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
 				TargetFormat, TargetFormat, D3DFMT_D16 ) ) )
 			{
 				*pDepthStencilFormat = D3DFMT_D16;
@@ -339,12 +339,12 @@ BOOL CD3DApp::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
 		}
 	}
 
-	if( MinDepthBits <= 15 && MinStencilBits <= 1 )
+	if ( MinDepthBits <= 15 && MinStencilBits <= 1 )
 	{
-		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+		if ( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
 			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D15S1 ) ) )
 		{
-			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+			if ( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
 				TargetFormat, TargetFormat, D3DFMT_D15S1 ) ) )
 			{
 				*pDepthStencilFormat = D3DFMT_D15S1;
@@ -353,12 +353,12 @@ BOOL CD3DApp::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
 		}
 	}
 
-	if( MinDepthBits <= 24 && MinStencilBits == 0 )
+	if ( MinDepthBits <= 24 && MinStencilBits == 0 )
 	{
-		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+		if ( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
 			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24X8 ) ) )
 		{
-			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+			if ( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
 				TargetFormat, TargetFormat, D3DFMT_D24X8 ) ) )
 			{
 				*pDepthStencilFormat = D3DFMT_D24X8;
@@ -367,12 +367,12 @@ BOOL CD3DApp::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
 		}
 	}
 
-	if( MinDepthBits <= 24 && MinStencilBits <= 8 )
+	if ( MinDepthBits <= 24 && MinStencilBits <= 8 )
 	{
-		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+		if ( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
 			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24S8 ) ) )
 		{
-			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+			if ( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
 				TargetFormat, TargetFormat, D3DFMT_D24S8 ) ) )
 			{
 				*pDepthStencilFormat = D3DFMT_D24S8;
@@ -381,12 +381,12 @@ BOOL CD3DApp::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
 		}
 	}
 
-	if( MinDepthBits <= 24 && MinStencilBits <= 4 )
+	if ( MinDepthBits <= 24 && MinStencilBits <= 4 )
 	{
-		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+		if ( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
 			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24X4S4 ) ) )
 		{
-			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+			if ( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
 				TargetFormat, TargetFormat, D3DFMT_D24X4S4 ) ) )
 			{
 				*pDepthStencilFormat = D3DFMT_D24X4S4;
@@ -395,12 +395,12 @@ BOOL CD3DApp::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
 		}
 	}
 
-	if( MinDepthBits <= 32 && MinStencilBits == 0 )
+	if ( MinDepthBits <= 32 && MinStencilBits == 0 )
 	{
-		if( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
+		if ( SUCCEEDED( pD3D->CheckDeviceFormat( iAdapter, DeviceType,
 			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D32 ) ) )
 		{
-			if( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
+			if ( SUCCEEDED( pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
 				TargetFormat, TargetFormat, D3DFMT_D32 ) ) )
 			{
 				*pDepthStencilFormat = D3DFMT_D32;
@@ -423,11 +423,11 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 	switch( uMsg )
 	{
 		case WM_ACTIVATE:
-			if( pDIDevice ) return InitializeMouseInput();
+			if ( pDIDevice ) return InitializeMouseInput();
 
   		case WM_SETCURSOR:
 			// Turn off Windows cursor in fullscreen mode
-			if( bActive && bReady )
+			if ( bActive && bReady )
 			{
 				SetCursor( NULL );
 				return TRUE; // prevent Windows from setting cursor to window class cursor
@@ -525,7 +525,7 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 							   hWnd, pModeInfo->dwBehavior, &d3dpp,
 							   &pd3dDevice );
 
-	if( SUCCEEDED(hr) )
+	if ( SUCCEEDED(hr) )
 	{
 		// Clear the viewport
 		pd3dDevice->Present(NULL, NULL, NULL, NULL);
@@ -558,23 +558,23 @@ HRESULT CD3DApp::Render3DEnvironment()
 	HRESULT hr;
 
 	// Test the cooperative level to see if it's okay to render
-	if( FAILED( hr = pd3dDevice->TestCooperativeLevel() ) )
+	if ( FAILED( hr = pd3dDevice->TestCooperativeLevel() ) )
 	{
 		// If the device was lost, do not render until we get it back
-		if( D3DERR_DEVICELOST == hr )
+		if ( D3DERR_DEVICELOST == hr )
 			return S_OK;
 
 		// Check if the device needs to be reset.
-		if( D3DERR_DEVICENOTRESET == hr )
+		if ( D3DERR_DEVICENOTRESET == hr )
 		{
-			if( FAILED( hr = Resize3DEnvironment() ) )
+			if ( FAILED( hr = Resize3DEnvironment() ) )
 				return hr;
 		}
 		return hr;
 	}
 	
 	// Render the scene as normal
-	if( FAILED( hr = RenderLoop() ) )
+	if ( FAILED( hr = RenderLoop() ) )
 		return hr;
 
 	return S_OK;
@@ -589,16 +589,16 @@ HRESULT CD3DApp::Resize3DEnvironment()
 	HRESULT hr;
 
 	// Release all vidmem objects
-	if( FAILED( hr = InvalidateDeviceObjects() ) )
+	if ( FAILED( hr = InvalidateDeviceObjects() ) )
 		return hr;
 
 	// Reset the device
-	if( FAILED( hr = pd3dDevice->Reset( &d3dpp ) ) )
+	if ( FAILED( hr = pd3dDevice->Reset( &d3dpp ) ) )
 		return hr;
 
 	// Initialize the app's device-dependent objects
 	hr = RestoreDeviceObjects();
-	if( FAILED(hr) )
+	if ( FAILED(hr) )
 		return hr;
 
 	return S_OK;
@@ -615,16 +615,18 @@ HRESULT CD3DApp::InitializeMouseInput()
 	pDIDevice->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND );
 	pDIDevice->SetEventNotification( CreateEvent(NULL, FALSE, FALSE, NULL) );
 
-
-	DIPROPDWORD dipdw;
+    DIPROPDWORD dipdw;
     dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
     dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
     dipdw.diph.dwObj        = 0;
     dipdw.diph.dwHow        = DIPH_DEVICE;
-    dipdw.dwData            = DIPROPAXISMODE_REL;
+    dipdw.dwData            = 16; // Arbitary buffer size
 
-	pDIDevice->SetProperty( DIPROP_AXISMODE , &dipdw.diph );
-	
+	HRESULT hr;
+
+    if ( FAILED( hr = pDIDevice->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
+        return hr;
+
 	pDIDevice->Acquire(); 
 
 	return S_OK;
