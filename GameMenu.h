@@ -7,6 +7,7 @@ using namespace std;
 
 class CMenuItem;
 class CCursor;
+class CSprite;
 
 
 class CGameMenu :
@@ -17,19 +18,26 @@ public:
 		UID_START	= 100,
 		UID_EDITOR,
 		UID_QUIT,
-		UID_GAME_OVER		//TODO: TMP
 	};
 
-	CGameMenu( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
+	CGameMenu( LPDIRECT3DDEVICE8 d3dDevice );
 	~CGameMenu();
 
 	HRESULT InitDeviceObjects();
-	HRESULT RenderLoop();
 	HRESULT RestoreDeviceObjects();
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
 
-	CMenuItem*			GetPointedMenuItem();
+	HRESULT ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod );
+
+	HRESULT FrameMove( float fElapsedTime );
+	HRESULT FrameRender();
+	
+	CD3DAppScene* GetNextScene();
+
+private:
+	CMenuItem*			GetPointedMenuItem() const;
 
 	LPD3DXSPRITE		pSprite;
 
@@ -37,6 +45,7 @@ public:
 	list<CMenuItem*>	listMenuItem;
 	CCursor*			pCursor;
 
-	CMenuItem*			pOldMenuItem;
+	CMenuItem*			pCurMenuItem;
 	CMenuItem*			pPressedMenuItem;
+	CMenuItem*			pClickedMenuItem;
 };

@@ -1,7 +1,6 @@
 #pragma once
 #include "Sprite.h"
 
-
 class CMovingSprite :
 	public CSprite
 {
@@ -10,12 +9,16 @@ public:
 		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel, D3DCOLOR Blending );
 	virtual ~CMovingSprite(void);
 
+	virtual void FrameMove( float fElapsedTime );
+	void SetSpeed( const D3DXVECTOR2 & vNewSpeed );
+	const D3DXVECTOR2 & GetSpeed() const {return vSpeed;}
+
+	bool IsColliding( CSprite* pSprite ) const;
+	D3DXVECTOR2 GetCollisionSide( CSprite* pSprite ) const;
+
 	D3DXVECTOR2	vOldPosition;
+
+protected:
 	D3DXVECTOR2	vSpeed;
 	D3DXVECTOR2	vAccel;
-
-	virtual HRESULT FrameMove( FLOAT fElapsedTime );
-
-	bool Overlaps( CSprite* pSprite );
-	D3DXVECTOR2 GetContactSide( CSprite* pSprite );
 };

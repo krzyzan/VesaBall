@@ -5,10 +5,10 @@
 
 #pragma once
 
-#define	MOUSE_BUFFER_SIZE 16
-
 #define _USE_MATH_DEFINES
+#include <stdlib.h>
 #include <math.h>
+#include <memory.h>
 
 #include <list>
 #include <vector>
@@ -17,10 +17,7 @@ using namespace std;
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <windows.h>
-#include <stdlib.h>
-#include <memory.h>
 #include <tchar.h>
-
 
 #define DIRECTINPUT_VERSION  0x0800
 #include <dxerr8.h>
@@ -34,8 +31,8 @@ using namespace std;
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 
 // Global defines
-const int RES_X = 1024;
-const int RES_Y = 768;
+const int RES_X = 640;
+const int RES_Y = 480;
 
 const float BOARD_L = 0.025f;				// left
 const float BOARD_R = 0.975f;				// right

@@ -1,62 +1,38 @@
-#include "stdafx.h"
-#include "counter.h"
+#include "StdAfx.h"
+#include "Counter.h"
 
+LPDIRECT3DTEXTURE8 CCounter::s_pTexture;
 
-CCounter::CCounter( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
-		const D3DXVECTOR2 & Position, DWORD DigitHeight, DWORD NumDigits )
-	: CMovingSprite( Texture, Size, 0, Position, D3DXVECTOR2(), D3DXVECTOR2(), 0xFFFFFFFF )
+CCounter::CCounter( LONG Value, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position, 
+		DWORD DigitHeight, DWORD NumDigits )
+	: CSprite( s_pTexture, Size, 0, Position, 0xFFFFFFFF )
 {
-	dwNumRollers = NumDigits;
+	dwNumDigits = NumDigits;
 	dwDigitHeight = DigitHeight;
 
 	D3DSURFACE_DESC sd;
 	pTexture->GetLevelDesc(0, &sd);
 	vScaling.y *= sd.Height/dwDigitHeight;
-	vScaling.x /= dwNumRollers;
+	vScaling.x /= dwNumDigits;
 	
-	pRoller	= new float[ dwNumRollers ];
-	pRollerDest = new DWORD[ dwNumRollers ];
-
-	Reset();
+	lValue = Value;
+	fValue = (float)Value;
 }
 
-CCounter::~CCounter()
-{
-	delete [] pRollerDest;
-	delete [] pRoller;
-}
 
 void CCounter::Render( LPD3DXSPRITE pSprite ) const
 {
-	D3DXVECTOR2 Position = (vPosition - vSize/2);
-	for (int r=dwNumRollers-1; r>=0; r--) {
-		CONST RECT SrcRect = {0, ((LONG)(pRoller[r]+0.5f)%10)*dwDigitHeight, 64, ((LONG)(pRoller[r]+0.5f)%10 + 1)*dwDigitHeight };
+	D3DXVECTOR2 Position = vPosition - vSize/2 + D3DXVECTOR2(vSize.x,0);
+	LONG lDigit = LONG(fValue + 0.5f);
+	for (DWORD r=0; r<dwNumDigits; r++) {
+		Position.x -= vSize.x/dwNumDigits;
+		CONST RECT SrcRect = {0, (lDigit%10)*dwDigitHeight, 64, (lDigit%10+1)*dwDigitHeight };
 		pSprite->Draw( pTexture, &SrcRect, &vScaling, &vRotationCenter, fRotation, &(Position * RES_X), dwBlending );
-		Position.x += vSize.x/dwNumRollers;
+		lDigit /= 10;
 	}
 }
 
-HRESULT CCounter::FrameMove( FLOAT fElapsedTime )
+void CCounter::Update( float fElapsedTime )
 {
-	for (DWORD r=0; r<dwNumRollers; r++)
-		pRoller[r] -= (pRoller[r] - pRollerDest[r]) * fElapsedTime * 5;
-
-	return S_OK;
-}
-
-void CCounter::Reset()
-{
-	dwCount = 0;
-	ZeroMemory( pRoller, sizeof(pRoller[0])*dwNumRollers );
-	ZeroMemory( pRollerDest, sizeof(pRoller[0])*dwNumRollers );
-}
-
-void CCounter::Set( DWORD c )
-{
-	dwCount = c;
-	DWORD dwScoreDest = c;
-	for (DWORD r=0; r<dwNumRollers; r++) {
-		pRollerDest[r] = dwScoreDest;
-		dwScoreDest /= 10;
-	}
+	fValue -= (fValue - lValue)  * fElapsedTime * 5;
 }

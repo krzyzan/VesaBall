@@ -5,8 +5,8 @@
 
 #include <fstream>		//TMP
 
-CGameEditor::CGameEditor( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice )
-	: CGameBoard( d3dDevice, DIDevice )
+CGameEditor::CGameEditor( LPDIRECT3DDEVICE8 d3dDevice )
+	: CGameBoard( d3dDevice )
 {
 	pCursor		= NULL;
 	pSprite		= NULL;
@@ -30,67 +30,83 @@ HRESULT CGameEditor::InitDeviceObjects()
 	return S_OK;
 }
 
-HRESULT CGameEditor::RenderLoop()
+
+HRESULT CGameEditor::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
 {
-    DIDEVICEOBJECTDATA didod[ MOUSE_BUFFER_SIZE ];  // Receives buffered data 
-    DWORD              dwElements;
-    HRESULT            hr;
-
-    if (NULL == pDIDevice) 
-        return S_OK;
-    
-    dwElements = MOUSE_BUFFER_SIZE;
-    if (FAILED( hr = pDIDevice->GetDeviceData( sizeof(DIDEVICEOBJECTDATA),
-                                     didod, &dwElements, 0 ) ) )
-        return hr;
-
-	for (DWORD i=0; i<dwElements; i++) {
-		switch (didod[ i ].dwOfs) {
-			case DIMOFS_X:
-				pCursor->Move( D3DXVECTOR2( MOUSE_SPEED * (int)didod[ i ].dwData, 0 ) );
-				break;
-			case DIMOFS_Y:
-				pCursor->Move( D3DXVECTOR2( 0, MOUSE_SPEED * (int)didod[ i ].dwData ) );
-				break;
-            case DIMOFS_BUTTON0:
-            case DIMOFS_BUTTON1:
-				if (didod[ i ].dwData & 0x80) {
-					if ( !pBrickArray->Contains( pCursor->vPosition ) ) 
-						break;
-
-					POINT pos = pBrickArray->VectorToArrayCoords( pCursor->vPosition );
-					CBrick* iNewBrick = pBrickArray->GetBrickAt( pos );
-					if ( iNewBrick->pTypeDesc ) {
-						curType = LONG(CBrick::s_TypeDesc - iNewBrick->pTypeDesc);
-						if (didod[ i ].dwOfs == DIMOFS_BUTTON0)
-							curType = (curType + 1)%CBrick::TYPE_MAX;
-						iNewBrick->pTypeDesc = NULL;
+	switch (didod->dwOfs) {
+		case DIMOFS_X:
+			pCursor->Move( D3DXVECTOR2( (float)(int)didod->dwData, 0 ) );
+			break;
+		case DIMOFS_Y:
+			pCursor->Move( D3DXVECTOR2( 0, (float)(int)didod->dwData ) );
+			break;
+        case DIMOFS_BUTTON0:
+        case DIMOFS_BUTTON1:
+			if (didod->dwData & 0x80) {
+				if ( pBrickArray->Contains( pCursor->vPosition ) ) {
+					POINT pos = pBrickArray->GetArrayCoords( pCursor->vPosition );
+					CBrick* pBrick = pBrickArray->GetBrick( pos );
+					if (pBrick) {
+						curType = pBrick->GetType();
+						if (didod->dwOfs == DIMOFS_BUTTON0)
+							curType = (curType + 1)%BRICK_TYPE_MAX;
+						pBrickArray->RemoveBrick( pos );
 					}
 
-					if (didod[ i ].dwOfs == DIMOFS_BUTTON0) {
-						pBrickArray->CreateBrick( pos, curType );
+					if (didod->dwOfs == DIMOFS_BUTTON0) {
+						pBrickArray->InsertBrick( curType, pos );
 					}
 				}
-				break;
-        }
-	
-	}
-
-	// renderujemy
-	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40,0x60,0x60), 1.0f, 0 );
-	pd3dDevice->BeginScene();
-	pSprite->Begin();
-
-	CGameBoard::RenderLoop();
-	pCursor->Render( pSprite );
-
-	pSprite->End();
-	pd3dDevice->EndScene();
-	pd3dDevice->Present( NULL, NULL, NULL, NULL );
+			}
+			break;
+    }
 
 	return S_OK;
 }
 
+
+HRESULT CGameEditor::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
+{
+	// TODO: TMP
+	//if (didod[ i ].dwOfs == DIK_SPACE && (didod[ i ].dwData & 0x80) )
+	//	exit(0);
+
+	return S_OK;
+}
+
+
+HRESULT CGameEditor::FrameMove( float fElapsedTime )
+{
+	return S_OK;
+}
+
+
+HRESULT CGameEditor::FrameRender()
+{
+	// renderujemy
+	pD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40,0x60,0x60), 1.0f, 0 );
+
+	pD3DDevice->BeginScene();
+	pSprite->Begin();
+
+	CGameBoard::FrameRender();
+
+	pCursor->Render( pSprite );
+
+	pSprite->End();
+	pD3DDevice->EndScene();
+
+	return S_OK;
+}
+
+
+CD3DAppScene* CGameEditor::GetNextScene()
+{
+	return this;
+}
+
+
+//TODO: jeœli funkcja wywo³uje funkcje klasy bazowej zwracaæ wartoœæ
 
 HRESULT CGameEditor::DeleteDeviceObjects()
 {

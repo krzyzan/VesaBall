@@ -1,29 +1,44 @@
 #pragma once
-#include "MovingSprite.h"
+#include "Sprite.h"
 
+	//! Prosty licznik wyœwietlajacy liczby dodatnie
+    /*!
+		Przed utworzeniem obiektów klasy konieczne jest wczytanie tekstury
+		pod adres #s_pTexture. W teksturze powinny byæ pionowo umieszczone cyfry
+		01234567890.
+    */ 
 class CCounter :
-	public CMovingSprite
+	public CSprite
 {
 public:
-	CCounter( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
-		const D3DXVECTOR2 & Position, DWORD DigitHeight, DWORD NumDigits );
-	virtual ~CCounter();
-
+		//! Konstruktor
+		/*!
+			\param Value		Wartoœæ pocz¹tkowa
+			\param Size			Rozmiar
+			\param Position		Pozycja
+			\param DigitHeight	Wysokoœæ pojedynczej cyfry w pikselach
+			\param NumDigits	Iloœæ wyœwietlanych cyfr
+		*/ 
+	CCounter( LONG Value, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position, 
+		DWORD DigitHeight, DWORD NumDigits );
+		//! Renderuje licznik
+		/*!
+			\param pSprite	adres \e ID3DXSprite u¿ywanego do renderowania
+		*/ 
 	void Render( LPD3DXSPRITE pSprite ) const;
-	HRESULT CCounter::FrameMove( FLOAT fElapsedTime );
+		//! Aktualizuje wyœwietlan¹ liczbê 
+		/*!
+			\param fElapsedTime Czas od ostatniego wywo³ania
+		*/
+	void Update( float fElapsedTime );
+		//! Adres wspólnej tekstury. \b UWAGA! Ustawiæ przed tworzeniem obiektów klasy.
+	static LPDIRECT3DTEXTURE8 s_pTexture;
 
-	void Reset();
-	void Set( DWORD c );
-	DWORD Get() const {	return dwCount; };
-	void Inc( DWORD c ) { Set( Get()+c ); };
-	void Dec( DWORD c ) { Set( Get()-c ); };
+	LONG lValue;
 
 private:
-	float* pRoller;
-	DWORD* pRollerDest;
-
 	DWORD dwDigitHeight;
-	DWORD dwNumRollers;
+	DWORD dwNumDigits;
 
-	DWORD dwCount;
+	float fValue;
 };

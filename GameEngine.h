@@ -1,9 +1,5 @@
 #pragma once
 
-#define INITGUID
-#include <dmusici.h>
-
-
 #include "GameBoard.h"
 #include "timer.h"
 
@@ -15,55 +11,47 @@ class CBonus;
 class CCounter;
 
 
-const DWORD INITIAL_LIVES = 2;
-
 class CGameEngine :
 	public CGameBoard
 {
 public:
-	CGameEngine( /*TODO: TMP*/HWND wnd, LPDIRECT3DDEVICE8 pd3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
+	CGameEngine( LPDIRECT3DDEVICE8 pD3DDevice );
 	~CGameEngine();
 
 	HRESULT InitDeviceObjects();
-	HRESULT RenderLoop();
 	HRESULT DeleteDeviceObjects();
 
+	HRESULT ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod );
+	
+	HRESULT FrameMove( float fElapsedTime );
+	HRESULT FrameRender();
+	CD3DAppScene* GetNextScene();
 
 private:
-	void MoveObjects( FLOAT fElapsedTime );
+	void MoveObjects( float fElapsedTime );
 	void CollideObjects();
-	void DestroyObjects();
 
-	void ApplyBonus( DWORD Type );
+	void ApplyBonus( CBonus* pBonus );
 	void ResetBoard();
 	void KillPaddle();
 
 	void CollideBallPaddle( CBall* pBall );
-	void CollideBallBrick( CBall* pBall );
+	void CollideBallBricks( CBall* pBall );
+	void CreateSparkles( CBall* pBall, const D3DXVECTOR2 & vSide );
 
-	HWND					hWnd;					//TODO: TMP
-	CTimer					timerRenderLimiter;
-	FLOAT					fTimeToRender;
-	DWORD					numFrameMove, numRender;
-
+private:
 	list<CBall*>			listBall;
 	list<CBonus*>			listBonus;
 	list<CEffectSprite*>	listEffect;
 	CCounter*				pScoreCounter; 
-	CCounter*				pLivesCounter;			//TODO: deski
+	CCounter*				pLivesCounter; 
 	CPaddle*				pPaddle;
 
-	LPDIRECT3DTEXTURE8		pDigitsTex;
+	LPDIRECT3DTEXTURE8		pSparkTex;
 
 	bool					bThruBrick;
 	bool					bFallingBricks;
 
-
 	float					fGameSpeed;				//TODO: TMP
-
-	IDirectMusicLoader8*		pLoader;
-	IDirectMusicPerformance8*	pPerformance;
-	IDirectMusicSegment8*		pSegment[3];
-	IDirectMusicAudioPath8*		p3DAudioPath;
-	IDirectSound3DBuffer8*		pDSB;
 };

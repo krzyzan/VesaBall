@@ -1,12 +1,16 @@
 #pragma once
 #include "MovingSprite.h"
 
-
+    //! Bonus
+    /*!
+		Przed u¿yciem konieczne jest za³adowanie tekstur do tablicy #s_pTexture.
+    */
 class CBonus :
 	public CMovingSprite
 {
 public:
-	enum EType
+	//! Typy bonusów
+	enum TypeEnum
 	{
 		ThruBrick,
 		SetOffExploding,
@@ -35,11 +39,21 @@ public:
 		MAX_TYPE
 	};
 
-	CBonus( EType Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
-	virtual ~CBonus();
+public:
+		//! Konstruktor
+		/*!
+			\param Type		Typ bonusa
+			\param Position	Pozycja pocz¹tkowa
+			\param Speed	Prêdkoœæ pocz¹tkowa
+		*/ 
+	CBonus( TypeEnum Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
+		//! Zwraca typ bonusa
+	TypeEnum GetType() const 
+		{ return eType; }
 
-	HRESULT FrameMove( FLOAT fElapsedTime );
-	DWORD	dwType;
-
+		//! Statyczna tablica adresów tekstur, dla poszczególnych typów bonusów. \b UWAGA! Ustawiæ przed tworzeniem obiektów klasy.
 	static LPDIRECT3DTEXTURE8 s_pTextures[MAX_TYPE];
+
+private:
+	TypeEnum eType;
 };

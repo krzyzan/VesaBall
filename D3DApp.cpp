@@ -12,7 +12,6 @@
 CD3DApp* CD3DApp::s_pD3DApp = NULL;
 
 
-
 //-----------------------------------------------------------------------------
 // Name: WndProc()
 // Desc: Static msg handler which passes messages to the application class.
@@ -22,24 +21,21 @@ LRESULT CALLBACK CD3DApp::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	return s_pD3DApp->MsgProc( hWnd, uMsg, wParam, lParam );
 }
 
-
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-
 CD3DApp::CD3DApp()
 {
-	s_pD3DApp			= this;
+	s_pD3DApp		= this;
 
-	bActive				= FALSE;
-	bReady				= FALSE;
-	CreateFlags			= 0L;
+	bActive			= FALSE;
+	bReady			= FALSE;
+	CreateFlags		= 0L;
 
-	strWindowTitle		= _T("VesaBall");
-	MinDepthBits		= 16;
-	MinStencilBits		= 0;
+	strWindowTitle	= _T("VesaBall");
+	MinDepthBits	= 16;
+	MinStencilBits	= 0;
 }
 
 HRESULT CD3DApp::Cleanup3DEnvironment()
@@ -47,19 +43,15 @@ HRESULT CD3DApp::Cleanup3DEnvironment()
 	bActive = FALSE;
 	bReady  = FALSE;
 
-	if ( pd3dDevice ) {
+	if ( pD3DDevice ) {
         InvalidateDeviceObjects();
 		DeleteDeviceObjects();
 	}
     
-	SAFE_RELEASE( pd3dDevice );
+	SAFE_RELEASE( pD3DDevice );
 	SAFE_RELEASE( pD3D );
-	SAFE_RELEASE( pDIDevice );
-	SAFE_RELEASE( pDI );
 
 	// Clean up everything and exit the app
-	//UnregisterClass( strWindowTitle, hInstance );
-
 	FinalCleanup();
 
 	return S_OK;
@@ -288,7 +280,7 @@ HRESULT CD3DApp::Run()
 	MSG  msg;
 	PeekMessage( &msg, NULL, 0U, 0U, PM_NOREMOVE );
 
-	while( WM_QUIT != msg.message  )
+	while (WM_QUIT != msg.message)
 	{
 		// Use PeekMessage() if the app is active, so we can use idle time to
 		// render the scene. Else, use GetMessage() to avoid eating CPU time.
@@ -422,9 +414,6 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 {
 	switch( uMsg )
 	{
-		case WM_ACTIVATE:
-			if ( pDIDevice ) return InitializeMouseInput();
-
   		case WM_SETCURSOR:
 			// Turn off Windows cursor in fullscreen mode
 			if ( bActive && bReady )
@@ -523,12 +512,12 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 	// Create the device
 	hr = pD3D->CreateDevice( 0, pDeviceInfo->DeviceType,
 							   hWnd, pModeInfo->dwBehavior, &d3dpp,
-							   &pd3dDevice );
+							   &pD3DDevice );
 
 	if ( SUCCEEDED(hr) )
 	{
 		// Clear the viewport
-		pd3dDevice->Present(NULL, NULL, NULL, NULL);
+		pD3DDevice->Present( NULL, NULL, NULL, NULL);
 
 		// When moving from fullscreen to windowed mode, it is important to
 		// adjust the window size after recreating the device rather than
@@ -540,7 +529,7 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 		// desktop.
 
 		// Store device Caps
-		pd3dDevice->GetDeviceCaps( &d3dCaps );
+		pD3DDevice->GetDeviceCaps( &d3dCaps );
 		CreateFlags = pModeInfo->dwBehavior;
 
 		return S_OK;
@@ -558,7 +547,7 @@ HRESULT CD3DApp::Render3DEnvironment()
 	HRESULT hr;
 
 	// Test the cooperative level to see if it's okay to render
-	if ( FAILED( hr = pd3dDevice->TestCooperativeLevel() ) )
+	if ( FAILED( hr = pD3DDevice->TestCooperativeLevel() ) )
 	{
 		// If the device was lost, do not render until we get it back
 		if ( D3DERR_DEVICELOST == hr )
@@ -572,9 +561,13 @@ HRESULT CD3DApp::Render3DEnvironment()
 		}
 		return hr;
 	}
-	
+
 	// Render the scene as normal
-	if ( FAILED( hr = RenderLoop() ) )
+	if ( FAILED( hr = FrameMove( Timer.GetElapsedTime() ) ) )
+		return hr;
+
+	// Render the scene as normal
+	if ( FAILED( hr = FrameRender() ) )
 		return hr;
 
 	return S_OK;
@@ -593,41 +586,13 @@ HRESULT CD3DApp::Resize3DEnvironment()
 		return hr;
 
 	// Reset the device
-	if ( FAILED( hr = pd3dDevice->Reset( &d3dpp ) ) )
+	if ( FAILED( hr = pD3DDevice->Reset( &d3dpp ) ) )
 		return hr;
 
 	// Initialize the app's device-dependent objects
 	hr = RestoreDeviceObjects();
 	if ( FAILED(hr) )
 		return hr;
-
-	return S_OK;
-}
-
-//-----------------------------------------------------------------------------
-// Name:
-// Desc:
-//-----------------------------------------------------------------------------
-HRESULT CD3DApp::InitializeMouseInput()
-{
-	pDI->CreateDevice( GUID_SysMouse, &pDIDevice, NULL );
-	pDIDevice->SetDataFormat( &c_dfDIMouse2 );
-	pDIDevice->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND );
-	pDIDevice->SetEventNotification( CreateEvent(NULL, FALSE, FALSE, NULL) );
-
-    DIPROPDWORD dipdw;
-    dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
-    dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-    dipdw.diph.dwObj        = 0;
-    dipdw.diph.dwHow        = DIPH_DEVICE;
-    dipdw.dwData            = 16; // Arbitary buffer size
-
-	HRESULT hr;
-
-    if ( FAILED( hr = pDIDevice->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
-        return hr;
-
-	pDIDevice->Acquire(); 
 
 	return S_OK;
 }
@@ -645,11 +610,6 @@ HRESULT CD3DApp::Create( HINSTANCE hInstance )
 	// Build a list of Direct3D adapters, modes and devices.
 	BuildDeviceList();
 
-
-	// Create the DirectInput object
-	DirectInput8Create( hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&pDI, NULL ); 
-	// Initialize mouse input
-	InitializeMouseInput();
 
 	// Register the windows class
 	//WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,

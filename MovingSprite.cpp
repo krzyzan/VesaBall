@@ -15,29 +15,48 @@ CMovingSprite::~CMovingSprite()
 {
 }
 
-HRESULT CMovingSprite::FrameMove( FLOAT fElapsedTime )
+void CMovingSprite::FrameMove( float fElapsedTime )
 {
 	vOldPosition = vPosition;
 	vSpeed += vAccel * fElapsedTime;
 	vPosition += vSpeed * fElapsedTime;
 
-	return S_OK;
+	// odbicia od œcian
+	if (vPosition.x - vSize.x/2 < BOARD_L) {
+		vPosition.x = 2*BOARD_L - vPosition.x + vSize.x;
+		vSpeed.x *= -1;
+	}
+
+	if (vPosition.x + vSize.x/2 > BOARD_R) {
+		vPosition.x = 2*BOARD_R - vPosition.x - vSize.x;
+		vSpeed.x *= -1;
+	}
+
+	if (vPosition.y - vSize.y/2 < BOARD_T) {
+		vPosition.y = 2*BOARD_T - vPosition.y + vSize.y;
+		vSpeed.y *= -1;
+	}
 }
 
-
-bool CMovingSprite::Overlaps( CSprite* pSprite )
+bool CMovingSprite::IsColliding( CSprite* pSprite ) const
 {
 	return (fabs(vPosition.x - pSprite->vPosition.x) < vSize.x/2 + pSprite->vSize.x/2 &&
 			fabs(vPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2 ); 
 }
 
-
-D3DXVECTOR2 CMovingSprite::GetContactSide( CSprite* pSprite )
+D3DXVECTOR2 CMovingSprite::GetCollisionSide( CSprite* pSprite ) const
 {
 	if (fabs(vOldPosition.x - pSprite->vPosition.x) < vSize.x/2 + pSprite->vSize.x/2)
 		return ( pSprite->vPosition.y - vPosition.y > 0) ? D3DXVECTOR2( 0, vSize.y/2 ) : D3DXVECTOR2( 0, -vSize.y/2 );
 
-	//if (fabs(vOldPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2)
+	if (fabs(vOldPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2)
 		return ( pSprite->vPosition.x - vPosition.x > 0) ? D3DXVECTOR2( vSize.x/2, 0 ) : D3DXVECTOR2( -vSize.x/2, 0 );
+
+	return D3DXVECTOR2(0,0);
 }
 
+
+void CMovingSprite::SetSpeed( const D3DXVECTOR2 & vNewSpeed )
+{
+	vSpeed = vNewSpeed;
+}

@@ -19,8 +19,6 @@ CSprite::CSprite( const LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
 	fRotation		= Rotation;
 	vPosition		= Position;
 	dwBlending		= Blending;
-    
-	bDeleteMe		= FALSE;
 }
 
 CSprite::~CSprite()

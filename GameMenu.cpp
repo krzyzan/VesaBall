@@ -3,15 +3,17 @@
 #include "menuitem.h"
 #include "cursor.h"
 
+#include "gameengine.h"
+#include "gameeditor.h"
 
-CGameMenu::CGameMenu( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice )
-	: CD3DAppScene( d3dDevice, DIDevice )
+CGameMenu::CGameMenu( LPDIRECT3DDEVICE8 d3dDevice )
+	: CD3DAppScene( d3dDevice )
 {
 	pSprite		= NULL;
 	pCursor		= NULL;
 
-	pOldMenuItem = NULL;
 	pPressedMenuItem = NULL;
+	pClickedMenuItem = NULL;
 }
 
 HRESULT CGameMenu::InitDeviceObjects()
@@ -42,6 +44,8 @@ HRESULT CGameMenu::InitDeviceObjects()
 	pCursor = new CCursor( pTex );
 	listRender.push_back( pCursor );
 
+	pCurMenuItem = GetPointedMenuItem();
+	if (pCurMenuItem) pCurMenuItem->SetHighlighted( true );
 
 	return S_OK;
 }
@@ -49,14 +53,14 @@ HRESULT CGameMenu::InitDeviceObjects()
 
 HRESULT CGameMenu::RestoreDeviceObjects()
 {
-	D3DXCreateSprite( pd3dDevice, &pSprite );
+	D3DXCreateSprite( pD3DDevice, &pSprite );
 
 	return S_OK;
 }
 
-CMenuItem* CGameMenu::GetPointedMenuItem()
+CMenuItem* CGameMenu::GetPointedMenuItem() const
 {
-	list<CMenuItem*>::iterator iMenuItem;
+	list<CMenuItem*>::const_iterator iMenuItem;
 	for (iMenuItem = listMenuItem.begin(); iMenuItem != listMenuItem.end(); iMenuItem++)
 		if (fabs((*iMenuItem)->vPosition.y - pCursor->vPosition.y) < (*iMenuItem)->vSize.y/2 &&
 			fabs((*iMenuItem)->vPosition.x - pCursor->vPosition.x) < (*iMenuItem)->vSize.x/2 )
@@ -65,75 +69,74 @@ CMenuItem* CGameMenu::GetPointedMenuItem()
 }
 
 
-HRESULT CGameMenu::RenderLoop()
+HRESULT CGameMenu::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
 {
-    DIDEVICEOBJECTDATA didod[ MOUSE_BUFFER_SIZE ];  // Receives buffered data 
-    DWORD              dwElements;
-    HRESULT            hr;
-
-    if (NULL == pDIDevice) 
-        return S_OK;
-    
-    dwElements = MOUSE_BUFFER_SIZE;
-    if (FAILED( hr = pDIDevice->GetDeviceData( sizeof(DIDEVICEOBJECTDATA),
-                                     didod, &dwElements, 0 ) ) )
-        return hr;
-
-	CMenuItem* pCurMenuItem = GetPointedMenuItem();
-	if (pCurMenuItem) pCurMenuItem->SetHighlighted( true );
-
-	for (DWORD i=0; i<dwElements; i++) {
-		switch (didod[ i ].dwOfs) {
-			case DIMOFS_X:
-				pCursor->Move( D3DXVECTOR2( MOUSE_SPEED * (int)didod[ i ].dwData, 0 ) );
-				break;
-			case DIMOFS_Y:
-				pCursor->Move( D3DXVECTOR2( 0, MOUSE_SPEED * (int)didod[ i ].dwData ) );
-				break;
-		}
-
-		switch (didod[ i ].dwOfs)
-        {
-            case DIMOFS_X:
-            case DIMOFS_Y:
-				pOldMenuItem = pCurMenuItem;
-				pCurMenuItem = GetPointedMenuItem();
-				if (pPressedMenuItem && pCurMenuItem != pPressedMenuItem)
-					pCurMenuItem = NULL;
-				if (pCurMenuItem != pOldMenuItem) {
-					if (pOldMenuItem)
-						pOldMenuItem->SetHighlighted( false );
-					if (pCurMenuItem)
-						pCurMenuItem->SetHighlighted( true );
-				}
-                break;
-
-            case DIMOFS_BUTTON0:
-				if (didod[ i ].dwData & 0x80) {		// przycisk nacisniety
-						if ( pCurMenuItem ) {
-						pPressedMenuItem = pCurMenuItem; 
-						pPressedMenuItem->SetPressed( true );
-					}
-				}
-				else {
-					if (pPressedMenuItem ) {		// przycisk puszczony
-						pPressedMenuItem->SetPressed( false );
-						if (pCurMenuItem == pPressedMenuItem) {
-							pPressedMenuItem = NULL;		//TODO: TMP
-							return pCurMenuItem->GetUID();
-						}
-						pPressedMenuItem = NULL;
-					}
-				}
-				break;
-        }
+	switch (didod->dwOfs) {
+		case DIMOFS_X:
+			pCursor->Move( D3DXVECTOR2( (float)(int)didod->dwData, 0 ) );
+			break;
+		case DIMOFS_Y:
+			pCursor->Move( D3DXVECTOR2( 0, (float)(int)didod->dwData ) );
+			break;
 	}
 
-////////	
-	
-	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(58,110,145), 1.0f, 0 );
+	CMenuItem* pOldMenuItem;
 
-	pd3dDevice->BeginScene();
+	switch (didod->dwOfs)
+    {
+        case DIMOFS_X:
+		case DIMOFS_Y:
+			pOldMenuItem = pCurMenuItem;
+			pCurMenuItem = GetPointedMenuItem();
+			if (pPressedMenuItem && pCurMenuItem != pPressedMenuItem)
+				pCurMenuItem = NULL;
+			if (pCurMenuItem != pOldMenuItem) {
+				if (pOldMenuItem)
+					pOldMenuItem->SetHighlighted( false );
+				if (pCurMenuItem)
+					pCurMenuItem->SetHighlighted( true );
+			}
+            break;
+	
+
+        case DIMOFS_BUTTON0:
+			if (didod->dwData & 0x80) {		// przycisk nacisniety
+					if ( pCurMenuItem ) {
+					pPressedMenuItem = pCurMenuItem; 
+					pPressedMenuItem->SetPressed( true );
+				}
+			}
+			else {
+				if (pPressedMenuItem ) {		// przycisk puszczony
+					pPressedMenuItem->SetPressed( false );
+					if (pCurMenuItem == pPressedMenuItem)
+						pClickedMenuItem = pCurMenuItem;
+					pPressedMenuItem = NULL;
+				}
+			}
+			break;
+    }
+
+	return S_OK;
+}
+
+
+HRESULT CGameMenu::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
+{
+	return S_OK;
+}
+
+HRESULT CGameMenu::FrameMove( float fElapsedTime )
+{
+	return S_OK;
+}
+
+
+HRESULT CGameMenu::FrameRender()
+{
+	pD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(58,110,145), 1.0f, 0 );
+
+	pD3DDevice->BeginScene();
 	pSprite->Begin();
 
 	list<CSprite*>::iterator iSprite;
@@ -141,12 +144,24 @@ HRESULT CGameMenu::RenderLoop()
 		(*iSprite)->Render( pSprite );
 
 	pSprite->End();
-	pd3dDevice->EndScene();
-
-	// Show the frame on the primary surface.
-	pd3dDevice->Present( NULL, NULL, NULL, NULL );
-
+	pD3DDevice->EndScene();
+	
 	return S_OK;
+}
+
+CD3DAppScene* CGameMenu::GetNextScene()
+{
+	if (pClickedMenuItem)
+		switch (pClickedMenuItem->GetUID()) {
+			case UID_START:
+				return new CGameEngine( pD3DDevice );
+			case UID_EDITOR:
+				return new CGameEditor( pD3DDevice );
+			case UID_QUIT:
+				return NULL;
+		}
+
+	return this;
 }
 
 

@@ -7,10 +7,10 @@
 //-----------------------------------------------------------------------------
 
 
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
+INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT )
 {
 	CD3DBallApp app;
-	app.Create( hInst );
+	app.Create( hInstance );
 	return app.Run();
 }
 

@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "d3dappscene.h"
 
-CD3DAppScene::CD3DAppScene( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice )
+CD3DAppScene::CD3DAppScene( LPDIRECT3DDEVICE8 d3dDevice )
 {
-	pd3dDevice	= d3dDevice;
-	pDIDevice	= DIDevice;
+	pD3DDevice	= d3dDevice;
 }
 
 
@@ -20,7 +19,7 @@ CD3DAppScene::~CD3DAppScene()
 HRESULT CD3DAppScene::LoadTexture( char* strFileName, LPDIRECT3DTEXTURE8* pTex )
 {
 	// TODO: zrobiæ obs³uge b³êdów
-    D3DXCreateTextureFromFile( pd3dDevice, strFileName, pTex );
+    D3DXCreateTextureFromFile( pD3DDevice, strFileName, pTex );
 	vtrTexture.push_back( *pTex );
 
 	return S_OK;

@@ -7,14 +7,15 @@ class CGameBoard :
 	public CD3DAppScene
 {
 public:
-	CGameBoard( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
+	CGameBoard( LPDIRECT3DDEVICE8 d3dDevice );
 	virtual ~CGameBoard(void);
 
 	HRESULT InitDeviceObjects();
 	HRESULT RestoreDeviceObjects();
-	HRESULT RenderLoop();
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
+
+	HRESULT FrameRender();
 
 protected:
 	LPD3DXSPRITE		pSprite;

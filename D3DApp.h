@@ -28,8 +28,6 @@ v2.00
 
 #pragma once
 #include <d3dx8.h>
-#include <dinput.h>
-
 #include "timer.h"
 
 //-----------------------------------------------------------------------------
@@ -117,12 +115,13 @@ public:
 	HRESULT Run();
 
 protected:
-	virtual HRESULT InitDeviceObjects()			= 0;
-	virtual HRESULT RestoreDeviceObjects()		= 0;
-	virtual HRESULT RenderLoop()				= 0;
-	virtual HRESULT InvalidateDeviceObjects()	= 0;
-	virtual HRESULT DeleteDeviceObjects()		= 0;
-	virtual HRESULT FinalCleanup()				= 0;
+	virtual HRESULT InitDeviceObjects()				= 0;
+	virtual HRESULT RestoreDeviceObjects()			= 0;
+	virtual HRESULT FrameMove( float fElapsedTime )	= 0;
+	virtual HRESULT FrameRender()					= 0;
+	virtual HRESULT InvalidateDeviceObjects()		= 0;
+	virtual HRESULT DeleteDeviceObjects()			= 0;
+	virtual HRESULT FinalCleanup()					= 0;
 
 	// Internal variables for the state of the app
 	BOOL					bActive;
@@ -130,11 +129,7 @@ protected:
 
 	// Direct3D
 	LPDIRECT3D8 			pD3D; 			// The main D3D object
-	LPDIRECT3DDEVICE8		pd3dDevice;		// The main D3D object
-
-	// DirectInput
-	LPDIRECTINPUT8			pDI;			// The main DI object
-	LPDIRECTINPUTDEVICE8	pDIDevice;		// The DI device
+	LPDIRECT3DDEVICE8		pD3DDevice;		// The main D3D object
 
 	// Timer
 	CTimer					Timer;
@@ -145,7 +140,6 @@ private:
 	BOOL	FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
 				D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat );
 
-	HRESULT InitializeMouseInput();
 	HRESULT Initialize3DEnvironment();
 	HRESULT Render3DEnvironment();
 	HRESULT Resize3DEnvironment();
@@ -165,13 +159,8 @@ private:
 	DWORD					MinDepthBits;		// Minimum number of bits needed in depth buffer
 	DWORD					MinStencilBits;		// Minimum number of bits needed in stencil buffer
 
-	// Variables for timing
-	//FLOAT					fTime;				// Current time in seconds
-	//FLOAT					fElapsedTime;		// Time elapsed since last frame
-	//FLOAT					fFPS; 				// Instanteous frame rate
-
 protected:
-	HWND	hWnd; 								// The main app window
+	HWND		hWnd; 							// The main app window
 
 	// Needed for the static WndProc()
 	static CD3DApp* s_pD3DApp;

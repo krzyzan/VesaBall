@@ -14,19 +14,19 @@ public:
     void Start();				// starts the timer
     void Stop();				// stop (or pause) the timer
     void Advance();				// advance the timer by 0.1 seconds
-    FLOAT GetAbsoluteTime();	// get the absolute system time
-    FLOAT GetTime();			// get the current time
-    FLOAT GetElapsedTime();	// get the time that elapsed between GetElapsedTime() calls
-    BOOL IsStopped();			// returns true if timer stopped
+    float GetAbsoluteTime();	// get the absolute system time
+    float GetTime();			// get the current time
+    float GetElapsedTime();	// get the time that elapsed between GetElapsedTime() calls
+    bool IsStopped();			// returns true if timer stopped
 
 protected:
-    BOOL m_bUsingQPF;
-    BOOL m_bTimerStopped;
-    LONGLONG m_llQPFTicksPerSec;
+    bool bUsingQPF;
+    bool bTimerStopped;
+    LONGLONG llQPFTicksPerSec;
 
-    LONGLONG m_llStopTime;
-    LONGLONG m_llLastElapsedTime;
-    LONGLONG m_llBaseTime;
+    LONGLONG llStopTime;
+    LONGLONG llLastElapsedTime;
+    LONGLONG llBaseTime;
 };
 
 

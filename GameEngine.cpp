@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "GameEngine.h"
+#include "GameMenu.h"
 
 #include "Ball.h"
 #include "Brick.h"
@@ -9,93 +10,22 @@
 #include "EffectSprite.h"
 
 
-CGameEngine::CGameEngine( /*TODO: TMP*/HWND wnd, LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice )
-	: CGameBoard( d3dDevice, DIDevice )
+const DWORD INITIAL_LIVES = 2;
+
+CGameEngine::CGameEngine( LPDIRECT3DDEVICE8 d3dDevice )
+	: CGameBoard( d3dDevice )
 {  
-	CoInitialize(NULL);
-  
-	CoCreateInstance(CLSID_DirectMusicLoader, NULL, 
-       CLSCTX_INPROC, IID_IDirectMusicLoader8,
-       (void**)&pLoader);
-
-	CoCreateInstance(CLSID_DirectMusicPerformance, NULL,
-       CLSCTX_INPROC, IID_IDirectMusicPerformance8,
-       (void**)&pPerformance );
-
-	pPerformance->InitAudio( 
-		NULL,      // IDirectMusic interface not needed.
-		NULL,      // IDirectSound interface not needed.
-		NULL,      // Window handle.
-		DMUS_APATH_DYNAMIC_STEREO,  // Default audiopath type.
-		64,        // Number of performance channels.
-		DMUS_AUDIOF_ALL,   // Features on synthesizer.
-		NULL     // Audio parameters; use defaults.
-	);
-
-	pPerformance->CreateStandardAudioPath( 
-		DMUS_APATH_DYNAMIC_3D,  // Path type.
-		64,                     // Number of performance channels.
-		TRUE,                   // Activate now.
-		&p3DAudioPath           // Pointer that receives audiopath.
-	);
-
-	p3DAudioPath->GetObjectInPath( 
-		DMUS_PCHANNEL_ALL,  // Performance channel.
-		DMUS_PATH_BUFFER,   // Stage in the path.
-		0,                  // Index of buffer in chain.
-		GUID_NULL,          // Class of object.
-		0,                  // Index of object in buffer; ignored.
-		IID_IDirectSound3DBuffer, // GUID of desired interface.
-		(LPVOID*) &pDSB     // Pointer that receives interface.
-	);
-
-	pLoader->LoadObjectFromFile(
-		CLSID_DirectMusicSegment, // Class identifier.
-		IID_IDirectMusicSegment8, // ID of desired interface.
-		L"snd\\brick.wav",     // Filename.
-		(LPVOID*) &pSegment[0]   // Pointer that receives interface.
-	);
-
-	pLoader->LoadObjectFromFile(
-		CLSID_DirectMusicSegment, // Class identifier.
-		IID_IDirectMusicSegment8, // ID of desired interface.
-		L"snd\\brick_metal.wav",     // Filename.
-		(LPVOID*) &pSegment[1]   // Pointer that receives interface.
-	);
-
-	pLoader->LoadObjectFromFile(
-		CLSID_DirectMusicSegment, // Class identifier.
-		IID_IDirectMusicSegment8, // ID of desired interface.
-		L"snd\\paddle.wav",     // Filename.
-		(LPVOID*) &pSegment[2]   // Pointer that receives interface.
-	);
-
-
-	/*TODO: TMP*/hWnd = wnd;
 	fGameSpeed = 1.0f;
 
 	pScoreCounter = NULL; 
 	pLivesCounter = NULL; 
 	pPaddle = NULL;
-
-	numFrameMove	= 0;
-	numRender		= 0;
 }
 
 
 CGameEngine::~CGameEngine()
 {
-	char str[100] = "FrameMove() / Render(): ";
-	char* p = str + strlen(str);
-	_gcvt(((FLOAT)numFrameMove)/numRender, 4, p);
-	p = str + strlen(str);
-	strcat( p, "\nRender() / sec: ");
-	p = str + strlen(str);
-	_gcvt(numRender/timerRenderLimiter.GetTime(), 4, p);
-
-	MessageBox( hWnd, str, "Internal counters", MB_OK );
 }
-
 
 void CGameEngine::ResetBoard()
 {
@@ -120,8 +50,7 @@ void CGameEngine::ResetBoard()
 
 	// tworzymy deskê z kulka
 	pPaddle = new CPaddle();
-
-	CBall* pBall = new CBall( pPaddle->vPosition + D3DXVECTOR2(0.01f, 0), D3DXVECTOR2(0,BALL_SPEED_AVG) );
+	CBall* pBall = new CBall( pPaddle->vPosition + D3DXVECTOR2(0.01f, 0), D3DXVECTOR2(0, BALL_SPEED_VAL_AVG) );
 	listBall.push_front( pBall );
 	pPaddle->CatchBall( pBall );
 }
@@ -136,7 +65,7 @@ HRESULT CGameEngine::InitDeviceObjects()
 	
 	// kulka
 	LoadTexture( "gfx/Ball_alu.png",	&CBall::s_pTexture );
-	LoadTexture( "gfx/SparkEffect.png",	&CBall::s_pSparkTexture );
+	LoadTexture( "gfx/SparkEffect.png",	&pSparkTex );
 	
 
 	// ³adujemy tekstury bonusów
@@ -165,56 +94,93 @@ HRESULT CGameEngine::InitDeviceObjects()
 	LoadTexture( "gfx/Bonus_EightBall.png",		&CBonus::s_pTextures[CBonus::EightBall] );
 
 	// licznik
-	LoadTexture( "gfx/Digits.png", &pDigitsTex );
+	LoadTexture( "gfx/Digits.png", &CCounter::s_pTexture );
 
 	ResetBoard();
 
 	// tworzymy licznik
-	pScoreCounter = new CCounter( pDigitsTex, D3DXVECTOR2(BOARD_W*0.2f, 0.05f*0.75f), D3DXVECTOR2(BOARD_L+BOARD_W*0.125f, 0.05f/2), 92, 6 );
-	pLivesCounter = new CCounter( pDigitsTex, D3DXVECTOR2(BOARD_W*0.2f, 0.05f*0.75f), D3DXVECTOR2(BOARD_R-BOARD_W*0.125f, 0.05f/2), 92, 6 );
-	pLivesCounter->Set( INITIAL_LIVES );
+	pScoreCounter = new CCounter( 0,			D3DXVECTOR2(BOARD_W*0.2f, 0.05f*0.75f), D3DXVECTOR2(BOARD_L+BOARD_W*0.125f, 0.05f/2), 92, 6 );
+	pLivesCounter = new CCounter( INITIAL_LIVES,D3DXVECTOR2(BOARD_W*0.2f, 0.05f*0.75f), D3DXVECTOR2(BOARD_R-BOARD_W*0.125f, 0.05f/2), 92, 6 );
 
-	timerRenderLimiter.Start();
-	fTimeToRender = 0;
+	return S_OK;
+}
+
+HRESULT CGameEngine::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
+{
+	if (didod->dwOfs == DIMOFS_BUTTON1 )
+		if (didod->dwData & 0x80)		// przycisk nacisniety
+			fGameSpeed *= 0.2f;
+		else							// przycisk puszczony
+			fGameSpeed /= 0.2f;
+
+	if (!pPaddle)
+		return S_OK;
+
+	list<CBall*>::iterator iBall;
+	switch (didod->dwOfs)
+    {
+        case DIMOFS_X:
+			pPaddle->Move( (float)(int)didod->dwData * 1.5f / RES_X );
+			break;
+
+		case DIMOFS_BUTTON0:
+			if (didod->dwData & 0x80)		// przycisk nacisniety
+				pPaddle->LaunchAllBalls();
+			break;
+    }
 
 	return S_OK;
 }
 
 
-HRESULT CGameEngine::RenderLoop()
+HRESULT CGameEngine::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
 {
-	FLOAT fElapsedTime = timerRenderLimiter.GetElapsedTime();
+	//TODO: TMP
+	if( didod->dwOfs = DIK_SPACE )
+		exit( 0 );
+	return S_OK;
+}
+
+
+HRESULT CGameEngine::FrameMove( float fElapsedTime )
+{
 	if ( fElapsedTime > 0.1 ) 
 		return S_OK;	
-	numFrameMove++;
 
-	DestroyObjects();
+	// Kasujemy z listy efektów
+	list<CEffectSprite*>::iterator iEffect = listEffect.begin(); 
+	while (iEffect != listEffect.end()) {
+		if ( (*iEffect)->Expired() ) {
+			delete (*iEffect);
+			iEffect = listEffect.erase( iEffect );
+		}
+		else
+			iEffect++;
+	}
+
 	MoveObjects( fElapsedTime * fGameSpeed );
 	CollideObjects();
 
-	//tracimy ¿ycie
-	if (listBall.empty() && listEffect.empty()) { 
-		if (pLivesCounter->Get() == 0)
-			return E_FAIL;
-		pLivesCounter->Dec(1);
+	// tracimy ¿ycie
+	if (listBall.empty() && listBonus.empty()) { 
+		pLivesCounter->lValue--;
 		ResetBoard();
 	}
 
+	return S_OK;
+}
 
-	fTimeToRender -= fElapsedTime;
-	if (fTimeToRender > 0) 
-		return S_OK;
 
-///////////////////////////////////////
-
+HRESULT CGameEngine::FrameRender()
+{
 	// renderujemy
-	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40,0x60,0x60), 1.0f, 0 );
+	pD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40,0x60,0x60), 1.0f, 0 );
 
-	pd3dDevice->BeginScene();
+	pD3DDevice->BeginScene();
 	pSprite->Begin();
 
 	// sceneria
-	CGameBoard::RenderLoop();
+	CGameBoard::FrameRender();
 
 	// efekty
 	list<CEffectSprite*>::iterator iEffect;
@@ -240,16 +206,20 @@ HRESULT CGameEngine::RenderLoop()
 	pLivesCounter->Render( pSprite );
 
 	pSprite->End();
-	pd3dDevice->EndScene();
-
-	// Show the frame on the primary surface.
-	pd3dDevice->Present( NULL, NULL, NULL, NULL );
-
-	fTimeToRender = 1.0f/110;
-	numRender++;
+	pD3DDevice->EndScene();
 
 	return S_OK;
 }
+
+
+CD3DAppScene* CGameEngine::GetNextScene()
+{
+	if (pLivesCounter->lValue < 0)
+		return new CGameMenu( pD3DDevice );
+	
+	return this;
+}
+
 
 HRESULT CGameEngine::DeleteDeviceObjects()
 {
@@ -276,7 +246,7 @@ HRESULT CGameEngine::DeleteDeviceObjects()
 }
 
 
-void CGameEngine::MoveObjects( FLOAT fElapsedTime )
+void CGameEngine::MoveObjects( float fElapsedTime )
 {
 	// ruch kulek
 	list<CBall*>::iterator iBall;
@@ -294,29 +264,15 @@ void CGameEngine::MoveObjects( FLOAT fElapsedTime )
 		(*iEffect)->FrameMove( fElapsedTime );
 
 	// aktualizacja licznika
-	pScoreCounter->FrameMove( fElapsedTime );
-	pLivesCounter->FrameMove( fElapsedTime );
-
-	// ruch deski
-	if (pPaddle) {
-		DIMOUSESTATE2 dims2;
-		ZeroMemory( &dims2, sizeof(dims2) );
-		pDIDevice->GetDeviceState( sizeof(DIMOUSESTATE2), &dims2 );
-
-		pPaddle->MouseMove( &dims2 );
-		if (dims2.rgbButtons[1])
-			fGameSpeed = 0.2f;
-		else
-			fGameSpeed = 1.0f;
-	}
+	pScoreCounter->Update( fElapsedTime );
+	pLivesCounter->Update( fElapsedTime );
 }
 
-
-void CGameEngine::ApplyBonus( DWORD Type )
+void CGameEngine::ApplyBonus( CBonus* pBonus )
 {
 	list<CBall*>::iterator iBall;
 
-	switch (Type) {
+	switch ( pBonus->GetType() ) {
 		case CBonus::ThruBrick:
 			bThruBrick = true;
 			for (iBall = listBall.begin(); iBall != listBall.end(); iBall++) {
@@ -337,7 +293,7 @@ void CGameEngine::ApplyBonus( DWORD Type )
 
 
 		case CBonus::ExtraLife:
-			pLivesCounter->Inc(1);
+			pLivesCounter->lValue++;
 			break;
 
 		/*
@@ -349,8 +305,9 @@ void CGameEngine::ApplyBonus( DWORD Type )
 
 		case CBonus::SlowBall:
 			for (iBall = listBall.begin(); iBall != listBall.end(); iBall++) {
-				D3DXVec2Normalize( &(*iBall)->vSpeed, &(*iBall)->vSpeed );
-				(*iBall)->vSpeed *= BALL_SPEED_MIN;
+				D3DXVECTOR2 vSpeed = (*iBall)->GetSpeed();
+				D3DXVec2Normalize( &vSpeed, &vSpeed );
+				(*iBall)->SetSpeed( vSpeed * BALL_SPEED_VAL_MIN );
 			}
 			break;
 
@@ -366,13 +323,14 @@ void CGameEngine::ApplyBonus( DWORD Type )
 
 		case CBonus::ShrinkBall:
 			for (iBall = listBall.begin(); iBall != listBall.end(); iBall++)
-				(*iBall)->SetSize( D3DXVECTOR2(BALL_SIZE_MIN, BALL_SIZE_MIN) );
+				(*iBall)->SetSize( BALL_SIZE_MIN );
 			break;
 
 		case CBonus::FastBall:
 			for (iBall = listBall.begin(); iBall != listBall.end(); iBall++) {
-				D3DXVec2Normalize( &(*iBall)->vSpeed, &(*iBall)->vSpeed );
-				(*iBall)->vSpeed *= BALL_SPEED_MAX;
+				D3DXVECTOR2 vSpeed = (*iBall)->GetSpeed();
+				D3DXVec2Normalize( &vSpeed, &vSpeed );
+				(*iBall)->SetSpeed( vSpeed * BALL_SPEED_VAL_MAX );
 			}
 			break;
 
@@ -398,15 +356,15 @@ void CGameEngine::ApplyBonus( DWORD Type )
 			for (iBall = listBall.begin(); iBall != listBall.end(); iBall++)
 				if ( !(*iBall)->bCatched ) {
 					CBall* pBall = new CBall( **iBall );
-					pBall->vSpeed.x =  (*iBall)->vSpeed.y;
-					pBall->vSpeed.y = -(*iBall)->vSpeed.x;
+					D3DXVECTOR2 vSpeed = (*iBall)->GetSpeed();
+					pBall->SetSpeed( D3DXVECTOR2(vSpeed.y, -vSpeed.x) );
 					listBall.push_front( pBall );
 				}
 			break;
 
 		case CBonus::MegaBall:
 			for (iBall = listBall.begin(); iBall != listBall.end(); iBall++)
-				(*iBall)->SetSize( D3DXVECTOR2(BALL_SIZE_MAX, BALL_SIZE_MAX) );
+				(*iBall)->SetSize( BALL_SIZE_MAX );
 			break;
 
 		case CBonus::EightBall: 
@@ -417,8 +375,11 @@ void CGameEngine::ApplyBonus( DWORD Type )
 					if ( !(*iBall)->bCatched ) {
 						CBall* pBall = *iBall;
 						for (int i=1; i<8; i++) {
+							if (listBall.size() > 100) continue;
 							pBall = new CBall( *pBall );
-							D3DXVec2TransformCoord( &pBall->vSpeed, &pBall->vSpeed, &matRotation );
+							D3DXVECTOR2 vNewSpeed = pBall->GetSpeed();
+							D3DXVec2TransformCoord( &vNewSpeed, &vNewSpeed, &matRotation );
+							pBall->SetSpeed( vNewSpeed );
 							listBall.push_front( pBall );
 						}
 					}
@@ -434,10 +395,10 @@ void CGameEngine::CollideObjects()
 	list<CBall*>::iterator iBall;
 	iBall = listBall.begin();
 	while (iBall != listBall.end()) {
-		CollideBallBrick( *iBall );
+		CollideBallBricks( *iBall );
 
 		if (pPaddle)
-			if ( !(*iBall)->bCatched && (*iBall)->Overlaps( pPaddle ) ) 
+			if ( !(*iBall)->bCatched && (*iBall)->IsColliding( pPaddle ) ) 
 				CollideBallPaddle( *iBall );
 
 		// kasuj gdy wyjdzie poza ekran
@@ -453,9 +414,9 @@ void CGameEngine::CollideObjects()
 	while (iBonus != listBonus.end()) {
 		// z³ap bonus
 		if (pPaddle)
-			if ( (*iBonus)->Overlaps( pPaddle ) ) {
-				ApplyBonus( (*iBonus)->dwType );
-				pScoreCounter->Inc( 100 );
+			if ( (*iBonus)->IsColliding( pPaddle ) ) {
+				ApplyBonus( *iBonus );
+				pScoreCounter->lValue += 100;
 				iBonus = listBonus.erase( iBonus );
 				continue;
 			}
@@ -468,84 +429,11 @@ void CGameEngine::CollideObjects()
 	}
 }
 
-void CGameEngine::CollideBallBrick( CBall* pBall )
-{
-	for (LONG x=-1; x<2; x+=2)
-		for (LONG y=-1; y<2; y+=2) {
-			D3DXVECTOR2 vPos = pBall->vPosition + D3DXVECTOR2( pBall->vSize.x/2*x, pBall->vSize.y/2*y );
-			if (pBrickArray->Contains( vPos )) {
-				POINT pos = pBrickArray->VectorToArrayCoords( vPos );
-				CBrick* iBrick = pBrickArray->GetBrickAt( pos );
-				if ( !iBrick->pTypeDesc )
-					continue;
-
-				D3DXVECTOR2 vBrickPosition = pBrickArray->vPosition - pBrickArray->vSize/2 + pBrickArray->vBrickSize/2
-					+ D3DXVECTOR2( pBrickArray->vBrickSize.x*pos.x, pBrickArray->vBrickSize.y*pos.y );
-
-				D3DXVECTOR2 vSide;  
-
-				// TODO: GetContactSide
-				if (fabs(pBall->vOldPosition.x - vBrickPosition.x) < pBall->vSize.x/2 + pBrickArray->vBrickSize.x/2)
-					vSide = ( vBrickPosition.y - pBall->vPosition.y > 0) ? D3DXVECTOR2( 0, pBall->vSize.y/2 ) : D3DXVECTOR2( 0, -pBall->vSize.y/2 );
-				else
-				//if (fabs(vOldPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2)
-					vSide = ( vBrickPosition.x - pBall->vPosition.x > 0) ? D3DXVECTOR2( pBall->vSize.x/2, 0 ) : D3DXVECTOR2( -pBall->vSize.x/2, 0 );
-
-				D3DXVECTOR2 vOldSpeed = pBall->vSpeed;
-
-				if (! bThruBrick ) {
-					iBrick->SetHitCounter( iBrick->dwHitCounter + 1 );
-					
-					if (vSide.y) {
-						pBall->vSpeed.y *= -1;
-						pBall->vPosition.y = 2*(vBrickPosition.y - vSide.y) - pBall->vPosition.y;
-						pBall->vPosition.y -= (vSide.y > 0) ? pBrickArray->vBrickSize.y : (-pBrickArray->vBrickSize.y);
-					}
-
-					if (vSide.x) {
-						pBall->vSpeed.x *= -1;
-						pBall->vPosition.x = 2*(vBrickPosition.x - vSide.x) - pBall->vPosition.x;
-						pBall->vPosition.x -= (vSide.x > 0) ? pBrickArray->vBrickSize.x : (-pBrickArray->vBrickSize.x);
-					}
-
-					pBall->CreateSparkles( vSide, &listEffect );
-				}
-
-				if ( iBrick->dwHitCounter == iBrick->pTypeDesc->dur || bThruBrick ) {
-					pScoreCounter->Inc( 100 + rand()%100 );	//TODO: sensowne wartoœci
-					if (frand(0,1) < BONUS_PROB) {
-						CBonus* pBonus = new CBonus( static_cast<CBonus::EType>(rand()%CBonus::MAX_TYPE), pBall->vPosition, vOldSpeed/2 );
-						listBonus.push_back( pBonus );
-					}
-
-				// znikanie cegie³ki
-				// TODO: poprawiæ teksture
-				CEffectSprite* es = new CEffectSprite( iBrick->pTypeDesc->pTexture[0], pBrickArray->vBrickSize, vBrickPosition, D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), 0.25f, 0xFFFFFFFF );
-				listEffect.push_front( es );
-
-				iBrick->pTypeDesc = NULL;
-			}
-
-			//if (pBrick->pTypeDesc->dur != 0xFFFFFFFF) {
-			//	pSegment[0]->Download( pPerformance );
-			//	pDSB->SetPosition( pBall->vPosition.x*2-1.0f, 0.0f, -1.0f, DS3D_IMMEDIATE );
-			//	pPerformance->PlaySegmentEx( pSegment[0], NULL, NULL, 0, 0, NULL, NULL, p3DAudioPath );  
-			//}
-			//else {
-			//	pSegment[1]->Download( pPerformance );
-			//	pDSB->SetPosition( pBall->vPosition.x*2-1.0f, 0.0f, -1.0f, DS3D_IMMEDIATE );
-			//	pPerformance->PlaySegmentEx( pSegment[1], NULL, NULL, 0, 0, NULL, NULL, p3DAudioPath );  
-			//}
-		}
-	}
-}
-
-
 void CGameEngine::CollideBallPaddle( CBall* pBall )
 {
-	D3DXVECTOR2 vSide = pBall->GetContactSide( pPaddle );
+	D3DXVECTOR2 vSide = pBall->GetCollisionSide( pPaddle );
 
-	if (vSide.y && pPaddle->bGrabPaddle )
+	if (vSide.y && pPaddle->bGrabPaddle && fabs(pBall->vPosition.x - pPaddle->vPosition.x) < pPaddle->vSize.x/3 )
 		pPaddle->CatchBall( pBall );
 	else {
 		if ( vSide.y )
@@ -556,34 +444,62 @@ void CGameEngine::CollideBallPaddle( CBall* pBall )
 			else
 				pBall->vOldPosition.x = pBall->vPosition.x = pPaddle->vPosition.x + pPaddle->vSize.x/2 + pBall->vSize.x/2 + 0.001f;	//TODO: dok³adnoœæ :(
 		pPaddle->LaunchBall( pBall );
-		pBall->CreateSparkles( vSide, &listEffect );
+		CreateSparkles( pBall, vSide );
 	}
 
     if (bFallingBricks)
 		pBrickArray->FallBricks();
-
-	/*
-	pSegment[2]->Download( pPerformance );
-	pDSB->SetPosition( pBall->vPosition.x*2-1.0f, 0.0f, 1.0f, DS3D_IMMEDIATE );
-	pPerformance->PlaySegmentEx( pSegment[2], NULL, NULL, 0, 0, NULL, NULL, p3DAudioPath );  
-	*/
 }
 
-//TODO: usun¹æ bDeleteMe
-
-void CGameEngine::DestroyObjects()
+void CGameEngine::CollideBallBricks( CBall* pBall )
 {
-	list<CEffectSprite*>::iterator iEffect;
+	for (LONG x=0; x<2; x++)
+		for (LONG y=0; y<2; y++) {
+			D3DXVECTOR2 vPos = pBall->vPosition - pBall->vSize/2 + D3DXVECTOR2( pBall->vSize.x*x, pBall->vSize.y*y );
+			if (pBrickArray->Contains( vPos )) {
+				POINT pos = pBrickArray->GetArrayCoords( vPos );
+				CBrick* pBrick = pBrickArray->GetBrick( pos );
+				if ( pBrick == NULL )
+					continue;
 
-	// Kasujemy z listy efektów
-	iEffect = listEffect.begin(); 
-	while (iEffect != listEffect.end()) {
-		if ((*iEffect)->bDeleteMe) {
-			delete (*iEffect);
-			iEffect = listEffect.erase( iEffect );
+				D3DXVECTOR2 vSide = pBall->GetCollisionSide( pBrick );
+				D3DXVECTOR2 vBonusSpeed = pBall->GetSpeed() / 2;
+
+				if (! bThruBrick ) {
+					pBall->Reflect( pBrick, vSide );
+					pBrick->Hit();
+					CreateSparkles( pBall, vSide );
+				}
+
+				if ( pBrick->IsDestroyed() || bThruBrick ) {
+					pScoreCounter->lValue += pBrick->GetScore();
+					if (frand(0,1) < BONUS_PROB) {
+						CBonus* pBonus = new CBonus( static_cast<CBonus::TypeEnum>(rand()%CBonus::MAX_TYPE), pBall->vPosition, vBonusSpeed );
+						listBonus.push_back( pBonus );
+					}
+
+					listEffect.push_front( pBrick->CreateBlendEffect() );
+					pBrickArray->RemoveBrick( pos );
+				}
+
+			}
 		}
-		else
-			iEffect++;
+}
+
+
+// Iskry przy odbiciu
+void CGameEngine::CreateSparkles( CBall* pBall, const D3DXVECTOR2 & vSide )
+{
+	if (listEffect.size() > 200) return;
+	D3DXVECTOR2 vSparkSize		= D3DXVECTOR2(1.0f/256, 1.0f/256);
+	D3DXVECTOR2 vSparkPosition	= pBall->vPosition + vSide;
+	D3DXVECTOR2 vSparkGravity	= D3DXVECTOR2( 0.0f, 0.25f );
+	for (int i=0; i<8; i++) {
+		float fSparkDuration = frand(0.5f, 1.0f);
+		D3DXVECTOR2 vSparkSpeed = D3DXVECTOR2( frand(-1.0f, 1.0f), frand(-1.0f, 1.0f) )/20 + pBall->GetSpeed()/4;
+		CEffectSprite* pEffectSprite = new CEffectSprite( pSparkTex, vSparkSize, 
+			vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
+		listEffect.push_back( pEffectSprite );
 	}
 }
 

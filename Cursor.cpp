@@ -1,27 +1,25 @@
 #include "stdafx.h"
 #include "cursor.h"
 
-#include "menuitem.h"
+
+const float MOUSE_SPEED = 0.002f;
 
 CCursor::CCursor( LPDIRECT3DTEXTURE8 Texture )
 	: CSprite( Texture, D3DXVECTOR2(1.0f/16, 1.0f/16), 0, 
-		D3DXVECTOR2( BOARD_W/2, BOARD_H/2 ), 0xFFFFFFFF )
+		D3DXVECTOR2( 1.0f/2, 0.75f/2 ), 0xFFFFFFFF )
 {
 }
 
-
-CCursor::~CCursor()
-{
-}
 
 HRESULT CCursor::Move( const D3DXVECTOR2 & vMovement )
 {
-	vPosition += vMovement;
+	vPosition += vMovement * MOUSE_SPEED;
 	D3DXVec2Maximize( &vPosition, &vPosition, &D3DXVECTOR2( 0.00f, 0.00f ) );
 	D3DXVec2Minimize( &vPosition, &vPosition, &D3DXVECTOR2( 1.00f, 0.75f ) );
 
 	return S_OK;
 }
+
 
 void CCursor::Render( LPD3DXSPRITE pSprite ) const
 {

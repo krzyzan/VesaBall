@@ -3,77 +3,77 @@
 
 CTimer::CTimer()
 {
-    m_bUsingQPF         = false;
-    m_bTimerStopped     = true;
-    m_llQPFTicksPerSec  = 0;
+    bUsingQPF         = false;
+    bTimerStopped     = true;
+    llQPFTicksPerSec  = 0;
 
-    m_llStopTime        = 0;
-    m_llLastElapsedTime = 0;
-    m_llBaseTime        = 0;
+    llStopTime        = 0;
+    llLastElapsedTime = 0;
+    llBaseTime        = 0;
 
     // Use QueryPerformanceFrequency() to get frequency of timer.  
     LARGE_INTEGER qwTicksPerSec;
-    m_bUsingQPF = (BOOL) (QueryPerformanceFrequency( &qwTicksPerSec ) != 0);
-    m_llQPFTicksPerSec = qwTicksPerSec.QuadPart;
+    bUsingQPF = (BOOL) (QueryPerformanceFrequency( &qwTicksPerSec ) != 0);
+    llQPFTicksPerSec = qwTicksPerSec.QuadPart;
 }
 
 
 //--------------------------------------------------------------------------------------
 void CTimer::Reset()
 {
-    if ( !m_bUsingQPF )
+    if ( !bUsingQPF )
         return;
 
     // Get either the current time or the stop time
     LARGE_INTEGER qwTime;
-    if ( m_llStopTime != 0 )
-        qwTime.QuadPart = m_llStopTime;
+    if ( llStopTime != 0 )
+        qwTime.QuadPart = llStopTime;
     else
         QueryPerformanceCounter( &qwTime );
 
-    m_llBaseTime        = qwTime.QuadPart;
-    m_llLastElapsedTime = qwTime.QuadPart;
-    m_llStopTime        = 0;
-    m_bTimerStopped     = FALSE;
+    llBaseTime        = qwTime.QuadPart;
+    llLastElapsedTime = qwTime.QuadPart;
+    llStopTime        = 0;
+    bTimerStopped     = FALSE;
 }
 
 
 //--------------------------------------------------------------------------------------
 void CTimer::Start()
 {
-    if ( !m_bUsingQPF )
+    if ( !bUsingQPF )
         return;
 
     // Get the current time
     LARGE_INTEGER qwTime;
     QueryPerformanceCounter( &qwTime );
 
-    if ( m_bTimerStopped )
-        m_llBaseTime += qwTime.QuadPart - m_llStopTime;
-    m_llStopTime = 0;
-    m_llLastElapsedTime = qwTime.QuadPart;
-    m_bTimerStopped = FALSE;
+    if ( bTimerStopped )
+        llBaseTime += qwTime.QuadPart - llStopTime;
+    llStopTime = 0;
+    llLastElapsedTime = qwTime.QuadPart;
+    bTimerStopped = FALSE;
 }
 
 
 //--------------------------------------------------------------------------------------
 void CTimer::Stop()
 {
-    if ( !m_bUsingQPF )
+    if ( !bUsingQPF )
         return;
 
-    if ( !m_bTimerStopped )
+    if ( !bTimerStopped )
     {
         // Get either the current time or the stop time
         LARGE_INTEGER qwTime;
-        if ( m_llStopTime != 0 )
-            qwTime.QuadPart = m_llStopTime;
+        if ( llStopTime != 0 )
+            qwTime.QuadPart = llStopTime;
         else
             QueryPerformanceCounter( &qwTime );
 
-        m_llStopTime = qwTime.QuadPart;
-        m_llLastElapsedTime = qwTime.QuadPart;
-        m_bTimerStopped = TRUE;
+        llStopTime = qwTime.QuadPart;
+        llLastElapsedTime = qwTime.QuadPart;
+        bTimerStopped = TRUE;
     }
 }
 
@@ -81,74 +81,74 @@ void CTimer::Stop()
 //--------------------------------------------------------------------------------------
 void CTimer::Advance()
 {
-    if ( !m_bUsingQPF )
+    if ( !bUsingQPF )
         return;
 
-    m_llStopTime += m_llQPFTicksPerSec/10;
+    llStopTime += llQPFTicksPerSec/10;
 }
 
 
 //--------------------------------------------------------------------------------------
-FLOAT CTimer::GetAbsoluteTime()
+float CTimer::GetAbsoluteTime()
 {
-    if ( !m_bUsingQPF )
+    if ( !bUsingQPF )
         return -1.0;
 
     // Get either the current time or the stop time
     LARGE_INTEGER qwTime;
-    if ( m_llStopTime != 0 )
-        qwTime.QuadPart = m_llStopTime;
+    if ( llStopTime != 0 )
+        qwTime.QuadPart = llStopTime;
     else
         QueryPerformanceCounter( &qwTime );
 
-    FLOAT fTime = qwTime.QuadPart / (FLOAT) m_llQPFTicksPerSec;
+    float fTime = qwTime.QuadPart / (float) llQPFTicksPerSec;
 
     return fTime;
 }
 
 
 //--------------------------------------------------------------------------------------
-FLOAT CTimer::GetTime()
+float CTimer::GetTime()
 {
-    if ( !m_bUsingQPF )
+    if ( !bUsingQPF )
         return -1.0;
 
     // Get either the current time or the stop time
     LARGE_INTEGER qwTime;
-    if ( m_llStopTime != 0 )
-        qwTime.QuadPart = m_llStopTime;
+    if ( llStopTime != 0 )
+        qwTime.QuadPart = llStopTime;
     else
         QueryPerformanceCounter( &qwTime );
 
-    FLOAT fAppTime = (FLOAT) ( qwTime.QuadPart - m_llBaseTime ) / (FLOAT) m_llQPFTicksPerSec;
+    float fAppTime = (float) ( qwTime.QuadPart - llBaseTime ) / (float) llQPFTicksPerSec;
 
     return fAppTime;
 }
 
 
 //--------------------------------------------------------------------------------------
-FLOAT CTimer::GetElapsedTime()
+float CTimer::GetElapsedTime()
 {
-    if ( !m_bUsingQPF )
+    if ( !bUsingQPF )
         return -1.0;
 
     // Get either the current time or the stop time
     LARGE_INTEGER qwTime;
-    if ( m_llStopTime != 0 )
-        qwTime.QuadPart = m_llStopTime;
+    if ( llStopTime != 0 )
+        qwTime.QuadPart = llStopTime;
     else
         QueryPerformanceCounter( &qwTime );
 
-    FLOAT fElapsedTime = (FLOAT) ( qwTime.QuadPart - m_llLastElapsedTime ) / (FLOAT) m_llQPFTicksPerSec;
-    m_llLastElapsedTime = qwTime.QuadPart;
+    float fElapsedTime = (float) ( qwTime.QuadPart - llLastElapsedTime ) / (float) llQPFTicksPerSec;
+    llLastElapsedTime = qwTime.QuadPart;
 
     return fElapsedTime;
 }
 
 
 //--------------------------------------------------------------------------------------
-BOOL CTimer::IsStopped()
+bool CTimer::IsStopped()
 {
-    return m_bTimerStopped;
+    return bTimerStopped;
 }
 
