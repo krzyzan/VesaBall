@@ -475,40 +475,43 @@ void CGameEngine::CollideBallBrick( CBall* pBall )
 			D3DXVECTOR2 vPos = pBall->vPosition + D3DXVECTOR2( pBall->vSize.x/2*x, pBall->vSize.y/2*y );
 			if (pBrickArray->Contains( vPos )) {
 				POINT pos = pBrickArray->VectorToArrayCoords( vPos );
-				CNewBrick* iNewBrick = pBrickArray->GetBrickAt( pos );
-				if ( iNewBrick->pBrick == NULL )
+				CBrick* iBrick = pBrickArray->GetBrickAt( pos );
+				if ( !iBrick->pTypeDesc )
 					continue;
+
+				D3DXVECTOR2 vBrickPosition = pBrickArray->vPosition - pBrickArray->vSize/2 + pBrickArray->vBrickSize/2
+					+ D3DXVECTOR2( pBrickArray->vBrickSize.x*pos.x, pBrickArray->vBrickSize.y*pos.y );
 
 				D3DXVECTOR2 vSide;  
 
 				// TODO: GetContactSide
-				if (fabs(pBall->vOldPosition.x - iNewBrick->vPosition.x) < pBall->vSize.x/2 + iNewBrick->vSize.x/2)
-					vSide = ( iNewBrick->vPosition.y - pBall->vPosition.y > 0) ? D3DXVECTOR2( 0, pBall->vSize.y/2 ) : D3DXVECTOR2( 0, -pBall->vSize.y/2 );
+				if (fabs(pBall->vOldPosition.x - vBrickPosition.x) < pBall->vSize.x/2 + pBrickArray->vBrickSize.x/2)
+					vSide = ( vBrickPosition.y - pBall->vPosition.y > 0) ? D3DXVECTOR2( 0, pBall->vSize.y/2 ) : D3DXVECTOR2( 0, -pBall->vSize.y/2 );
 				else
 				//if (fabs(vOldPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2)
-					vSide = ( iNewBrick->vPosition.x - pBall->vPosition.x > 0) ? D3DXVECTOR2( pBall->vSize.x/2, 0 ) : D3DXVECTOR2( -pBall->vSize.x/2, 0 );
+					vSide = ( vBrickPosition.x - pBall->vPosition.x > 0) ? D3DXVECTOR2( pBall->vSize.x/2, 0 ) : D3DXVECTOR2( -pBall->vSize.x/2, 0 );
 
 				D3DXVECTOR2 vOldSpeed = pBall->vSpeed;
 
 				if (! bThruBrick ) {
-					iNewBrick->SetHitCounter( iNewBrick->dwHitCounter + 1 );
+					iBrick->SetHitCounter( iBrick->dwHitCounter + 1 );
 					
 					if (vSide.y) {
 						pBall->vSpeed.y *= -1;
-						pBall->vPosition.y = 2*(iNewBrick->vPosition.y - vSide.y) - pBall->vPosition.y;
-						pBall->vPosition.y -= (vSide.y > 0) ? iNewBrick->vSize.y : (-iNewBrick->vSize.y);
+						pBall->vPosition.y = 2*(vBrickPosition.y - vSide.y) - pBall->vPosition.y;
+						pBall->vPosition.y -= (vSide.y > 0) ? pBrickArray->vBrickSize.y : (-pBrickArray->vBrickSize.y);
 					}
 
 					if (vSide.x) {
 						pBall->vSpeed.x *= -1;
-						pBall->vPosition.x = 2*(iNewBrick->vPosition.x - vSide.x) - pBall->vPosition.x;
-						pBall->vPosition.x -= (vSide.x > 0) ? iNewBrick->vSize.x : (-iNewBrick->vSize.x);
+						pBall->vPosition.x = 2*(vBrickPosition.x - vSide.x) - pBall->vPosition.x;
+						pBall->vPosition.x -= (vSide.x > 0) ? pBrickArray->vBrickSize.x : (-pBrickArray->vBrickSize.x);
 					}
 
 					pBall->CreateSparkles( vSide, &listEffect );
 				}
 
-				if ( iNewBrick->dwHitCounter == iNewBrick->pTypeDesc->dur || bThruBrick ) {
+				if ( iBrick->dwHitCounter == iBrick->pTypeDesc->dur || bThruBrick ) {
 					pScoreCounter->Inc( 100 + rand()%100 );	//TODO: sensowne wartoœci
 					if (frand(0,1) < BONUS_PROB) {
 						CBonus* pBonus = new CBonus( static_cast<CBonus::EType>(rand()%CBonus::MAX_TYPE), pBall->vPosition, vOldSpeed/2 );
@@ -517,10 +520,10 @@ void CGameEngine::CollideBallBrick( CBall* pBall )
 
 				// znikanie cegie³ki
 				// TODO: poprawiæ teksture
-				CEffectSprite* es = new CEffectSprite( iNewBrick->pTypeDesc->pTexture[0], iNewBrick->vSize, iNewBrick->vPosition, D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), 0.25f, 0xFFFFFFFF );
+				CEffectSprite* es = new CEffectSprite( iBrick->pTypeDesc->pTexture[0], pBrickArray->vBrickSize, vBrickPosition, D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), 0.25f, 0xFFFFFFFF );
 				listEffect.push_front( es );
 
-				SAFE_DELETE( iNewBrick->pBrick );
+				iBrick->pTypeDesc = NULL;
 			}
 
 			//if (pBrick->pTypeDesc->dur != 0xFFFFFFFF) {

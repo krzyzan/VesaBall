@@ -16,5 +16,5 @@ public:
 
 protected:
 	CCursor*	pCursor;
-	BYTE		curType;
+	LONG		curType;
 };

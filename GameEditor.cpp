@@ -59,12 +59,12 @@ HRESULT CGameEditor::RenderLoop()
 						break;
 
 					POINT pos = pBrickArray->VectorToArrayCoords( pCursor->vPosition );
-					CNewBrick* iNewBrick = pBrickArray->GetBrickAt( pos );
-					if ( iNewBrick->pBrick ) {
-						curType = iNewBrick->pTypeDesc->type;
+					CBrick* iNewBrick = pBrickArray->GetBrickAt( pos );
+					if ( iNewBrick->pTypeDesc ) {
+						curType = LONG(CBrick::s_TypeDesc - iNewBrick->pTypeDesc);
 						if (didod[ i ].dwOfs == DIMOFS_BUTTON0)
-							curType = (curType + 1)%CNewBrick::TYPE_MAX;
-						SAFE_DELETE( iNewBrick->pBrick );
+							curType = (curType + 1)%CBrick::TYPE_MAX;
+						iNewBrick->pTypeDesc = NULL;
 					}
 
 					if (didod[ i ].dwOfs == DIMOFS_BUTTON0) {

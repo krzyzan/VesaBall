@@ -1,12 +1,12 @@
 #include "StdAfx.h"
 #include "BrickArray.h"
 
-CNewBrick::STypeDesc CNewBrick::s_TypeDesc[CNewBrick::TYPE_MAX] = { 
-	{0,	1			}, 
-	{1,	1			}, 
-	{2, 1			},
-	{3,	0xFFFFFFFF	}, 
-	{4,	3			},
+CBrick::STypeDesc CBrick::s_TypeDesc[CBrick::TYPE_MAX] = { 
+	{1			}, 
+	{1			}, 
+	{1			},
+	{0xFFFFFFFF	}, 
+	{3			},
 };
 
 
@@ -14,6 +14,11 @@ CBrickArray::CBrickArray()
 {
 	vSize = D3DXVECTOR2( 0.95f, 0.50f );
 	vPosition = D3DXVECTOR2( 0.50f, 0.30f );
+	
+	D3DSURFACE_DESC sd;
+	CBrick::s_TypeDesc->pTexture[0]->GetLevelDesc(0, &sd);
+	vBrickSize = D3DXVECTOR2( vSize.x/MAX_X, vSize.y/MAX_Y );
+	vBrickScaling = D3DXVECTOR2( vBrickSize.x/sd.Width, vBrickSize.y/sd.Height ) * RES_X;
 
 	ZeroMemory( NewBrick, sizeof( NewBrick ) );
 }
@@ -21,67 +26,22 @@ CBrickArray::CBrickArray()
 
 CBrickArray::~CBrickArray()
 {
-	for (LONG y=0; y<MAX_Y; y++)
-		for (LONG x=0; x<MAX_X; x++)
-			SAFE_DELETE( NewBrick[x][y].pBrick );
 }
 
-
-void CBrickArray::ZapBricks() 
+void CBrickArray::CreateBrick( const POINT & pos, LONG type )
 {
-	for (int x=0; x<MAX_X; x++)
-		for (int y=0; y<MAX_Y; y++)
-			if (NewBrick[x][y].pBrick && NewBrick[x][y].pTypeDesc->dur != 0xFFFFFFFF )
-				NewBrick[x][y].dwHitCounter = NewBrick[x][y].pTypeDesc->dur-1;
+	NewBrick[pos.x][pos.y].pTypeDesc = &CBrick::s_TypeDesc[type];
 }
-
-
-void CBrickArray::FallBricks() 
-{
-	for (int x=0; x<MAX_X; x++)
-		for (int y=MAX_Y-2; y>=0; y--)
-			if (NewBrick[x][y].pBrick && NewBrick[x][y].pTypeDesc->dur != 0xFFFFFFFF && !NewBrick[x][y+1].pBrick ) {
-				NewBrick[x][y+1].pBrick = NewBrick[x][y].pBrick;
-				NewBrick[x][y].pBrick = NULL;
-				NewBrick[x][y+1].vPosition.y += NewBrick[x][y+1].vSize.y;
-			}
-}
-
 
 void CBrickArray::Render( LPD3DXSPRITE pSprite ) const
 {
 	for (int y=0; y<MAX_Y; y++)
 		for (int x=0; x<MAX_X; x++)
-			if (NewBrick[x][y].pBrick) {
-				D3DXVECTOR2 Position = (NewBrick[x][y].vPosition - NewBrick[x][y].vSize/2);
+			if (NewBrick[x][y].pTypeDesc) {
+				D3DXVECTOR2 Position = (vPosition - vSize/2 + D3DXVECTOR2( vBrickSize.x*x, vBrickSize.y*y ) ) * RES_X;
 				if (NewBrick[x][y].dwHitCounter < NewBrick[x][y].pTypeDesc->dur)					//TODO: ugly
-					pSprite->Draw( NewBrick[x][y].pTypeDesc->pTexture[NewBrick[x][y].dwHitCounter], NULL, &NewBrick[x][y].vScaling, NULL, 0, &(Position * RES_X), 0xFFFFFFFF );
+					pSprite->Draw( NewBrick[x][y].pTypeDesc->pTexture[NewBrick[x][y].dwHitCounter], NULL, &vBrickScaling, NULL, 0, &Position, 0xFFFFFFFF );
 			}
-}
-
-
-void CBrickArray::CreateBrick( const POINT & pos, BYTE type )
-{
-	NewBrick[pos.x][pos.y].pBrick = new CBrick();
-	NewBrick[pos.x][pos.y].pTypeDesc = &CNewBrick::s_TypeDesc[type];
-	NewBrick[pos.x][pos.y].vPosition = D3DXVECTOR2( vPosition.x - vSize.x/2 + vSize.x/MAX_X*(0.5f + pos.x), vPosition.y - vSize.y/2 + vSize.y/MAX_Y*(0.5f + pos.y) );
-	NewBrick[pos.x][pos.y].SetSize( D3DXVECTOR2( vSize.x/MAX_X, vSize.y/MAX_Y) );
-}
-
-
-bool CBrickArray::Contains( const D3DXVECTOR2 & vPos ) const
-{
-	return	fabs(vPosition.y - vPos.y) < vSize.y/2 &&
-			fabs(vPosition.x - vPos.x) < vSize.x/2;
-}
-
-
-POINT CBrickArray::VectorToArrayCoords( const D3DXVECTOR2 & vPos ) const
-{
-	POINT pos;
-	pos.x = (LONG)(((vPos.x - vPosition.x) / vSize.x + 0.5f) * MAX_X);
-	pos.y = (LONG)(((vPos.y - vPosition.y) / vSize.y + 0.5f) * MAX_Y);
-	return pos;
 }
 
 
@@ -99,7 +59,7 @@ HRESULT CBrickArray::Load( char* strFileName )
 			if (ch != ' ')
 				CreateBrick( pos, ch - 48 );
 			else
-				NewBrick[pos.x][pos.y].pBrick = NULL;
+				NewBrick[pos.x][pos.y].pTypeDesc = NULL;
 		}
 		file.get( ch );
 	}
@@ -115,8 +75,8 @@ HRESULT CBrickArray::Save( char* strFileName ) const
 	file.open( strFileName, ios::binary | ios::out | ios::trunc );
 	for (int y=0; y<MAX_Y; y++) {
 		for (int x=0; x<MAX_X; x++) {
-			if (NewBrick[x][y].pBrick)
-				file.put( NewBrick[x][y].pTypeDesc->type + 48 );
+			if (NewBrick[x][y].pTypeDesc)
+				file.put( char(CBrick::s_TypeDesc - NewBrick[x][y].pTypeDesc) + 48 );
 			else
 				file.put( ' ' );
 		}
@@ -126,3 +86,40 @@ HRESULT CBrickArray::Save( char* strFileName ) const
 
 	return S_OK;
 };
+
+void CBrickArray::ZapBricks() 
+{
+	for (int x=0; x<MAX_X; x++)
+		for (int y=0; y<MAX_Y; y++)
+			if (NewBrick[x][y].pTypeDesc && NewBrick[x][y].pTypeDesc->dur != 0xFFFFFFFF )
+				NewBrick[x][y].dwHitCounter = NewBrick[x][y].pTypeDesc->dur-1;
+}
+
+
+void CBrickArray::FallBricks() 
+{
+	for (int x=0; x<MAX_X; x++)
+		for (int y=MAX_Y-2; y>=0; y--)
+			if (NewBrick[x][y].pTypeDesc && NewBrick[x][y].pTypeDesc->dur != 0xFFFFFFFF && !NewBrick[x][y+1].pTypeDesc ) {
+				NewBrick[x][y+1] = NewBrick[x][y];
+				NewBrick[x][y].pTypeDesc = NULL;
+				//NewBrick[x][y+1].vPosition.y += vBrickSize.y;
+			}
+}
+
+
+
+bool CBrickArray::Contains( const D3DXVECTOR2 & vPos ) const
+{
+	return	fabs(vPosition.y - vPos.y) < vSize.y/2 &&
+			fabs(vPosition.x - vPos.x) < vSize.x/2;
+}
+
+
+POINT CBrickArray::VectorToArrayCoords( const D3DXVECTOR2 & vPos ) const
+{
+	POINT pos;
+	pos.x = (LONG)(((vPos.x - vPosition.x) / vSize.x + 0.5f) * MAX_X);
+	pos.y = (LONG)(((vPos.y - vPosition.y) / vSize.y + 0.5f) * MAX_Y);
+	return pos;
+}

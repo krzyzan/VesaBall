@@ -18,13 +18,13 @@ CGameBoard::~CGameBoard()
 HRESULT CGameBoard::InitDeviceObjects()
 {
 	// tekstury cegie³ek
-	LoadTexture( "gfx/Brick_yellow.png",&CNewBrick::s_TypeDesc[0].pTexture[0] );
-	LoadTexture( "gfx/Brick_green.png",	&CNewBrick::s_TypeDesc[1].pTexture[0] );
-	LoadTexture( "gfx/Brick_blue.png",	&CNewBrick::s_TypeDesc[2].pTexture[0] );
-	LoadTexture( "gfx/Brick_metal.png",	&CNewBrick::s_TypeDesc[3].pTexture[0] );
-	LoadTexture( "gfx/Brick_0.png",		&CNewBrick::s_TypeDesc[4].pTexture[0] );
-	LoadTexture( "gfx/Brick_1.png",		&CNewBrick::s_TypeDesc[4].pTexture[1] );
-	LoadTexture( "gfx/Brick_2.png",		&CNewBrick::s_TypeDesc[4].pTexture[2] );
+	LoadTexture( "gfx/Brick_yellow.png",&CBrick::s_TypeDesc[0].pTexture[0] );
+	LoadTexture( "gfx/Brick_green.png",	&CBrick::s_TypeDesc[1].pTexture[0] );
+	LoadTexture( "gfx/Brick_blue.png",	&CBrick::s_TypeDesc[2].pTexture[0] );
+	LoadTexture( "gfx/Brick_metal.png",	&CBrick::s_TypeDesc[3].pTexture[0] );
+	LoadTexture( "gfx/Brick_0.png",		&CBrick::s_TypeDesc[4].pTexture[0] );
+	LoadTexture( "gfx/Brick_1.png",		&CBrick::s_TypeDesc[4].pTexture[1] );
+	LoadTexture( "gfx/Brick_2.png",		&CBrick::s_TypeDesc[4].pTexture[2] );
 	
 	// sceneria
 	LPDIRECT3DTEXTURE8 pWallTex;
