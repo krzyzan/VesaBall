@@ -1,10 +1,10 @@
 #pragma once
-#include "D3DAppScene.h"
+#include "D3DScene.h"
 #include "BrickArray.h"
 
 
 class CGameBoard :
-	public CD3DAppScene
+	public CD3DScene
 {
 public:
 	CGameBoard( LPDIRECT3DDEVICE8 d3dDevice );
@@ -15,11 +15,19 @@ public:
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
 
+	HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod );
+
 	HRESULT FrameRender();
 
+	CD3DScene* GetNextScene();
+	
 protected:
 	LPD3DXSPRITE		pSprite;
 	
 	list<CSprite*>		listSprite;
 	CBrickArray*		pBrickArray;
+	DWORD				dwLevelNum;
+
+private:
+	bool		bQuit;
 };

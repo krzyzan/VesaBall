@@ -26,7 +26,6 @@
 				RuntimeLibrary="5"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
-				AssemblerOutput="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -75,7 +74,6 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
-				AssemblerOutput="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"/>
 			<Tool
@@ -139,10 +137,10 @@
 				RelativePath=".\D3DApp.cpp">
 			</File>
 			<File
-				RelativePath=".\D3DAppScene.cpp">
+				RelativePath=".\D3DAppVesaBall.cpp">
 			</File>
 			<File
-				RelativePath=".\D3DBallApp.cpp">
+				RelativePath=".\D3DScene.cpp">
 			</File>
 			<File
 				RelativePath=".\EffectSprite.cpp">
@@ -207,10 +205,10 @@
 				RelativePath=".\D3DApp.h">
 			</File>
 			<File
-				RelativePath=".\D3DAppScene.h">
+				RelativePath=".\D3DAppVesaBall.h">
 			</File>
 			<File
-				RelativePath=".\D3DBallApp.h">
+				RelativePath=".\D3DScene.h">
 			</File>
 			<File
 				RelativePath=".\EffectSprite.h">

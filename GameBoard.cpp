@@ -3,9 +3,12 @@
 #include "BrickArray.h"
 
 CGameBoard::CGameBoard( LPDIRECT3DDEVICE8 d3dDevice )
-	: CD3DAppScene( d3dDevice )
+	: CD3DScene( d3dDevice )
 {
-	pSprite			= NULL;
+	pSprite		= NULL;
+	bQuit		= false;
+
+	dwLevelNum	= 0;
 }
 
 
@@ -33,6 +36,9 @@ HRESULT CGameBoard::InitDeviceObjects()
 	LoadTexture( "gfx/Brick_1.png",		&CBrick::s_pTexture[11][1] );
 	LoadTexture( "gfx/Brick_2.png",		&CBrick::s_pTexture[11][2] );
 	
+	LoadTexture( "gfx/Brick_trans0.png",&CBrick::s_pTexture[12][0] );
+	LoadTexture( "gfx/Brick_trans1.png",&CBrick::s_pTexture[12][1] );
+
 	// sceneria
 	LPDIRECT3DTEXTURE8 pWallTex;
 	LoadTexture( "gfx/Wall.png", &pWallTex );
@@ -41,7 +47,7 @@ HRESULT CGameBoard::InitDeviceObjects()
 
 	// tworzymy cegie³ki
 	pBrickArray	= new CBrickArray();
-	pBrickArray->Load( "lev/level.lev" );
+	pBrickArray->Load( dwLevelNum );
 
 	return S_OK;
 }
@@ -53,6 +59,24 @@ HRESULT CGameBoard::RestoreDeviceObjects()
 
 	return S_OK;
 }
+
+HRESULT CGameBoard::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
+{
+	if (didod->dwOfs == DIK_ESCAPE && (didod->dwData & 0x80) )
+		bQuit = true;
+
+	return S_OK;
+}
+
+
+CD3DScene* CGameBoard::GetNextScene()
+{
+	if ( bQuit )
+		return NULL;
+
+	return this;
+}
+
 
 HRESULT CGameBoard::FrameRender()
 {

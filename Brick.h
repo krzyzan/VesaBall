@@ -6,8 +6,7 @@ class CEffectSprite;
 
 
 const DUR_MAX = 4;
-const BYTE BRICK_TYPE_MAX = 12;
-const BRICK_PERSISTENT = 0xFFFFFFFF;
+const BYTE BRICK_TYPE_MAX = 13;
 
     //! Cegie³ka
     /*!
@@ -18,8 +17,9 @@ const BRICK_PERSISTENT = 0xFFFFFFFF;
 {
 	struct SType
 	{
-		DWORD				dwScore;
-		DWORD				dur;
+		DWORD	dwScore;
+		bool	bExplosive;
+		DWORD	dur;
 	};
 
 public:
@@ -48,7 +48,9 @@ public:
 		//! Czy trafiona ju¿ tyle razy ¿e zniszczona?
 	bool IsDestroyed() const {return dwHitCount == s_Type[dwType].dur;}
 		//! Czy mo¿e byæ zniszczona?
-	bool IsDestructible() const {return s_Type[dwType].dur != BRICK_PERSISTENT;}
+	bool IsDestructible() const {return s_Type[dwType].dur != DUR_MAX;}
+		//! Czy mo¿e byæ zniszczona?
+	bool IsExplosive() const {return s_Type[dwType].bExplosive;}
 
 	static SType				s_Type[BRICK_TYPE_MAX];
 	static LPDIRECT3DTEXTURE8	s_pTexture[BRICK_TYPE_MAX][DUR_MAX];

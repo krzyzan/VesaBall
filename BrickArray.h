@@ -4,6 +4,8 @@
 const BRICK_ARRAY_X = 20;
 const BRICK_ARRAY_Y = 20;
 
+const DWORD NUM_LEVELS = 3;
+
     //! Tablica cegie³ek
 class CBrickArray
 {
@@ -36,35 +38,47 @@ public:
 		*/ 
 	void InsertBrick( DWORD type, const POINT & pos );
 
-		//! Usuwa cegie³kê z tablicy
+		//! Usuwa cegie³kê
 		/*!
+			Je¿eli na podanej pozycji nie ma cegie³ki, nie robi nic.
 			\param	pos		Wspó³rzêdne w tablicy
 		*/ 
-	void RemoveBrick( const POINT & pos ) { SAFE_DELETE( pBrick[pos.x][pos.y]); }
+	void RemoveBrick( const POINT & pos );
 
-		//! Pobiera adres cegie³ki w tablicy
+		//! Czy w tablicy s¹ cegie³ki?
+		/*!
+			Niezniszczalne cegie³ki nie s¹ liczone.
+		*/
+	bool Empty() const
+		{ return (dwBrickCounter == 0); }
+
+		//! Zwraca adres cegie³ki w tablicy
 		/*!
 			\param	pos		Wspó³rzêdne w tablicy
 			\return	Adres cegie³ki
 		*/ 
 	CBrick* GetBrick( const POINT & pos ) const {return pBrick[pos.x][pos.y];}
 
+		//! Kasuje wszystkie cegie³ki
+	void Clear();
 		//! Wczytuje tablicê cegie³ek z pliku
 		/*!
 			\b UWAGA: brak obs³ugi b³êdów
+			Wszystkie cegie³ki znajduj¹ce siê w tablicy s¹ usuwane.
 			\param	strFileName	Nazwa pliku
 		*/ 
-	void Load( const char* strFileName );
+	void Load( DWORD dwLevelNum );
 
 		//! Zapisuje tablicê cegie³ek do pliku
 		/*!
 			\b UWAGA: brak obs³ugi b³êdów
-			\param	strFileName	Nazwa pliku
+			\param	dwLevelNum	Numer poziomu
 		*/ 
-	void Save( const char* strFileName ) const;
+	void Save( DWORD dwLevelNum ) const;
 
 private:
 	CBrick*	pBrick[BRICK_ARRAY_X][BRICK_ARRAY_Y];
+	DWORD dwBrickCounter;
 
 	D3DXVECTOR2 vSize;
 	D3DXVECTOR2 vPosition;

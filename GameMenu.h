@@ -3,7 +3,7 @@
 #include <list>
 using namespace std;
 
-#include "d3dappscene.h"
+#include "d3dscene.h"
 
 class CMenuItem;
 class CCursor;
@@ -11,7 +11,7 @@ class CSprite;
 
 
 class CGameMenu :
-	public CD3DAppScene
+	public CD3DScene
 {
 public:
 	enum UID_MSG {
@@ -34,7 +34,7 @@ public:
 	HRESULT FrameMove( float fElapsedTime );
 	HRESULT FrameRender();
 	
-	CD3DAppScene* GetNextScene();
+	CD3DScene* GetNextScene();
 
 private:
 	CMenuItem*			GetPointedMenuItem() const;

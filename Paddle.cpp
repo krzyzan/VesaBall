@@ -12,8 +12,7 @@ LPDIRECT3DTEXTURE8 CPaddle::s_pLightningTexture;
 
 CPaddle::CPaddle()
 	: CSprite( s_pTexture, D3DXVECTOR2( 1.0f/8, 1.0f/64 ), 0, 
-		D3DXVECTOR2( BOARD_L+BOARD_W/2, BOARD_B-1.0f/64 ), 
-		0xFFFFFFFF )
+		D3DXVECTOR2( BOARD_L+BOARD_W/2, BOARD_B-1.0f/64 ), 0xFFFFFFFF )
 {
 	pLightning = new CSprite( s_pLightningTexture, D3DXVECTOR2(vSize.x, vSize.y*2), 0, vPosition - D3DXVECTOR2(0,vSize.y/2), dwBlending );
 	bGrabPaddle = false;
@@ -70,7 +69,7 @@ void CPaddle::LaunchBall( CBall* pBall )
 {
 	D3DXVECTOR2 vNormal = pBall->vPosition - D3DXVECTOR2(vPosition.x, vPosition.y + vSize.x/4 );
 	D3DXVec2Normalize( &vNormal, &vNormal );
-	float fSpeedVal = D3DXVec2Length( &pBall->GetSpeed() ) + (BALL_SPEED_VAL_MIN + BALL_SPEED_VAL_MAX) / 100;
+	float fSpeedVal = D3DXVec2Length( &pBall->GetSpeed() ) + (BALL_SPEED_VAL_MAX - BALL_SPEED_VAL_MIN) / 100;
 	pBall->SetSpeed( vNormal * fSpeedVal );
 	pBall->bCatched = false;
 }

@@ -12,6 +12,7 @@
 
 #include <list>
 #include <vector>
+#include <stack>
 #include <fstream>
 using namespace std;
 

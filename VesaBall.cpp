@@ -1,15 +1,10 @@
 #include "stdafx.h"
-#include "D3DBallApp.h"
+#include "D3DAppVesaBall.h"
 
-//-----------------------------------------------------------------------------
-// Name: WinMain()
-// Desc: The application's entry point
-//-----------------------------------------------------------------------------
-
-
+//!	"Entry point" aplikacji
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT )
 {
-	CD3DBallApp app;
+	CVesaBallApp app;
 	app.Create( hInstance );
 	return app.Run();
 }

@@ -19,9 +19,7 @@ public:
 	HRESULT FrameMove( float fElapsedTime );
 	HRESULT FrameRender();
 
-	CD3DAppScene* GetNextScene();
-
-protected:
+private:
 	CCursor*	pCursor;
 	DWORD		curType;
 };

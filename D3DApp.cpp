@@ -463,7 +463,7 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 		case WM_KEYDOWN:
 			switch( wParam )
 			{
-				case VK_ESCAPE:
+				case VK_BACK:			//TODO: TMP
 					SendMessage( hWnd, WM_CLOSE, 0, 0 );
 					break;
 			}

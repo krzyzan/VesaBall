@@ -1,16 +1,17 @@
 #include "StdAfx.h"
 #include "GameEditor.h"
+#include "GameMenu.h"
+
 #include "Cursor.h"
 #include "Brick.h"
 
-#include <fstream>		//TMP
+#include <fstream>
 
 CGameEditor::CGameEditor( LPDIRECT3DDEVICE8 d3dDevice )
 	: CGameBoard( d3dDevice )
 {
-	pCursor		= NULL;
-	pSprite		= NULL;
-	curType		= 0;
+	pCursor			= NULL;
+	curType			= 0;
 }
 
 
@@ -64,14 +65,31 @@ HRESULT CGameEditor::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
 	return S_OK;
 }
 
-
 HRESULT CGameEditor::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
 {
-	// TODO: TMP
-	//if (didod[ i ].dwOfs == DIK_SPACE && (didod[ i ].dwData & 0x80) )
-	//	exit(0);
+	if ( didod->dwData & 0x80 )
+		switch (didod->dwOfs) {
+			case DIK_RIGHT:
+				if (dwLevelNum < NUM_LEVELS-1)
+					pBrickArray->Load( ++dwLevelNum );
+				return S_OK;
+			case DIK_LEFT:
+				if (dwLevelNum > 0)
+					pBrickArray->Load( --dwLevelNum );
+				return S_OK;
+			case DIK_L:
+				pBrickArray->Load( dwLevelNum );
+				return S_OK;
+			case DIK_S:
+				pBrickArray->Save( dwLevelNum );
+				return S_OK;
+			case DIK_C:
+				pBrickArray->Clear();
+				return S_OK;
+		}
 
-	return S_OK;
+
+	return CGameBoard::ProcessKeybrdEvent( didod );
 }
 
 
@@ -100,17 +118,8 @@ HRESULT CGameEditor::FrameRender()
 }
 
 
-CD3DAppScene* CGameEditor::GetNextScene()
-{
-	return this;
-}
-
-
-//TODO: jeœli funkcja wywo³uje funkcje klasy bazowej zwracaæ wartoœæ
-
 HRESULT CGameEditor::DeleteDeviceObjects()
 {
-	pBrickArray->Save( "lev/level.lev" );
 	delete pCursor;
 
 	return CGameBoard::DeleteDeviceObjects();

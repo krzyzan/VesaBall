@@ -26,19 +26,23 @@ public:
 	
 	HRESULT FrameMove( float fElapsedTime );
 	HRESULT FrameRender();
-	CD3DAppScene* GetNextScene();
+	CD3DScene* GetNextScene();
 
 private:
 	void MoveObjects( float fElapsedTime );
 	void CollideObjects();
 
 	void ApplyBonus( CBonus* pBonus );
+	void SetBoard();
+	void UnsetBoard();
 	void ResetBoard();
 	void KillPaddle();
 
 	void CollideBallPaddle( CBall* pBall );
 	void CollideBallBricks( CBall* pBall );
+	
 	void CreateSparkles( CBall* pBall, const D3DXVECTOR2 & vSide );
+	void Explode( const POINT & pos);
 
 private:
 	list<CBall*>			listBall;
@@ -54,4 +58,7 @@ private:
 	bool					bFallingBricks;
 
 	float					fGameSpeed;				//TODO: TMP
+	
+	float					fTimeToExplode;
+	list<POINT>				listExploding;
 };

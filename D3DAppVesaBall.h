@@ -1,35 +1,28 @@
 /*    	
 ToDo:
-	- Przyspieszanie kulki przy odbiciu (a¿ do 1.0f ?)
-	- zrobic GameOver oraz wyjœcie do menu z levelu i edytora
-	- usun¹æ obracanie w CCounter i wsadziæ do CGameEngine
 	- Wywaliæ niepotrzebne argumenty z konstruktorów
-	- Zrobiæ porzadek z destruktorami ( wykasowaæ niepotrzebne, wszystkie musz¹ byæ virtual )
-	- Rzeczy niezwi¹zane z ruchem (np. blending, efekty) wrzucic do Render
-	- Co robiæ gdy wjedziemy bokiem deski w kulkê???
 	- zrobiæ obs³ugê dŸwiêku (np. kasuj¹c niepotrzebny kod z sampli do DSound )
 	- Porz¹dek z protected, public, private
-
-ToDo:
-	- Poœwiata/ogon dla fireballa
-	- Gumowa deska
-	- Deska, która losowo odbija 
+	- zrobic GameOver
 */
 
 #pragma once
 
 #include <d3dx8.h>
 #include <dinput.h>
+#include <stack>
+using namespace std;
+
 #include "D3DApp.h"
 
-class CD3DAppScene;
+class CD3DScene;
 
 
-class CD3DBallApp :
+class CVesaBallApp :
 	public CD3DApp  
 {
 public:
-	CD3DBallApp();
+	CVesaBallApp();
 	HRESULT Create( HINSTANCE hInstance );
 
 private:
@@ -45,6 +38,8 @@ private:
 	HRESULT FrameMove( float fElapsedTime );
 	HRESULT FrameRender();
 
+	HRESULT ManageScenes();
+
 	// DirectInput
 	HRESULT InitializeMouseInput();
 	HRESULT InitializeKeyboardInput();
@@ -55,9 +50,9 @@ private:
 
 	float					fTimeToRender;
 
-	// Rendered scene
-	CD3DAppScene*	pScene;
-
 	DWORD dwFrameMoveCounter;				//TODO: TMP
 	DWORD dwFrameRenderCounter;				//TODO: TMP
+
+	// Rendered scene
+	stack<CD3DScene*>		stackScenes;
 };

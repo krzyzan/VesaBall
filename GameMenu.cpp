@@ -7,7 +7,7 @@
 #include "gameeditor.h"
 
 CGameMenu::CGameMenu( LPDIRECT3DDEVICE8 d3dDevice )
-	: CD3DAppScene( d3dDevice )
+	: CD3DScene( d3dDevice )
 {
 	pSprite		= NULL;
 	pCursor		= NULL;
@@ -149,19 +149,25 @@ HRESULT CGameMenu::FrameRender()
 	return S_OK;
 }
 
-CD3DAppScene* CGameMenu::GetNextScene()
+CD3DScene* CGameMenu::GetNextScene()
 {
-	if (pClickedMenuItem)
+	CD3DScene* pScene = this;
+	if (pClickedMenuItem) {
 		switch (pClickedMenuItem->GetUID()) {
 			case UID_START:
-				return new CGameEngine( pD3DDevice );
+				pScene = new CGameEngine( pD3DDevice );
+				break;
 			case UID_EDITOR:
-				return new CGameEditor( pD3DDevice );
+				pScene = new CGameEditor( pD3DDevice );
+				break;
 			case UID_QUIT:
-				return NULL;
+				pScene = NULL;
+				break;
 		}
+		pClickedMenuItem = NULL;
+	}
 
-	return this;
+	return pScene;
 }
 
 

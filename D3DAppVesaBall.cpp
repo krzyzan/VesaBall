@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "D3DBallApp.h"
+#include "D3DAppVesaBall.h"
 #include "GameMenu.h"
 #include "GameEngine.h"
 #include "GameEditor.h"
@@ -8,17 +8,17 @@
 const	MOUSE_BUFFER_SIZE	= 16;
 const	KEYBRD_BUFFER_SIZE	= 16;
 
-CD3DBallApp::CD3DBallApp()
+CVesaBallApp::CVesaBallApp()
 {	
+	fTimeToRender			= 0;
 	dwFrameMoveCounter		= 0;
 	dwFrameRenderCounter	= 0;
 
 	srand( (INT)Timer.GetTime() );
-	pScene	= NULL;
 }
 
 
-HRESULT CD3DBallApp::Create( HINSTANCE hInstance )
+HRESULT CVesaBallApp::Create( HINSTANCE hInstance )
 {
 	CD3DApp::Create( hInstance );
 
@@ -31,7 +31,7 @@ HRESULT CD3DBallApp::Create( HINSTANCE hInstance )
 	return S_OK;
 }
 
-HRESULT CD3DBallApp::InitializeKeyboardInput()
+HRESULT CVesaBallApp::InitializeKeyboardInput()
 {
     HRESULT hr;
 
@@ -66,7 +66,7 @@ HRESULT CD3DBallApp::InitializeKeyboardInput()
 }
 
 
-HRESULT CD3DBallApp::InitializeMouseInput()
+HRESULT CVesaBallApp::InitializeMouseInput()
 {
     HRESULT hr;
 
@@ -98,134 +98,45 @@ HRESULT CD3DBallApp::InitializeMouseInput()
 }
 
 
-HRESULT CD3DBallApp::InitDeviceObjects()
+HRESULT CVesaBallApp::InitDeviceObjects()
 {
-	fTimeToRender = 0;
-
-	pScene = new CGameMenu( pD3DDevice );
-	pScene->InitDeviceObjects();
+	stackScenes.push( new CGameMenu( pD3DDevice ) );
+	stackScenes.top()->InitDeviceObjects();
 
 	return S_OK;
 }
 
-HRESULT CD3DBallApp::RestoreDeviceObjects()
+HRESULT CVesaBallApp::RestoreDeviceObjects()
 {
-	pScene->RestoreDeviceObjects();
+	if (!stackScenes.empty())
+		stackScenes.top()->RestoreDeviceObjects();
 
 	return S_OK;
 }
 
 
-HRESULT CD3DBallApp::ReadMouseEvents()
+HRESULT CVesaBallApp::InvalidateDeviceObjects()
 {
-	DIDEVICEOBJECTDATA didod[ MOUSE_BUFFER_SIZE ];  // Receives buffered data 
-	DWORD              dwElements;
-	HRESULT            hr;
-
-	if (NULL == pMouseDevice) 
-		return S_OK;
+	if (!stackScenes.empty())
+		stackScenes.top()->InvalidateDeviceObjects();
 	
-	dwElements = MOUSE_BUFFER_SIZE;
-	if (FAILED( hr = pMouseDevice->GetDeviceData( sizeof(DIDEVICEOBJECTDATA),
-									didod, &dwElements, 0 ) ) )
-		return hr;
+	return S_OK;
+}
 
-	for (DWORD i = 0; i < dwElements; i++) {
-		pScene->ProcessMouseEvent( &didod[i] );
+
+HRESULT CVesaBallApp::DeleteDeviceObjects()
+{
+	while (!stackScenes.empty()) {
+		stackScenes.top()->DeleteDeviceObjects();
+		delete stackScenes.top();
+		stackScenes.pop();
 	}
 
 	return S_OK;
 }
 
 
-HRESULT CD3DBallApp::ReadKeyboardEvents()
-{
-	DIDEVICEOBJECTDATA didod[ KEYBRD_BUFFER_SIZE ];  // Receives buffered data 
-	DWORD              dwElements;
-	HRESULT            hr;
-
-	if( NULL == pKeyboardDevice ) 
-		return S_OK;
-
-	dwElements = KEYBRD_BUFFER_SIZE;
-
-	if (FAILED( hr = pKeyboardDevice->GetDeviceData( sizeof(DIDEVICEOBJECTDATA),
-									didod, &dwElements, 0 ) ) )  
-		return hr;
-
-	for (DWORD i = 0; i < dwElements; i++) {
-		pScene->ProcessKeybrdEvent( &didod[i] );
-	}
-
-	return S_OK;
-}
-
-
-HRESULT CD3DBallApp::FrameMove( float fElapsedTime )
-{
-	fTimeToRender -= fElapsedTime;
-	dwFrameMoveCounter++;
-
-	ReadKeyboardEvents();
-	ReadMouseEvents();
-
-	pScene->FrameMove( fElapsedTime );
-
-	CD3DAppScene* pNextScene = pScene->GetNextScene();
-	
-	if (pNextScene == NULL) {
-		SendMessage( hWnd, WM_CLOSE, 0, 0 );
-		return S_OK;
-	}
-
-	if (pScene != pNextScene ) {
-		pScene->InvalidateDeviceObjects();
-		pScene->DeleteDeviceObjects();
-		SAFE_DELETE( pScene );
-		pScene = pNextScene;
-		pScene->InitDeviceObjects();
-		pScene->RestoreDeviceObjects();
-	};
-
-
-	return S_OK;
-}
-
-
-HRESULT CD3DBallApp::FrameRender()
-{
-	if (fTimeToRender > 0) 
-		return S_OK;
-
-	fTimeToRender = 1.0f/110;
-	dwFrameRenderCounter++;
-
-	pScene->FrameRender();
-
-	// Show the frame on the primary surface.
-	pD3DDevice->Present( NULL, NULL, NULL, NULL );
-
-
-	return S_OK;
-}
-
-HRESULT CD3DBallApp::InvalidateDeviceObjects()
-{
-	pScene->InvalidateDeviceObjects();
-	
-	return S_OK;
-}
-
-HRESULT CD3DBallApp::DeleteDeviceObjects()
-{
-	pScene->DeleteDeviceObjects();
-	SAFE_DELETE( pScene );
-
-	return S_OK;
-}
-
-
-HRESULT	CD3DBallApp::FinalCleanup()
+HRESULT	CVesaBallApp::FinalCleanup()
 {
 	SAFE_RELEASE( pMouseDevice );
 	SAFE_RELEASE( pKeyboardDevice );
@@ -244,3 +155,106 @@ HRESULT	CD3DBallApp::FinalCleanup()
 	return S_OK;
 }
 
+HRESULT CVesaBallApp::ReadMouseEvents()
+{
+	DIDEVICEOBJECTDATA didod[ MOUSE_BUFFER_SIZE ];  // Receives buffered data 
+	DWORD              dwElements;
+	HRESULT            hr;
+
+	if (NULL == pMouseDevice) 
+		return S_OK;
+	
+	dwElements = MOUSE_BUFFER_SIZE;
+	if (FAILED( hr = pMouseDevice->GetDeviceData( sizeof(DIDEVICEOBJECTDATA),
+									didod, &dwElements, 0 ) ) )
+		return hr;
+
+	for (DWORD i = 0; i < dwElements; i++) {
+		stackScenes.top()->ProcessMouseEvent( &didod[i] );
+	}
+
+	return S_OK;
+}
+
+
+HRESULT CVesaBallApp::ReadKeyboardEvents()
+{
+	DIDEVICEOBJECTDATA didod[ KEYBRD_BUFFER_SIZE ];  // Receives buffered data 
+	DWORD              dwElements;
+	HRESULT            hr;
+
+	if( NULL == pKeyboardDevice ) 
+		return S_OK;
+
+	dwElements = KEYBRD_BUFFER_SIZE;
+
+	if (FAILED( hr = pKeyboardDevice->GetDeviceData( sizeof(DIDEVICEOBJECTDATA),
+									didod, &dwElements, 0 ) ) )  
+		return hr;
+
+	for (DWORD i = 0; i < dwElements; i++) {
+		stackScenes.top()->ProcessKeybrdEvent( &didod[i] );
+	}
+
+	return S_OK;
+}
+
+
+HRESULT CVesaBallApp::FrameMove( float fElapsedTime )
+{
+	fTimeToRender -= fElapsedTime;
+	dwFrameMoveCounter++;
+
+	ReadKeyboardEvents();
+	ReadMouseEvents();
+
+	stackScenes.top()->FrameMove( fElapsedTime );
+
+	return S_OK;
+}
+
+
+HRESULT CVesaBallApp::FrameRender()
+{
+	if (fTimeToRender > 0) 
+		return S_OK;
+
+	fTimeToRender = 1.0f/110;
+	dwFrameRenderCounter++;
+
+	stackScenes.top()->FrameRender();
+
+	// Show the frame on the primary surface.
+	pD3DDevice->Present( NULL, NULL, NULL, NULL );
+
+	ManageScenes();
+
+	return S_OK;
+}
+
+HRESULT CVesaBallApp::ManageScenes()
+{
+	CD3DScene* pNextScene = stackScenes.top()->GetNextScene();
+
+	if (pNextScene == NULL) {
+		stackScenes.top()->InvalidateDeviceObjects();
+		stackScenes.top()->DeleteDeviceObjects();
+		delete stackScenes.top();
+		stackScenes.pop();
+		if (stackScenes.empty()) {
+			SendMessage( hWnd, WM_CLOSE, 0, 0 );
+			return S_OK;
+		}
+		stackScenes.top()->RestoreDeviceObjects();
+		return S_OK;
+	}
+
+	if (pNextScene != stackScenes.top()) {
+		stackScenes.top()->InvalidateDeviceObjects();
+		stackScenes.push( pNextScene );
+		stackScenes.top()->InitDeviceObjects();
+		stackScenes.top()->RestoreDeviceObjects();
+	}
+
+	return S_OK;
+}

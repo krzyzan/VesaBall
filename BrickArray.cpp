@@ -2,20 +2,21 @@
 #include "BrickArray.h"
 
 
+//TODO: wrzuciæ efekty blendingu, listê efektów, listê wybuchów?
+
 CBrickArray::CBrickArray()
 {
 	vSize = D3DXVECTOR2( 0.95f, 0.50f );
 	vPosition = D3DXVECTOR2( 0.50f, 0.30f );
 
 	ZeroMemory( pBrick, sizeof( pBrick ) );
+	dwBrickCounter = 0;
 }
 
 
 CBrickArray::~CBrickArray()
 {
-	for (LONG y=0; y<BRICK_ARRAY_Y; y++)
-		for (LONG x=0; x<BRICK_ARRAY_X; x++)
-			SAFE_DELETE( pBrick[x][y] );
+	Clear();
 }
 
 
@@ -54,6 +55,19 @@ void CBrickArray::InsertBrick( DWORD type, const POINT & pos )
 	pBrick[pos.x][pos.y] = new CBrick( type, 
 		D3DXVECTOR2( vPosition.x - vSize.x/2 + vSize.x/BRICK_ARRAY_X*(0.5f + pos.x), vPosition.y - vSize.y/2 + vSize.y/BRICK_ARRAY_Y*(0.5f + pos.y) ), 
 		D3DXVECTOR2( vSize.x/BRICK_ARRAY_X, vSize.y/BRICK_ARRAY_Y) );
+	if ( pBrick[pos.x][pos.y]->IsDestructible() )
+		dwBrickCounter++;
+}
+
+void CBrickArray::RemoveBrick( const POINT & pos ) 
+{ 
+	if ( !pBrick[pos.x][pos.y] )
+		return;
+	
+	if ( pBrick[pos.x][pos.y]->IsDestructible() )
+		dwBrickCounter--;
+	
+	SAFE_DELETE( pBrick[pos.x][pos.y] ); 
 }
 
 
@@ -73,11 +87,23 @@ POINT CBrickArray::GetArrayCoords( const D3DXVECTOR2 & vPos ) const
 }
 
 
-void CBrickArray::Load( const char* strFileName )
+void CBrickArray::Clear()
 {
+	POINT pos;
+	for (pos.y=0; pos.y<BRICK_ARRAY_Y; pos.y++)
+		for (pos.x=0; pos.x<BRICK_ARRAY_X; pos.x++)
+			RemoveBrick( pos );
+}
+
+void CBrickArray::Load( DWORD dwLevelNum )
+{
+	Clear();
+
+	char strFileName[MAX_PATH];
+	sprintf( strFileName, "lev/%d.lev", dwLevelNum );
+
 	ifstream file;
 	file.open( strFileName, ios::binary | ios::in );
-
 	char ch;
 	POINT pos;
 	for (pos.y=0; pos.y<BRICK_ARRAY_Y; pos.y++) {
@@ -85,8 +111,6 @@ void CBrickArray::Load( const char* strFileName )
 			file.get( ch );
 			if (ch != ' ')
 				InsertBrick( ch - 48, pos );
-			else
-				pBrick[pos.x][pos.y] = NULL;
 		}
 		file.get( ch );
 	}
@@ -94,8 +118,11 @@ void CBrickArray::Load( const char* strFileName )
 };
 
 
-void CBrickArray::Save( const char* strFileName ) const
+void CBrickArray::Save( DWORD dwLevelNum ) const
 {
+	char strFileName[MAX_PATH];
+	sprintf( strFileName, "lev/%d.lev", dwLevelNum );
+	
 	ofstream file;
 	file.open( strFileName, ios::binary | ios::out | ios::trunc );
 	for (int y=0; y<BRICK_ARRAY_Y; y++) {
