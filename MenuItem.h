@@ -1,11 +1,11 @@
 #pragma once
-#include "sprite.h"
+#include "object.h"
 
 #define SHADOW_DISTANCE D3DXVECTOR2(0.005f, 0.005f)
 
 
 class CMenuItem :
-	public CSprite
+	public CObject
 {
 public:
 	CMenuItem( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
@@ -19,6 +19,6 @@ public:
 	HRESULT GetUID() const { return dwUID; }
 
 private:
-	CSprite* pShadow;
+	CObject* pShadow;
 	HRESULT dwUID;
 };

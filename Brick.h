@@ -7,22 +7,22 @@
 #include <list.h>
 using namespace std;
 
-#include "Sprite.h"
+#include "Object.h"
 
+class CBall;
 class CMovingSprite;
 
 
 class CBrick :
-	public CSprite  
+	public CObject  
 {
 public:
 	CBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size );
 	virtual ~CBrick();
 
-	void BallHits( CBall* pBall, const D3DXVECTOR2 & vSide );
+	void ReflectBall( CBall* pBall, const D3DXVECTOR2 & vSide );
 
-	static void PrepareEnvironment( list<CSprite*>* pListRender, list<CMovingSprite*>* pListFrameMove, BOOL pGameStates[] );
-	static list<CSprite*>*			s_pListRender;
+	static void PrepareEnvironment( list<CObject*>* pListRender, list<CMovingSprite*>* pListFrameMove );
+	static list<CObject*>*			s_pListRender;
 	static list<CMovingSprite*>*	s_pListFrameMove;
-	static BOOL*					s_pGameStates;
 };

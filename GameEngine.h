@@ -10,13 +10,14 @@ class CBall;
 class CBrick;
 class CMovingSprite;
 class CPaddle;
+class CBonus;
 
-class CLevel :
+class CGameEngine :
 	public CD3DAppScene
 {
 public:
-	CLevel( /*TODO: TMP*/HWND wnd, LPDIRECT3DDEVICE8 pd3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
-	~CLevel();
+	CGameEngine( /*TODO: TMP*/HWND wnd, LPDIRECT3DDEVICE8 pd3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
+	~CGameEngine();
 
 	HRESULT InitDeviceObjects();
 	HRESULT RestoreDeviceObjects();
@@ -32,10 +33,11 @@ protected:
 	LPD3DXSPRITE			pSprite;
 
 	list<CMovingSprite*>	listFrameMove;
-	list<CSprite*>			listBallObst;
-	list<CSprite*>			listBonusObst;
-	
-	BOOL bThruBrick;
+
+	CPaddle*				pPaddle;
+	list<CBall*>			listBall;
+	list<CBrick*>			listBrick;
+	list<CBonus*>			listBonus;
 
 	HWND					hWnd;					//TODO: TMP
 	CTimer					timerRenderLimiter;

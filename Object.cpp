@@ -1,9 +1,9 @@
-// Sprite.cpp: implementation of the CSprite class.
+// Sprite.cpp: implementation of the CObject class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "Sprite.h"
+#include "Object.h"
 
 #include "Ball.h"	//TODO: TMP
 
@@ -11,7 +11,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CSprite::CSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
+CObject::CObject( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
 				 float Rotation, const D3DXVECTOR2 & Position, D3DCOLOR Blending )
 {
 	pTexture		= Texture;
@@ -23,11 +23,11 @@ CSprite::CSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
 	bDeleteMe		= FALSE;
 }
 
-CSprite::~CSprite()
+CObject::~CObject()
 {
 }
 
-void CSprite::SetSize( const D3DXVECTOR2 & Size )
+void CObject::SetSize( const D3DXVECTOR2 & Size )
 {
 	vSize			= Size;
 	D3DSURFACE_DESC sd;
@@ -36,18 +36,10 @@ void CSprite::SetSize( const D3DXVECTOR2 & Size )
 	vRotationCenter = vSize * RES_X / 2;
 }
 
-void CSprite::Render( LPD3DXSPRITE pSprite ) const
+void CObject::Render( LPD3DXSPRITE pSprite ) const
 {
 	D3DXVECTOR2 Position = (vPosition - vSize/2);
 	if (vScaling.x < 0) Position.x += vSize.x;
 	if (vScaling.y < 0) Position.y += vSize.y;
 	pSprite->Draw( pTexture, NULL, &vScaling, &vRotationCenter, fRotation, &(Position * RES_X), dwBlending );
-}
-
-void CSprite::BallHits( CBall* pBall, const D3DXVECTOR2 & vSide )
-{
-}
-
-void CSprite::BonusHits( CBonus* pBonus, const D3DXVECTOR2 & vSide )
-{
 }

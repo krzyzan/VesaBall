@@ -1,5 +1,5 @@
 #pragma once
-#include "MovingSprite.h"
+#include "MovingObject.h"
 
 class CEffectSprite :
 	public CMovingSprite
@@ -15,6 +15,5 @@ public:
 protected:
 	FLOAT fRemaining;
 	FLOAT fDuration;
-	FLOAT fGravity;
 };
 

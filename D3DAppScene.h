@@ -8,7 +8,7 @@ using namespace std;
 #include <d3dx8.h>
 #include <dinput.h>
 
-class CSprite;
+class CObject;
 
 class CD3DAppScene
 {
@@ -27,7 +27,7 @@ public:
 protected:
 	LPDIRECT3DDEVICE8			pd3dDevice;
 	LPDIRECTINPUTDEVICE8		pDIDevice;
-	list<CSprite*>				listRender;			//TODO: wywaliæ do dziedziczonych
+	list<CObject*>				listRender;			//TODO: wywaliæ do dziedziczonych
 
 private:
 	vector<LPDIRECT3DTEXTURE8>	vtrTexture;

@@ -10,28 +10,28 @@ v0.10
 	- Wersja poczatkowa dziedziczona od CD3DApp
 
 v0.11
-	- Dodana klasa CSprite
+	- Dodana klasa CObject
 	- Dodana klasa CBall
 	- Dodana klasa CPaddle
 
 v0.12
 	- G³ówna tablica spritów jest teraz list¹ (szybko kasuje w œrodku)
-	- CSprite::Draw() podzielone na Render() i FrameMove()
-	- CSprite'y s¹ usuwane z listy w CD3DBallApp::FrameMove() je¿eli bDeleteMe = TRUE;
+	- CObject::Draw() podzielone na Render() i FrameMove()
+	- CObject'y s¹ usuwane z listy w CD3DBallApp::FrameMove() je¿eli bDeleteMe = TRUE;
 	- CBall kasuje siê gdy wyleci za dolna krawêdŸ ekranu
 	- Grafika przeniesiona do katalogu gfx
 
 v0.13
 	- Kana³ alpha w teksturach
-	- CSprite::vPosition jest na œrodku obiektu (by³ w rogu)
+	- CObject::vPosition jest na œrodku obiektu (by³ w rogu)
 	- Ruch kulek niezale¿ny od czasu
 
 v0.14
 	- Skalowanie obiektów i t³a zale¿nie od rozdzielczoœci
-	- CSprite::vPosition jest typu FLOAT od 0.0f do 1.0f (!)
+	- CObject::vPosition jest typu FLOAT od 0.0f do 1.0f (!)
 	- dodany Reset() w konstruktorze CTimer, 
 		bo inaczej nie dzia³a w konfiguracji Release u Laski (dziwne, nie???)
-	- CSprite::FrameMove() jest teraz CSprite::FrameMove( FLOAT fElapsedTime )
+	- CObject::FrameMove() jest teraz CObject::FrameMove( FLOAT fElapsedTime )
 		i wszystkie obiekty dostaj¹ wspólny czas z timerRenderLimiter
 	- Poprawne obliczanie odbiæ
 	- ZIKO: Ustawianie RotationCenter na œrodku sprita
@@ -46,7 +46,7 @@ v0.15
 	- Poczatek kodu Game Over (na razie wy³¹czony)
 
 v0.16
-	- CSprite::CSprite pobiera teraz Size, a nie oblicza z rozmiarów tekstury
+	- CObject::CObject pobiera teraz Size, a nie oblicza z rozmiarów tekstury
 	- Wspólna klasa bazowa dla ruchomych sprite'ów: CMovingSprite
 
 v0.17
@@ -60,7 +60,7 @@ v0.17
 
 v0.18
 	- Poprawione sta³e w celu zwiêkszenia grywalnoœci
-	- Klasa CLevel
+	- Klasa CGameEngine
 
 v0.20
 	- Poprawione tekstury
@@ -68,7 +68,7 @@ v0.20
 
 v0.30
 	- Nowa klasa bazowa CD3DAppScene
-	- Klasa CLevel
+	- Klasa CGameEngine
 	- Klasa CGameMenu
 
 v0.40
@@ -84,6 +84,15 @@ v0.45
 	- Wy³adowania elektryczne przy ³apaniu kulek
 	- Czyszczenie kodu
 
+v0.50
+	TODO: dopisaæ
+
+v0.55
+	TODO: dopisaæ
+
+v0.60
+	- Bonus: MagneticPaddle
+	- Bonus: GhostBall
     	
 ToDo:
 	- zrobic GameOver oraz wyjœcie do menu z levelu

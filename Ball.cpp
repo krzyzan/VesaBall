@@ -4,7 +4,7 @@
 
 #include "StdAfx.h"
 #include "Ball.h"
-#include "Level.h"
+#include "GameEngine.h"
 #include "EffectSprite.h"
 #include "Bonus.h"
 
@@ -13,10 +13,8 @@
 //////////////////////////////////////////////////////////////////////
 
 list<CMovingSprite*>*	CBall::s_pListFrameMove;
-list<CSprite*>*			CBall::s_pListRender;
-list<CSprite*>*			CBall::s_pListObst;
+list<CObject*>*			CBall::s_pListRender;
 LPDIRECT3DTEXTURE8		CBall::s_pSparkTexture;
-BOOL*					CBall::s_pGameStates;
 
 
 CBall::CBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed )
@@ -26,14 +24,10 @@ CBall::CBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3
 
 CBall::~CBall()
 {
-
 }
 
-void CBall::PrepareEnvironment( BOOL* pGameStates, list<CSprite*>* pListObst, list<CSprite*>* pListRender, 
-	list<CMovingSprite*>* pListFrameMove, LPDIRECT3DTEXTURE8 pSparkTexture)
+void CBall::PrepareEnvironment( list<CObject*>* pListRender, list<CMovingSprite*>* pListFrameMove, LPDIRECT3DTEXTURE8 pSparkTexture)
 {
-	s_pGameStates = pGameStates;
-	s_pListObst = pListObst;
 	s_pListRender = pListRender;
 	s_pListFrameMove = pListFrameMove;
 	s_pSparkTexture = pSparkTexture;
@@ -42,12 +36,6 @@ void CBall::PrepareEnvironment( BOOL* pGameStates, list<CSprite*>* pListObst, li
 HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 {
 	CMovingSprite::FrameMove( fElapsedTime );
-
-	//TODO: kolor kulek zmnieniæ raz a nie milion razy na sekunde :)
-	if (s_pGameStates[ CBonus::GhostBall ])
-		dwBlending = 0xFFAFCFFF;
-	else
-		dwBlending = 0xFFFFFFFF;
 
 	// kasuj gdy wyjdzie za ekran
 	if (vPosition.y > BOARD_B + vSize.y/2 ) {
@@ -71,21 +59,11 @@ HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 		vSpeed.y *= -1;
 	}
 
-	/*
 	if (vPosition.y + vSize.y/2 > BOARD_B) {
 		vPosition.y = 2*BOARD_B - vPosition.y - vSize.y;
 		vSpeed.y *= -1;
 	}
-	*/
 
-	// odbicia od przeszkód
-	list<CSprite*>::iterator iObst;
-	for (iObst = s_pListObst->begin(); iObst != s_pListObst->end(); iObst++) {
-		D3DXVECTOR2 vSide = IsColliding( *iObst );
-		if (vSide == D3DXVECTOR2(0,0)) 
-			continue;
-		(*iObst)->BallHits( this, vSide );
-	}
 
 	return S_OK;
 }

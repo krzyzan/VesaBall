@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "D3DBallApp.h"
 #include "GameMenu.h"
-#include "Level.h"
+#include "GameEngine.h"
 
 
 CD3DBallApp::CD3DBallApp()
@@ -37,7 +37,7 @@ HRESULT CD3DBallApp::RenderLoop()
 			pScene->InvalidateDeviceObjects();
 			pScene->DeleteDeviceObjects();
 			SAFE_DELETE( pScene );
-			pScene = new CLevel( hWnd, pd3dDevice, pDIDevice );
+			pScene = new CGameEngine( hWnd, pd3dDevice, pDIDevice );
 			pScene->InitDeviceObjects();
 			pScene->RestoreDeviceObjects();
 			break;

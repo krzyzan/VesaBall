@@ -1,4 +1,4 @@
-// Sprite.h: interface for the CSprite class.
+// Object.h: interface for the CObject class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -9,19 +9,15 @@ using namespace std;
 
 #include <d3dx8.h>
 
-class CBall;		//TODO: TMP
-class CBonus;		//TODO: TMP
 
-class CSprite  
+class CObject  
 {
 public:
-	CSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
+	CObject( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
 				 float Rotation, const D3DXVECTOR2 & Position, D3DCOLOR Blending );
-	virtual ~CSprite();
+	virtual ~CObject();
 
 	virtual void Render( LPD3DXSPRITE pSprite ) const;
-	virtual void BallHits( CBall* pBall, const D3DXVECTOR2 & vSide );	//TODO: TMP
-	virtual void BonusHits( CBonus* pBonus, const D3DXVECTOR2 & vSide );	//TODO: TMP
 
 	void SetSize( const D3DXVECTOR2 & Size );
 

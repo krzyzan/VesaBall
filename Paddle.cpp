@@ -7,26 +7,21 @@
 #include "Ball.h"
 #include "Bonus.h"
 
-BOOL*		CPaddle::s_pGameStates;
-
 CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECTINPUTDEVICE8 DIDevice )
 	: CMovingSprite( Texture, D3DXVECTOR2(1.0f/8, 1.0f/64), 0, 
 		D3DXVECTOR2(BOARD_L+BOARD_W/2, BOARD_B-1.0f/64), 
 		D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), 0xFFFFFFFF)
 {
-	pLightningPaddle = new CSprite( LightningTex, D3DXVECTOR2( vSize.x, vSize.y*2), fRotation, vPosition - D3DXVECTOR2(0,vSize.y/2), dwBlending );
+	pPaddleLightning = new CObject( LightningTex, D3DXVECTOR2( vSize.x, vSize.y*2), fRotation, vPosition - D3DXVECTOR2(0,vSize.y/2), dwBlending );
 	pDIDevice = DIDevice;
 }
 
+
 CPaddle::~CPaddle()
 {
-	delete pLightningPaddle;
+	delete pPaddleLightning;
 }
 
-CPaddle::PrepareEnvironment( BOOL* pGameStates )
-{
-	s_pGameStates = pGameStates;
-}
 
 HRESULT CPaddle::FrameMove( FLOAT fElapsedTime )
 {
@@ -61,15 +56,15 @@ HRESULT CPaddle::FrameMove( FLOAT fElapsedTime )
 	}
 
 	// ustawiamy b³yskawice
-	if ( s_pGameStates[ CBonus::MagneticPaddle ] || !listCatchedBalls.empty() ) {
-		pLightningPaddle->vPosition.x = vPosition.x;
+	//if ( bMagnetic || !listCatchedBalls.empty() ) {
+		pPaddleLightning->vPosition.x = vPosition.x;
 		if ( fTimeToLightningChange < 0 ) {
-			if (rand()%2) pLightningPaddle->vScaling.x *= -1;
-			if (rand()%2) pLightningPaddle->vScaling.y *= -1;
+			if (rand()%2) pPaddleLightning->vScaling.x *= -1;
+			if (rand()%2) pPaddleLightning->vScaling.y *= -1;
 			fTimeToLightningChange = 0.05f;
 		}
 		fTimeToLightningChange -= fElapsedTime;
-	}
+	//}
 
 	return S_OK;
 }
@@ -77,10 +72,10 @@ HRESULT CPaddle::FrameMove( FLOAT fElapsedTime )
 
 void CPaddle::Render( LPD3DXSPRITE pSprite ) const
 {
-	CSprite::Render( pSprite );
+	CObject::Render( pSprite );
 
-	if ( s_pGameStates[CBonus::MagneticPaddle] || !listCatchedBalls.empty() )
-		pLightningPaddle->Render( pSprite );
+	if ( /*bMagnetic ||*/ !listCatchedBalls.empty() )
+		pPaddleLightning->Render( pSprite );
 }
 
 
@@ -98,23 +93,3 @@ void CPaddle::LaunchBall( CBall* pBall, FLOAT speed )
 	D3DXVec2Normalize( &vDirection, &vDirection );
 	pBall->vSpeed = vDirection * speed;
 }
-
-void CPaddle::BallHits( CBall* pBall, const D3DXVECTOR2 & vSide ) 
-{
-	if (vSide.y)
-		pBall->vPosition.y = vPosition.y - vSize.y/2 - pBall->vSize.y/2;
-
-	if (vSide.y && s_pGameStates[ CBonus::MagneticPaddle ])
-		CatchBall( pBall );
-	else {
-		LaunchBall( pBall, D3DXVec2Length( &pBall->vSpeed ) );
-		pBall->StrikeSparkles( vSide );
-	}
-}
-
-void CPaddle::BonusHits( CBonus* pBonus, const D3DXVECTOR2 & vSide )
-{
-	s_pGameStates[pBonus->eType] = true;
-	pBonus->bDeleteMe = true;
-}
-

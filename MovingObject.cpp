@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "movingsprite.h"
+#include "movingobject.h"
 
 
 CMovingSprite::CMovingSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, float Rotation, 
 		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel, D3DCOLOR Blending )
-	: CSprite( Texture, Size, Rotation, Position, Blending )
+	: CObject( Texture, Size, Rotation, Position, Blending )
 {
 	vSpeed = Speed;
 	vAccel = Accel;
@@ -23,7 +23,7 @@ HRESULT CMovingSprite::FrameMove( FLOAT fElapsedTime )
 	return S_OK;
 }
 
-D3DXVECTOR2 CMovingSprite::IsColliding( CSprite* pSprite )
+D3DXVECTOR2 CMovingSprite::IsColliding( CObject* pSprite )
 {
 	if (fabs(vOldPosition.x - pSprite->vPosition.x) < vSize.x/2 + pSprite->vSize.x/2 &&
 			fabs(vPosition.y - pSprite->vPosition.y) < vSize.y/2 + pSprite->vSize.y/2 )

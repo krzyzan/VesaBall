@@ -61,7 +61,7 @@ HRESULT CGameMenu::RenderLoop()
 	pd3dDevice->BeginScene();
 	pSprite->Begin();
 
-	list<CSprite*>::iterator iSprite;
+	list<CObject*>::iterator iSprite;
 	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
 		(*iSprite)->Render( pSprite );
 
@@ -86,7 +86,7 @@ HRESULT CGameMenu::InvalidateDeviceObjects()
 HRESULT CGameMenu::DeleteDeviceObjects()
 {
 	// Kasujemy z listy renderowania
-	list<CSprite*>::iterator iSprite = listRender.begin();
+	list<CObject*>::iterator iSprite = listRender.begin();
 	while (iSprite != listRender.end())
 		delete (*iSprite++);
 

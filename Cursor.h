@@ -2,12 +2,11 @@
 
 #include <list>
 using namespace std;
-
 #include <dinput.h>
-
-#include "movingsprite.h"
+#include "movingobject.h"
 
 class CMenuItem;
+
 
 class CCursor :
 	public CMovingSprite

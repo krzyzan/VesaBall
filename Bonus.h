@@ -1,5 +1,5 @@
 #pragma once
-#include "movingsprite.h"
+#include "movingobject.h"
 
 #include <list>
 using namespace std;
@@ -22,11 +22,10 @@ public:
 
 	HRESULT FrameMove( FLOAT fElapsedTime );
 
-	static void PrepareEnvironment( list<CSprite*>* pListObst, LPDIRECT3DTEXTURE8* pTexture);
+	static void PrepareEnvironment( LPDIRECT3DTEXTURE8* pTexture);
 
 	TYPE	eType;
 
 protected:
-	static list<CSprite*>*			s_pListObst;
 	static LPDIRECT3DTEXTURE8*		s_pTextures;
 };

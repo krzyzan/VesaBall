@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "bonus.h"
 
-list<CSprite*>*		CBonus::s_pListObst;
 LPDIRECT3DTEXTURE8*	CBonus::s_pTextures;
 
 CBonus::CBonus( TYPE Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed )
@@ -14,9 +13,8 @@ CBonus::~CBonus()
 {
 }
 
-void CBonus::PrepareEnvironment( list<CSprite*>* pListObst, LPDIRECT3DTEXTURE8* pTextures )
+void CBonus::PrepareEnvironment( LPDIRECT3DTEXTURE8* pTextures )
 {
-	s_pListObst = pListObst;
 	s_pTextures = pTextures;
 }
 
@@ -44,15 +42,6 @@ HRESULT CBonus::FrameMove( FLOAT fElapsedTime )
 	if (vPosition.y - vSize.y/2 < BOARD_T) {
 		vPosition.y = 2*BOARD_T - vPosition.y + vSize.y;
 		vSpeed.y *= -1;
-	}
-
-	// odbicia od przeszkód
-	list<CSprite*>::iterator iObst;
-	for (iObst = s_pListObst->begin(); iObst != s_pListObst->end(); iObst++) {
-		D3DXVECTOR2 vSide = IsColliding( *iObst );
-		if (vSide == D3DXVECTOR2(0,0)) 
-			continue;
-		(*iObst)->BonusHits( this, vSide );
 	}
 
 	return S_OK;

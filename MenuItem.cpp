@@ -3,11 +3,11 @@
 
 CMenuItem::CMenuItem( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
 		 const D3DXVECTOR2 & Position, D3DCOLOR Blending, HRESULT UID )
-	: CSprite( Texture, Size, 0, Position, Blending )
+	: CObject( Texture, Size, 0, Position, Blending )
 {
 	dwUID = UID;
 
-	pShadow = new CSprite( *this );
+	pShadow = new CObject( *this );
 	pShadow->dwBlending = 0x2F000000;
 	pShadow->vPosition += SHADOW_DISTANCE;
 }
@@ -20,7 +20,7 @@ CMenuItem::~CMenuItem()
 void CMenuItem::Render( LPD3DXSPRITE pSprite ) const
 {
 	pShadow->Render( pSprite );
-	CSprite::Render( pSprite );
+	CObject::Render( pSprite );
 }
 
 void CMenuItem::SetPressed( BOOL bPressed )
