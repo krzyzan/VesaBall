@@ -125,9 +125,6 @@
 				RelativePath=".\D3DApp.cpp">
 			</File>
 			<File
-				RelativePath=".\D3DBall.cpp">
-			</File>
-			<File
 				RelativePath=".\D3DBallApp.cpp">
 			</File>
 			<File
@@ -135,6 +132,9 @@
 			</File>
 			<File
 				RelativePath=".\Sprite.cpp">
+			</File>
+			<File
+				RelativePath=".\VesaBall.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -148,19 +148,19 @@
 				RelativePath=".\D3DApp.h">
 			</File>
 			<File
-				RelativePath=".\d3dapplication.h">
-			</File>
-			<File
 				RelativePath=".\D3DBallApp.h">
 			</File>
 			<File
 				RelativePath=".\Deck.h">
 			</File>
 			<File
+				RelativePath=".\Globals.h">
+			</File>
+			<File
 				RelativePath=".\Sprite.h">
 			</File>
 			<File
-				RelativePath=".\timer.h">
+				RelativePath=".\Timer.h">
 			</File>
 		</Filter>
 		<Filter

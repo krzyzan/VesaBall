@@ -5,6 +5,7 @@
 #pragma once
 
 #include <d3dx8.h>
+#include "Globals.h"
 
 class CSprite  
 {
@@ -25,4 +26,6 @@ public:
 	D3DCOLOR			dwBlending;
 
 	BOOL				bDeleteMe;
+
+	D3DXVECTOR2			vTexSize;
 };

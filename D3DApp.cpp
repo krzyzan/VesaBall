@@ -28,7 +28,6 @@ LRESULT CALLBACK CD3DApp::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 //////////////////////////////////////////////////////////////////////
 
 LPDIRECT3DDEVICE8	CD3DApp::pd3dDevice	= NULL;
-CTimer				CD3DApp::Timer;
 
 CD3DApp::CD3DApp( HINSTANCE hInstance, INT ResX, INT ResY )
 {
@@ -178,7 +177,7 @@ HRESULT CD3DApp::InitD3D()
 	d3dpp.BackBufferCount					= 2;
 	d3dpp.Flags								= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 	d3dpp.FullScreen_RefreshRateInHz		= D3DPRESENT_RATE_DEFAULT;
-	d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
+	d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
 
 	// Create the D3DDevice
 	if( FAILED( pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
@@ -225,9 +224,6 @@ HRESULT CD3DApp::Render3DEnvironment()
 	// Render the scene as normal
 	if( FAILED( hr = Render() ) )
 		return hr;
-
-	// Show the frame on the primary surface.
-	pd3dDevice->Present( NULL, NULL, NULL, NULL );
 
 	return S_OK;
 }

@@ -6,6 +6,7 @@
 
 #include "Sprite.h"
 #include "Deck.h"
+#include "timer.h"	//TMP
 
 class CBall : public CSprite  
 {
@@ -18,4 +19,5 @@ public:
 protected:
 	D3DXVECTOR2 vDirection;
 	CDeck* pDeck;
+	CTimer		Timer; //TMP
 };

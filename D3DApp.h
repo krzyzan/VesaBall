@@ -67,7 +67,7 @@ protected:
 	LPDIRECTINPUTDEVICE8	pDIDevice;			// The DI device
 
 	// Timer
-	static CTimer Timer;
+	CTimer	Timer;
 
 private:
 	HRESULT InitD3D();
