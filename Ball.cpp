@@ -11,11 +11,14 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBall::CBall( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, LPDIRECT3DTEXTURE8 SparkTexture )
-	: CMovingSprite( Level, Texture, D3DXVECTOR2(1.0f/48, 1.0f/48), 0, Position, Speed, D3DXVECTOR2(0, 0), 0xFFFFFFFF )
+CBall::CBall( LPDIRECT3DTEXTURE8 Texture, 
+		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, 
+		list<CSprite*>*	ListRender,	list<CMovingSprite*>* ListFrameMove,
+		LPDIRECT3DTEXTURE8 SparkTexture )
+	: CMovingSprite( Texture, D3DXVECTOR2(1.0f/64, 1.0f/64), 0, Position, Speed, D3DXVECTOR2(0, 0), 0xFFFFFFFF )
 {
-	pLevel->listBall.push_back( this );
-
+	pListRender = ListRender;
+	pListFrameMove = ListFrameMove;
 	pSparkTexture = SparkTexture;
 }
 
@@ -64,9 +67,11 @@ void CBall::ThrowSparkles( const D3DXVECTOR2 & vPositionFromCenter )
 	D3DXVECTOR2 vSparkSize		= D3DXVECTOR2(1.0f/256, 1.0f/256);
 	D3DXVECTOR2 vSparkPosition	= vPositionFromCenter + vPosition;
 	D3DXVECTOR2 vSparkGravity	= D3DXVECTOR2( 0.0f, 0.4f );
-	FLOAT fSparkDuration		= frand(0.5f, 1.0f);
-	for ( int i=0; i<8; i++ ) {
+	for (int i=0; i<8; i++) {
+			FLOAT fSparkDuration	= frand(0.4f, 1.0f);
 			D3DXVECTOR2 vSparkSpeed = D3DXVECTOR2( frand(-1.0f, 1.0f), frand(-1.0f, 1.0f) )/10 + vSpeed/4;
-			new CEffectSprite( pLevel, pSparkTexture, vSparkSize, vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
+			CEffectSprite* pEffectSprite = new CEffectSprite( pSparkTexture, vSparkSize, vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
+			pListFrameMove->push_back( pEffectSprite );
+			pListRender->push_back( pEffectSprite );
 	}
 }

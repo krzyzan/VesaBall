@@ -12,12 +12,9 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CSprite::CSprite( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
+CSprite::CSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
 				 float Rotation, const D3DXVECTOR2 & Position, D3DCOLOR Blending )
 {
-	pLevel			= Level;
-	pLevel->listRender.push_back( this );
-	
 	pTexture		= Texture;
 	vSize			= Size;
 
@@ -44,6 +41,6 @@ void CSprite::Render( LPD3DXSPRITE pSprite ) const
 	pSprite->Draw( pTexture, NULL, &vScaling, &vRotationCenter, fRotation, &Position, dwBlending );
 }
 
-void CSprite::Collide( list<CBall*>* pListBall )
+void CSprite::Collide( list<CBall*>* pListBall, BOOL & bThruBrick )
 {
 }

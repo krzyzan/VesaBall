@@ -1,5 +1,5 @@
 // D3DBallApp.h: interface for the CD3DBallApp class.
-// v0.18
+// v0.20
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -63,7 +63,9 @@ v0.18
 	- Klasa CLevel
 
 ToDo:
-	- Zrobic start pi³ki z deski
+	- Zmieniæ na CD3DAppScene
+	- Zrobiæ menu
+	- Zrobiæ porzadek z destruktorami ( wykasowaæ niepotrzebne, wszystkie musz¹ byæ virtual )
 	- Zrobic start pi³ki z deski
 	- Rzeczy niezwi¹zane z ruchem (np. blending efekty) wrzucic do Render
 	- Zrobiæ Game Over
@@ -83,13 +85,14 @@ ToDo:
 #pragma once
 
 #include <list>			//TMP
+
+#include <d3dx8.h>
+
 #include "D3DApp.h"
 #include "Level.h"
 
 #include "Paddle.h"		//TMP
 #include "Brick.h"		//TMP
-
-
 
 using namespace std;
 
@@ -98,7 +101,6 @@ class CD3DBallApp : public CD3DApp
 public:
 	CD3DBallApp();
 
-	HRESULT LoadTexture( LPCTSTR nameTexture, DWORD numTex );
 	HRESULT InitDeviceObjects();
 	HRESULT FrameMove();
 	HRESULT Render();
@@ -107,13 +109,10 @@ public:
 	HRESULT DeleteDeviceObjects();
 	HRESULT	FinalCleanup();
 
-	LPDIRECT3DTEXTURE8		pTex[256];
-	LPD3DXSPRITE			pSprite;
-	
-	CTimer					timerFrameMove;
-	FLOAT					fTimeToRender;
+	CTimer			timerFrameMove;
+	FLOAT			fTimeToRender;
 
-	DWORD					numFrameMove, numRender;
+	DWORD			numFrameMove, numRender;
 
-	CLevel*					pLevel;
+	CD3DAppStage*	pLevel;
 };

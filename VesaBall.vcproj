@@ -125,10 +125,16 @@
 				RelativePath=".\D3DApp.cpp">
 			</File>
 			<File
+				RelativePath=".\D3DAppStage.cpp">
+			</File>
+			<File
 				RelativePath=".\D3DBallApp.cpp">
 			</File>
 			<File
 				RelativePath=".\EffectSprite.cpp">
+			</File>
+			<File
+				RelativePath=".\GameMenu.cpp">
 			</File>
 			<File
 				RelativePath=".\Level.cpp">
@@ -166,10 +172,16 @@
 				RelativePath=".\D3DApp.h">
 			</File>
 			<File
+				RelativePath=".\D3DAppStage.h">
+			</File>
+			<File
 				RelativePath=".\D3DBallApp.h">
 			</File>
 			<File
 				RelativePath=".\EffectSprite.h">
+			</File>
+			<File
+				RelativePath=".\GameMenu.h">
 			</File>
 			<File
 				RelativePath=".\Level.h">

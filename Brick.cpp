@@ -11,17 +11,21 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBrick::CBrick( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position )
-: CSprite( Level, Texture, D3DXVECTOR2(1.0f/BRICK_X, 1.0f/BRICK_Y), 0, Position, (DWORD)(rand()%192+64) | (DWORD)(rand()%192+64)*0x000100 | (DWORD)(rand()%192+64)*0x010000 | 0xFF000000 )
+CBrick::CBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, list<CSprite*>* ListRender, list<CMovingSprite*>* ListFrameMove )
+: CSprite( Texture, D3DXVECTOR2(1.0f/BRICK_X, 1.0f/BRICK_Y), 0, Position, (DWORD)(rand()%192+64) | (DWORD)(rand()%192+64)*0x000100 | (DWORD)(rand()%192+64)*0x010000 | 0xFF000000 )
 {
+	pListRender = ListRender;
+	pListFrameMove = ListFrameMove;
 }
 
 CBrick::~CBrick()
 {
-	new CEffectSprite( pLevel, pTexture, vSize, vPosition, D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), 0.25f, dwBlending );
+	CEffectSprite* pEffectSprite = new CEffectSprite( pTexture, vSize, vPosition, D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), 0.25f, dwBlending );
+	pListFrameMove->push_back( pEffectSprite );
+	pListRender->push_back( pEffectSprite );
 }
 
-void CBrick::Collide( list<CBall*>* pListBall )
+void CBrick::Collide( list<CBall*>* pListBall, BOOL & bThruBrick )
 {
 	list<CBall*>::iterator iBall;
 	for (iBall = pListBall->begin(); iBall != pListBall->end(); iBall++) {
@@ -31,7 +35,7 @@ void CBrick::Collide( list<CBall*>* pListBall )
 			fabs(pBall->vPosition.y - vPosition.y) < pBall->vSize.y/2 + vSize.y/2 )
 		{
 			bDeleteMe = TRUE;
-			if (!pLevel->bThruBrick) {
+			if (!bThruBrick) {
 				if (pBall->vSpeed.y > 0) {
 					pBall->vSpeed.y *= -1;
 					pBall->ThrowSparkles( D3DXVECTOR2( 0,  pBall->vSize.y/2 ) );
@@ -49,7 +53,7 @@ void CBrick::Collide( list<CBall*>* pListBall )
 			fabs(pBall->vPosition.x - vPosition.x) < pBall->vSize.x/2 + vSize.x/2 )
 		{
 			bDeleteMe = TRUE;
-			if (!pLevel->bThruBrick) {
+			if (!bThruBrick) {
 				if (pBall->vSpeed.x > 0) {
 					pBall->vSpeed.x *= -1;
 					pBall->ThrowSparkles( D3DXVECTOR2( 0,  pBall->vSize.x/2 ) );

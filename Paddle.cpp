@@ -11,8 +11,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CPaddle::CPaddle( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice)
- : CMovingSprite( Level, Texture, D3DXVECTOR2(1.0f/8, 1.0f/64), 0, 
+CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice)
+ : CMovingSprite( Texture, D3DXVECTOR2(1.0f/8, 1.0f/64), 0, 
 		D3DXVECTOR2(0.5f, 0.75f-1.0f/64), D3DXVECTOR2(0, 0), 
 		D3DXVECTOR2(0, 0), 0xFFFFFFFF)
 {
@@ -40,7 +40,7 @@ void CPaddle::FrameMove( FLOAT fElapsedTime )
 
 }
 
-void CPaddle::Collide( list<CBall*>* pListBall ) 
+void CPaddle::Collide( list<CBall*>* pListBall, BOOL & bThruBrick ) 
 {
 	list<CBall*>::iterator iBall;
 	for (iBall = pListBall->begin(); iBall != pListBall->end(); iBall++) {
@@ -49,7 +49,7 @@ void CPaddle::Collide( list<CBall*>* pListBall )
 		if (fabs(pBall->vOldPosition.x - vPosition.x) < pBall->vSize.x/2 + vSize.x/2 &&
 			fabs(pBall->vPosition.y - vPosition.y) < pBall->vSize.y/2 + vSize.y/2 )
 		{
-			pLevel->bThruBrick = !pLevel->bThruBrick;			//TMP
+			bThruBrick = !bThruBrick;			//TMP
 			pBall->vPosition.y = vPosition.y - vSize.y/2 - pBall->vSize.y/2;			//TMP
 
 			FLOAT speed = D3DXVec2Length( &pBall->vSpeed );
@@ -65,7 +65,7 @@ void CPaddle::Collide( list<CBall*>* pListBall )
 		if (fabs(pBall->vOldPosition.y - vPosition.y) < pBall->vSize.y/2 + vSize.y/2 &&
 			fabs(pBall->vPosition.x - vPosition.x) < pBall->vSize.x/2 + vSize.x/2 )
 		{
-			pLevel->bThruBrick = !pLevel->bThruBrick;
+			bThruBrick = !bThruBrick;
 
 			FLOAT speed = D3DXVec2Length( &pBall->vSpeed );
 			pBall->vSpeed = pBall->vPosition /*- D3DXVECTOR2(vPosition.x, 0.75f)*/;

@@ -15,12 +15,12 @@ class CLevel;
 class CSprite  
 {
 public:
-	CSprite( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
+	CSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
 				 float Rotation, const D3DXVECTOR2 & Position, D3DCOLOR Blending );
 	virtual ~CSprite();
 
 	virtual void Render( LPD3DXSPRITE pSprite ) const;
-	virtual void Collide( list<CBall*>* pListBall );	//TMP
+	virtual void Collide( list<CBall*>* pListBall, BOOL & bThruBrick );	//TMP
 
 	LPDIRECT3DTEXTURE8	pTexture;
 	D3DXVECTOR2			vScaling;
@@ -31,6 +31,4 @@ public:
 
 	BOOL				bDeleteMe;
 	D3DXVECTOR2			vSize;
-
-	CLevel*				pLevel;
 };

@@ -9,11 +9,11 @@
 class CPaddle : public CMovingSprite  
 {
 public:
-	CPaddle::CPaddle( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice );
+	CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice );
 	virtual ~CPaddle();
 
 	void FrameMove( FLOAT fElapsedTime );
-	void Collide( list<CBall*>* pListBall );
+	void Collide( list<CBall*>* pListBall, BOOL & bThruBrick );
 
 private:
 	LPDIRECTINPUTDEVICE8	pDIDevice;

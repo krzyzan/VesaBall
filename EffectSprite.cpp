@@ -2,10 +2,10 @@
 #include "effectsprite.h"
 #include "level.h"
 
-CEffectSprite::CEffectSprite( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
+CEffectSprite::CEffectSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
 		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel, 
 		FLOAT Duration, DWORD Blending )
-	: CMovingSprite( Level, Texture, Size, 0, Position, Speed, Accel, Blending )
+	: CMovingSprite( Texture, Size, 0, Position, Speed, Accel, Blending )
 {
 	fDuration = fRemaining = Duration;
 }

@@ -4,16 +4,17 @@
 
 #pragma once
 
-#include <list>
 #include "MovingSprite.h"
 
+#include <list>
 using namespace std;
 
 class CBall : public CMovingSprite  
 {
 public:
-	CBall( CLevel* Level, LPDIRECT3DTEXTURE8 Texture, 
+	CBall( LPDIRECT3DTEXTURE8 Texture, 
 		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, 
+		list<CSprite*>*	ListRender,	list<CMovingSprite*>* ListFrameMove,
 		LPDIRECT3DTEXTURE8 SparkTexture );
 	virtual ~CBall();
 
@@ -21,5 +22,7 @@ public:
 	void ThrowSparkles( const D3DXVECTOR2 & vPositionFromCenter );
 
 protected:
-	LPDIRECT3DTEXTURE8 pSparkTexture;
+	list<CSprite*>*			pListRender;
+	list<CMovingSprite*>*	pListFrameMove;
+	LPDIRECT3DTEXTURE8		pSparkTexture;
 };
