@@ -55,18 +55,20 @@ HRESULT CGameEditor::RenderLoop()
             case DIMOFS_BUTTON0:
             case DIMOFS_BUTTON1:
 				if (didod[ i ].dwData & 0x80) {
-					if ( pBrickArray->Contains( pCursor->vPosition ) ) {
-						POINT pos = pBrickArray->VectorToArrayCoords( pCursor->vPosition );
-						if (pBrickArray->pBrick[pos.x][pos.y]) {
-							curType = pBrickArray->pBrick[pos.x][pos.y]->pTypeDesc->type;
-							if (didod[ i ].dwOfs == DIMOFS_BUTTON0)
-								curType = (curType + 1)%CBrick::TYPE_MAX;
-							SAFE_DELETE( pBrickArray->pBrick[pos.x][pos.y] );
-						}
+					if ( !pBrickArray->Contains( pCursor->vPosition ) ) 
+						break;
 
-						if (didod[ i ].dwOfs == DIMOFS_BUTTON0) {
-							pBrickArray->InsertBrick( curType, pos );
-						}
+					POINT pos = pBrickArray->VectorToArrayCoords( pCursor->vPosition );
+					CNewBrick* iNewBrick = pBrickArray->GetBrickAt( pos );
+					if ( iNewBrick->pBrick ) {
+						curType = iNewBrick->pTypeDesc->type;
+						if (didod[ i ].dwOfs == DIMOFS_BUTTON0)
+							curType = (curType + 1)%CNewBrick::TYPE_MAX;
+						SAFE_DELETE( iNewBrick->pBrick );
+					}
+
+					if (didod[ i ].dwOfs == DIMOFS_BUTTON0) {
+						pBrickArray->CreateBrick( pos, curType );
 					}
 				}
 				break;
@@ -76,24 +78,19 @@ HRESULT CGameEditor::RenderLoop()
 
 	// renderujemy
 	pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40,0x60,0x60), 1.0f, 0 );
-
 	pd3dDevice->BeginScene();
 	pSprite->Begin();
 
 	CGameBoard::RenderLoop();
-
 	pCursor->Render( pSprite );
 
 	pSprite->End();
 	pd3dDevice->EndScene();
-
-	// Show the frame on the primary surface.
 	pd3dDevice->Present( NULL, NULL, NULL, NULL );
 
 	return S_OK;
 }
 
-//TODO: jeœli funkcja wywo³uje funkcje klasy bazowej zwracaæ wartoœæ
 
 HRESULT CGameEditor::DeleteDeviceObjects()
 {

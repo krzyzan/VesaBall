@@ -22,10 +22,11 @@ public:
 	D3DXVECTOR2			vSize;
 	D3DCOLOR			dwBlending;
 
-	BOOL				bDeleteMe;
+	BOOL				bDeleteMe;		//TOD: TMP
+
+	LPDIRECT3DTEXTURE8	pTexture;		//TODO: protected
 
 protected:
-	LPDIRECT3DTEXTURE8	pTexture;
 	FLOAT				fRotation;
 	D3DXVECTOR2			vRotationCenter;
 };

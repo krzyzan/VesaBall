@@ -7,6 +7,7 @@
 #include "Ball.h"
 #include "Bonus.h"
 
+
 LPDIRECT3DTEXTURE8 CPaddle::s_pTexture;
 LPDIRECT3DTEXTURE8 CPaddle::s_pLightningTexture;
 
@@ -50,6 +51,7 @@ HRESULT CPaddle::MouseMove( DIMOUSESTATE2* dims2 )
 	return S_OK;
 }
 
+
 void CPaddle::Render( LPD3DXSPRITE pSprite ) const
 {
 	CSprite::Render( pSprite );
@@ -61,7 +63,6 @@ void CPaddle::Render( LPD3DXSPRITE pSprite ) const
 	}
 }
 
-//TODO: kulki nie moga by³ z³apane przez ten sam punkt deski
 
 void CPaddle::CatchBall( CBall* pBall )
 {
@@ -76,7 +77,7 @@ void CPaddle::CatchBall( CBall* pBall )
 
 void CPaddle::LaunchBall( CBall* pBall )
 {
-	D3DXVECTOR2 vDirection = pBall->vPosition - D3DXVECTOR2(vPosition.x, vPosition.y + vSize.x/16 );	//TODO: poprawiæ w zale¿noœci od rozmiaru deski
+	D3DXVECTOR2 vDirection = pBall->vPosition - D3DXVECTOR2(vPosition.x, vPosition.y + vSize.x/32 );	//TODO: poprawiæ w zale¿noœci od rozmiaru deski
 	D3DXVec2Normalize( &vDirection, &vDirection );
 	pBall->vSpeed = vDirection * D3DXVec2Length( &pBall->vSpeed );
 	pBall->bCatched = false;

@@ -1,5 +1,9 @@
 #pragma once
 
+#define INITGUID
+#include <dmusici.h>
+
+
 #include "GameBoard.h"
 #include "timer.h"
 
@@ -24,6 +28,7 @@ public:
 	HRESULT RenderLoop();
 	HRESULT DeleteDeviceObjects();
 
+
 private:
 	void MoveObjects( FLOAT fElapsedTime );
 	void CollideObjects();
@@ -34,23 +39,31 @@ private:
 	void KillPaddle();
 
 	void CollideBallPaddle( CBall* pBall );
-
-	list<CBall*>			listBall;
-	list<CBonus*>			listBonus;
-	list<CEffectSprite*>	listEffect;
-	CCounter*				pScoreCounter; 
-	CCounter*				pLivesCounter; 
-	CPaddle*				pPaddle;
-
-	LPDIRECT3DTEXTURE8		pDigitsTex;
+	void CollideBallBrick( CBall* pBall );
 
 	HWND					hWnd;					//TODO: TMP
 	CTimer					timerRenderLimiter;
 	FLOAT					fTimeToRender;
 	DWORD					numFrameMove, numRender;
 
+	list<CBall*>			listBall;
+	list<CBonus*>			listBonus;
+	list<CEffectSprite*>	listEffect;
+	CCounter*				pScoreCounter; 
+	CCounter*				pLivesCounter;			//TODO: deski
+	CPaddle*				pPaddle;
+
+	LPDIRECT3DTEXTURE8		pDigitsTex;
+
 	bool					bThruBrick;
 	bool					bFallingBricks;
 
+
 	float					fGameSpeed;				//TODO: TMP
+
+	IDirectMusicLoader8*		pLoader;
+	IDirectMusicPerformance8*	pPerformance;
+	IDirectMusicSegment8*		pSegment[3];
+	IDirectMusicAudioPath8*		p3DAudioPath;
+	IDirectSound3DBuffer8*		pDSB;
 };

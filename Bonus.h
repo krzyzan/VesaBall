@@ -6,7 +6,7 @@ class CBonus :
 	public CMovingSprite
 {
 public:
-	enum TYPE
+	enum EType
 	{
 		ThruBrick,
 		SetOffExploding,
@@ -35,7 +35,7 @@ public:
 		MAX_TYPE
 	};
 
-	CBonus( TYPE Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
+	CBonus( EType Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
 	virtual ~CBonus();
 
 	HRESULT FrameMove( FLOAT fElapsedTime );

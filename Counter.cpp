@@ -22,6 +22,7 @@ CCounter::CCounter( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
 
 CCounter::~CCounter()
 {
+	delete [] pRollerDest;
 	delete [] pRoller;
 }
 
