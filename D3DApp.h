@@ -6,9 +6,8 @@ using namespace std;
 #include "d3dscene.h"
 #include "timer.h"
 
-//-----------------------------------------------------------------------------
-// Error codes
-//-----------------------------------------------------------------------------
+
+//TODO: pozbyæ siê tego
 
 enum APPMSGTYPE { MSG_NONE, MSGERR_APPMUSTEXIT, MSGWARN_SWITCHEDTOREF };
 
@@ -32,7 +31,7 @@ const	KEYBRD_BUFFER_SIZE	= 16;
 //! Aplikacja Direct3D
 /*!
 	Stanowi ³atwy w u¿yciu interfejs Direct3D. 
-	Zarz¹dza obiektami #CD3DScene wykonuj¹c ich inicjalizacjê w odpowiedniej kolejnoœci.
+	Zarz¹dza obiektami #CD3DScene wykonuj¹c w odpowiedniej kolejnoœci ich inicjalizacjê, resetowanie oraz zamykanie.
 */
 
 class CD3DApp 
@@ -40,21 +39,22 @@ class CD3DApp
 	// Struktura przechowuj¹ca informacjê dotycz¹c¹ trybu graficznego.
 	struct D3DModeInfo
 	{
-		DWORD	   Width;				// Screen width in this mode
-		DWORD	   Height;				// Screen height in this mode
-		D3DFORMAT  Format;				// Pixel format in this mode
+		DWORD	   Width;				// Rozdzielczoœæ pozioma w pikselach
+		DWORD	   Height;				// Rozdzielczoœæ pionowa w pikselach
+		D3DFORMAT  Format;				// Format piksela
 		DWORD	   RefreshRate;
-		DWORD	   dwBehavior;			// Hardware / Software / Mixed vertex processing
-		D3DFORMAT  DepthStencilFormat;	// Which depth/stencil format to use with this mode
+		DWORD	   dwBehavior;			// Przetwarzanie wierzcho³ków Hardware / Software / Mixed
+		D3DFORMAT  DepthStencilFormat;	// Który format bufora g³êbi/stencil u¿yæ z tym trybem
 	};
 
-	// Struktura przechowuj¹ca informacjê dotycz¹c¹ urz¹dzenia Direct3D, wraz z list¹ trybów compatybilnych z tym urz¹dzeniem.
+	// Struktura przechowuj¹ca informacjê dotycz¹c¹ urz¹dzenia Direct3D, 
+	// wraz z list¹ trybów compatybilnych z tym urz¹dzeniem.
 	struct D3DDeviceInfo
 	{
 		// Dane urz¹dzenia
-		D3DDEVTYPE	 DeviceType;	  // Reference, HAL, etc.
-		D3DCAPS8	 d3dCaps;		  // Capabilities of this device
-		const TCHAR* strDesc;		  // Name of this device
+		D3DDEVTYPE	 DeviceType;	  // Reference, HAL, itp.
+		D3DCAPS8	 d3dCaps;		  // Mo¿liwoœci urz¹dzenia
+		const TCHAR* strDesc;		  // Nazwa urz¹dzenia
 
 		// Tryby graficzne dla tego urz¹dzenia
 		DWORD		 dwNumModes;
@@ -66,7 +66,8 @@ class CD3DApp
 	};
 
 
-	// Struktura przechowuj¹ca informacjê dotycz¹c¹ karty graficznej, wraz z list¹ urz¹dzeñ Direct3D dostêpnychna tej karcie.
+	// Struktura przechowuj¹ca informacjê dotycz¹c¹ karty graficznej, 
+	// wraz z list¹ urz¹dzeñ zgodnych z Direct3D dostêpnych na tej karcie.
 	struct D3DAdapterInfo
 	{
 		// Dane karty graficznej
@@ -91,7 +92,7 @@ public:
 		//! Tworzy aplikacje Direct3D
 		/*!
 			- Tworzy okno aplikacji.
-			- Znajduje odpowiedni tryb obs³ugiwany przez kartê graficzn¹.
+			- Enumeruje i wybiera odpowiedni tryb obs³ugiwany przez kartê graficzn¹.
 			- Inicjalizuje asynchroniczny (buforowany) odczyt z klawiatury i myszy.
 			- Startuje wewnetrzny timer
 			- Inicjalizuje generator liczb losowych
@@ -102,7 +103,7 @@ public:
 		/*!
 			Powinna byæ wywo³ana po wykonaniu funkcji #Create();
 		*/
-	HRESULT SetupScene( CD3DScene* pScene );
+	HRESULT StartNewScene( CD3DScene* pScene );
 
 		//! Uruchamia g³ówn¹ pêtlê programu
 		/*!
@@ -114,10 +115,10 @@ public:
 private:
 	// Wewnêtrzne funkcje zarz¹dzaj¹ce i renderuj¹ce sceny 3D
 	HRESULT	ChangeScene();
-	HRESULT EndScene();
+	HRESULT StartParentScene();
 
-	HRESULT SceneReadMouseEvents();
-	HRESULT SceneReadKeyboardEvents();
+	HRESULT ReadMouseEvents();
+	HRESULT ReadKeyboardEvents();
 
 	// DirectInput
 	HRESULT InitializeMouseInput();
@@ -182,5 +183,7 @@ private:
 
 	// Statyczny wskaŸnik do aplikacji, potrzebny dla statycznej WndProc()
 	static CD3DApp* spD3DApp;
+
+	// Statyczny handler zdarzeñ, przekazuje zdarzenia do aplikacji spD3DApp.
 	static LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 };

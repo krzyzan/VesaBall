@@ -18,7 +18,7 @@ public:
 
 	//! Renderuje kursor na ekranie
 	/*! 
-		Reimplementacja z #CSprite, renderuje zaokr¹glaj¹c pozycjê do piksela.
+		Renderuje zaokr¹glaj¹c pozycjê do piksela.
 		Poprawia to efekt wizualny w niskich rozdzielczoœciach.
         \param pSprite	adres \e ID3DXSprite u¿ywanego do renderowania
 	*/

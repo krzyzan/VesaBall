@@ -26,7 +26,7 @@
 				RuntimeLibrary="5"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
-				AssemblerOutput="4"
+				AssemblerOutput="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -75,7 +75,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
-				AssemblerOutput="4"
+				AssemblerOutput="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"/>
 			<Tool

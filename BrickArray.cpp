@@ -2,10 +2,10 @@
 #include "BrickArray.h"
 
 
-CBrickArray::CBrickArray()
+CBrickArray::CBrickArray( const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size )
 {
-	vSize = D3DXVECTOR2( BOARD_W, BOARD_W/2 );
-	vPosition = D3DXVECTOR2( BOARD_L+BOARD_W/2, 0.30f );
+	vPosition = Position;
+	vSize = Size;
 
 	ZeroMemory( pBrick, sizeof( pBrick ) );
 	dwBrickCounter = 0;
@@ -14,11 +14,18 @@ CBrickArray::CBrickArray()
 
 CBrickArray::~CBrickArray()
 {
+	Clear();
+}
+
+
+void CBrickArray::Clear()
+{
 	POINT pos;
 	for (pos.y=0; pos.y<BRICK_ARRAY_Y; pos.y++)
 		for (pos.x=0; pos.x<BRICK_ARRAY_X; pos.x++)
 			RemoveBrick( pos );
 }
+
 
 void CBrickArray::Render( LPD3DXSPRITE pSprite ) const
 {
@@ -31,8 +38,7 @@ void CBrickArray::Render( LPD3DXSPRITE pSprite ) const
 
 void CBrickArray::InsertBrick( DWORD type, const POINT & pos )
 {
-	pBrick[pos.x][pos.y] = new CBrick( type, 
-		vPosition - vSize/2 + D3DXVECTOR2( vSize.x/BRICK_ARRAY_X*(0.5f + pos.x), vSize.y/BRICK_ARRAY_Y*(0.5f + pos.y) ), 
+	pBrick[pos.x][pos.y] = new CBrick( type, GetPositionAt( pos ),
 		D3DXVECTOR2( vSize.x/BRICK_ARRAY_X, vSize.y/BRICK_ARRAY_Y) );
 	
 	if ( pBrick[pos.x][pos.y]->IsDestructible() )
@@ -54,10 +60,10 @@ void CBrickArray::RemoveBrick( const POINT & pos )
 
 void CBrickArray::Load( DWORD dwLevelNum )
 {
-	CBrickArray::~CBrickArray();
+	Clear();
 
 	char strFileName[MAX_PATH];
-	sprintf( strFileName, "lev/%d.lev", dwLevelNum );
+	sprintf( strFileName, "lev/%02d.lev", dwLevelNum );
 
 	ifstream file;
 	file.open( strFileName, ios::binary | ios::in );
@@ -78,7 +84,7 @@ void CBrickArray::Load( DWORD dwLevelNum )
 void CBrickArray::Save( DWORD dwLevelNum ) const
 {
 	char strFileName[MAX_PATH];
-	sprintf( strFileName, "lev/%d.lev", dwLevelNum );
+	sprintf( strFileName, "lev/%02d.lev", dwLevelNum );
 	
 	ofstream file;
 	file.open( strFileName, ios::binary | ios::out | ios::trunc );
@@ -102,7 +108,7 @@ bool CBrickArray::Contains( const D3DXVECTOR2 & vPos ) const
 }
 
 
-POINT CBrickArray::GetArrayCoords( const D3DXVECTOR2 & vPos ) const
+POINT CBrickArray::GetArrayCoordsAt( const D3DXVECTOR2 & vPos ) const
 {
 	POINT pos;
 	pos.x = (LONG)(((vPos.x - vPosition.x) / vSize.x + 0.5f) * BRICK_ARRAY_X);
@@ -110,6 +116,11 @@ POINT CBrickArray::GetArrayCoords( const D3DXVECTOR2 & vPos ) const
 	return pos;
 }
 
+
+D3DXVECTOR2 CBrickArray::GetPositionAt( const POINT & pos ) const
+{
+	return vPosition - vSize/2 + D3DXVECTOR2( vSize.x/BRICK_ARRAY_X*(0.5f + pos.x), vSize.y/BRICK_ARRAY_Y*(0.5f + pos.y) );
+}
 
 void CBrickArray::ZapBricks() 
 {

@@ -48,7 +48,7 @@ HRESULT CGameMenu::InitDeviceObjects()
 	pCursor = new CCursor( pTex );
 	listRender.push_back( pCursor );
 
-	pCurrentItem = GetPointedMenuItem();
+	pCurrentItem = GetPOINTedMenuItem();
 	if (pCurrentItem) pCurrentItem->SetHighlighted( true );
 
 	return S_OK;
@@ -62,7 +62,7 @@ HRESULT CGameMenu::RestoreDeviceObjects()
 	return S_OK;
 }
 
-CMenuItem* CGameMenu::GetPointedMenuItem() const
+CMenuItem* CGameMenu::GetPOINTedMenuItem() const
 {
 	list<CMenuItem*>::const_iterator iMenuItem;
 	for (iMenuItem = listMenuItem.begin(); iMenuItem != listMenuItem.end(); iMenuItem++)
@@ -91,7 +91,7 @@ HRESULT CGameMenu::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
         case DIMOFS_X:
 		case DIMOFS_Y:
 			pOldMenuItem = pCurrentItem;
-			pCurrentItem = GetPointedMenuItem();
+			pCurrentItem = GetPOINTedMenuItem();
 			if (pPressedItem && pCurrentItem != pPressedItem)
 				pCurrentItem = NULL;
 			if (pCurrentItem != pOldMenuItem) {
@@ -154,19 +154,12 @@ HRESULT CGameMenu::FrameRender()
 {
 	pD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(58,110,145), 1.0f, 0 );
 
-	pD3DDevice->BeginScene();
 	pSprite->Begin();
-
 	list<CSprite*>::iterator iSprite;
 	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
 		(*iSprite)->Render( pSprite );
-
 	pSprite->End();
-	pD3DDevice->EndScene();
 	
-	// Show the frame on the primary surface.
-	pD3DDevice->Present( NULL, NULL, NULL, NULL );
-
 	return S_OK;
 }
 

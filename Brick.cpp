@@ -8,19 +8,19 @@
 #include "SpriteEffect.h"
 
 CBrick::SType CBrick::s_Type[BRICK_TYPE_MAX] = { 
-	{  1,	0,	1}, 
-	{  2,	0,	1}, 
-	{  3,	1,	1},
-	{  5,	0,	1},
-	{  8,	0,	1},
-	{ 13,	0,	1}, 
-	{ 21,	0,	1}, 
-	{ 34,	0,	1},
-	{ 55,	0,	1},
-	{ 89,	0,	1},
-	{144,	0,	DUR_MAX}, 
-	{233,	0,	3},
-	{377,	0,	2},
+	{  1,	1}, 
+	{  2,	1}, 
+	{  3,	1},
+	{  5,	1},
+	{  8,	1},
+	{ 13,	1}, 
+	{ 21,	1}, 
+	{ 34,	1},
+	{ 55,	1},
+	{ 89,	1},
+	{144,	DUR_MAX}, 
+	{233,	3},
+	{377,	2},
 };
 
 LPDIRECT3DTEXTURE8 CBrick::spTexture[BRICK_TYPE_MAX][DUR_MAX];
@@ -56,7 +56,7 @@ void CBrick::Zap()
 	}
 }
 
-CSpriteEffect* CBrick::CreateBlendEffect() const
+CSpriteEffect* CBrick::CreateBlendEffect( const D3DXVECTOR2 & vSpeed ) const
 {
-	return new CSpriteEffect( pTexture, vSize, vPosition, D3DXVECTOR2(frand(-0.1f, 0.1f), frand(-0.1f, 0.1f)), D3DXVECTOR2(0, 0), 0xFFFFFFFF, 0.25f );
+	return new CSpriteEffect( pTexture, vSize, vPosition, vSpeed, D3DXVECTOR2(0, 0), 0xFFFFFFFF, 0.25f );
 }

@@ -24,27 +24,25 @@ using namespace std;
 #include <dxerr8.h>
 #include <d3dx8.h>
 
-//-----------------------------------------------------------------------------
-// Miscellaneous helper functions
-//-----------------------------------------------------------------------------
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if (p) { delete[] (p);   (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 
-// Global defines
-const int RES_X = 640;
-const int RES_Y = 480;
+extern DWORD RES_X;
+extern DWORD RES_Y;
 
 const float BOARD_L = 0.025f;				// left
 const float BOARD_R = 0.975f;				// right
 const float BOARD_T = 0.00f;				// top
 const float BOARD_B = 0.75f;				// bottom
-const float BOARD_W	= (BOARD_R-BOARD_L);	//width
-const float BOARD_H	= (BOARD_B-BOARD_T);	//height
+const float BOARD_W	= (BOARD_R-BOARD_L);	// width
+const float BOARD_H	= (BOARD_B-BOARD_T);	// height
 
 const float PADDLE_WIDTH_MIN = BOARD_W / 16;
 const float PADDLE_WIDTH_MAX = BOARD_W / 2;
 const float PADDLE_WIDTH_AVG = (PADDLE_WIDTH_MIN + PADDLE_WIDTH_MAX) / 2;
+
+const float	GRAV_ACCEL = 0.25f;
 
 inline float frand( float i, float j ) 
 	{ return ((float)rand()/RAND_MAX)*(j-i)+i; };

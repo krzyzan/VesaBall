@@ -31,26 +31,26 @@ public:
 
 		//! Wykonuje ruch kulki
 		/*!
-			Jeœli kulka jest "z³apana" przez deskê nie robi nic.
-			W przeciwnym wypadku wykonuje #CSpriteMoving::FrameMove( float fElapsedTime )
+			\copydoc CSpriteMoving::FrameMove(float fElapsedTime)
+			Jeœli kulka jest "z³apana" przez deskê, nie robi nic.
 			\param fElapsedTime	Czas od ostatniego wywo³ania
 		*/ 
 	void FrameMove( float fElapsedTime );
 		
-		//! Ustawia prêdkoœæ, "zaokraglaj¹c" jej wartoœæ do przedzia³u <BALL_SPEED_MIN, BALL_SPEED_MAX>
+		//! Ustawia prêdkoœæ do najbli¿szej wartoœci w przedziale <BALL_SPEED_MIN, BALL_SPEED_MAX>
 		/*!
 			\param vNewSpeed	Nowa prêdkoœæ.
 		*/ 
 	void SetSpeed( const D3DXVECTOR2 & vNewSpeed );
 		
-		//! Odbija kulkê od obiektu
+		//! Zmienia kierunek wektora prêdkoœci przy odbiciu od prostok¹tnego obiektu
 		/*!
 			\param pSprite		WskaŸnik do obiektu
 			\param vSide		Wektor punktu wzgledem œrodka kulki w którym nastepuje kolizja
 		*/ 
 	void Reflect( CSprite* pSprite, const D3DXVECTOR2 & vSide );
-	
-		//! Je¿eli TRUE, ruchem kulki zajmuje siê #CPaddle, domyslnie FALSE
+
+		//! Je¿eli \b true, kulka sie nie porusza, domyœlnie \b false
 	bool bCatched;
 
 		//! Adres wspólnej tekstury. 

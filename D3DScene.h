@@ -10,13 +10,14 @@ using namespace std;
 	/*!
 		\par
 		Klasa abstrakcyjna, opisuje pojedyncz¹ scenê - czêœæ programu stanowi¹c¹ logiczn¹ ca³oœæ, 
-		jak np. g³ówne menu gry, ekran wyników, menu opcji itp. Stanowi "szkielet" dla klas które od niej dziedzicz¹,
-		\par
-		Wspó³pracuje œciœle ze zaprzyjaŸnion¹ klas¹ #CD3DApp, która zajmuje siê wykonywaniem funkcji w odpowiedniej kolejnoœci.
+		jak np. g³ówne menu gry, ekran wyników, menu opcji itp. Stanowi "szkielet" dla klas które od niej dziedzicz¹.
+		Jedynym interfejsem do sceny powinien byc konstruktor. 
+		Wywo³ywaniem funkcji w odpowiedniej kolejnoœci oraz zakoñczeniem sceny zajmuje siê zaprzyjaŸniona klasa #CD3DApp.
 		U³atwia to poprawne alokowanie obiektów w pamiêci karty graficznej, 
-		które musza byæ zwalniane gdy urz¹dzenie karty jest resetowane (np. u¿ytkownik zminimalizowa³ aplikacjê naciskaj¹c Alt-Tab).
+		które musza byæ zwalniane gdy urz¹dzenie karty jest resetowane 
+		(np. u¿ytkownik zminimalizowa³ aplikacjê naciskaj¹c Alt-Tab). 
 		\par
-		Zapewnia tak¿e proste zarz¹dzanie teksturami zwalniaj¹c je automatycznie, gdy scena siê koñczy.
+		Klasa zapewnia tak¿e proste zarz¹dzanie teksturami zwalniaj¹c je automatycznie, gdy scena siê koñczy.
 	*/
 class CD3DScene
 {
@@ -31,7 +32,7 @@ protected:
 		*/
 	virtual ~CD3DScene();
 
-		//! Inicjuje obiekty u¿ywajace pamiêci systemowej
+		//! Inicjalizuje obiekty u¿ywajace pamiêci systemowej
 		/*!
 			W tej funkcji klasa dziedziczona powinna zainicjowaæ wszystkie obiekty, 
 			oprócz tych które znajduj¹ siê w pamiêci kart graficznej. W szczególnoœci tutaj
@@ -41,7 +42,7 @@ protected:
 		*/
 	virtual HRESULT InitDeviceObjects() = 0;
 		
-		//! Inicjuje obiekty u¿ywaj¹ce pamiêci karty
+		//! Inicjalizuje obiekty u¿ywaj¹ce pamiêci karty
 		/*!
 			W tej funkcji klasa dziedziczona powinna zainicjowaæ tylko te obiekty, 
 			które znajduj¹ siê w pamiêci kart graficznej. W szczególnoœci dotyczy to buforów wierzcho³ków, 
@@ -49,7 +50,7 @@ protected:
 		*/
 	virtual HRESULT RestoreDeviceObjects() = 0;
 		
-		//! Zwalnia obiekty uzywaj¹ce pamiêci karty
+		//! Zwalnia obiekty u¿ywaj¹ce pamiêci karty
 		/*!
 			W tej funkcji klasa dziedziczona powinna zwolniæ obiekty zainicjowane w #RestoreDeviceObjects().
 		*/

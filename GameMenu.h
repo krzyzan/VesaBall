@@ -35,7 +35,7 @@ public:
 	HRESULT FrameRender();
 	
 private:
-	CMenuItem*			GetPointedMenuItem() const;
+	CMenuItem*			GetPOINTedMenuItem() const;
 
 	LPD3DXSPRITE		pSprite;
 

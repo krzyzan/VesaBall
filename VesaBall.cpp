@@ -2,19 +2,22 @@
 
 #include "D3DApp.h"
 #include "GameMenu.h"
-/*    	
-ToDo:
-	- Zrobiæ przyjació³ z CD3DApp i CD3DScene.
-	- Wywaliæ niepotrzebne argumenty z konstruktorów
-	- zrobiæ obs³ugê dŸwiêku (np. kasuj¹c niepotrzebny kod z sampli do DSound )
-	- Porz¹dek z protected, public, private
-	- zrobic GameOver
-*/
 
+#include <fstream>
+using namespace std;
 
-//!	"Entry point" aplikacji
-INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT )
+DWORD RES_X;
+DWORD RES_Y;
+
+//! Inicjalizuje Direct3D i w³¹cza menu gry.
+INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR args, INT argc)
 {
+	ifstream ConfigFile;
+	ConfigFile.open( "cfg/res.cfg", ios::in );
+	ConfigFile >> RES_X;
+	ConfigFile >> RES_Y;
+	ConfigFile.close();
+
 	CD3DApp app( _T("VesaBall") );
 
 	HRESULT hr;
@@ -22,7 +25,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT )
 	if (FAILED( hr = app.Create( hInstance ) ) )
 		return hr;
 
-	if (FAILED( hr = app.SetupScene( new CGameMenu() ) ) )
+	if (FAILED( hr = app.StartNewScene( new CGameMenu() ) ) )
 		return hr;
 
 	return app.Run();

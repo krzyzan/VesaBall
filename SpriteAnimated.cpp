@@ -29,7 +29,7 @@ void CSpriteAnimated::Render( LPD3DXSPRITE pSprite ) const
 	D3DXVECTOR2 Position = vPosition - vSize/2;
 	LONG lFrame = LONG((1.0f-fRemaining/fDuration)*(dwLastFrame-dwFirstFrame))+dwFirstFrame;
 	CONST RECT SrcRect = {(lFrame/8)*ptFramePixels.x, (lFrame%8)*ptFramePixels.y, (lFrame/8+1)*ptFramePixels.x, (lFrame%8+1)*ptFramePixels.y };
-	pSprite->Draw( pTexture, &SrcRect, &vScaling, &vRotationCenter, fRotation, &(Position * RES_X), dwColor );
+	pSprite->Draw( pTexture, &SrcRect, &vScaling, &vRotationCenter, fRotation, &(Position * (float)RES_X), dwColor );
 }
 
 

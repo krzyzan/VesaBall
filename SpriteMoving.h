@@ -31,7 +31,7 @@ public:
 
 		//! Zwraca punkt w którym nastêpuje kolizja z obiektem. 
 		/*!
-			Jeœli obiekty nie koliduja zwraca /b D3DXVECTOR(0,0)
+			Jeœli obiekty nie koliduja zwraca \b D3DXVECTOR(0,0)
 		*/
 	D3DXVECTOR2 GetCollisionSide( CSprite* pSprite ) const;
 

@@ -1,12 +1,10 @@
-// Paddle.cpp: implementation of the CPaddle class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "Paddle.h"
 #include "Ball.h"
 #include "Bonus.h"
 
+
+const float BALL_ACCEL = 1.0f / 200;
 
 LPDIRECT3DTEXTURE8 CPaddle::spTexture;
 LPDIRECT3DTEXTURE8 CPaddle::spLightningTexture;
@@ -66,11 +64,11 @@ void CPaddle::CatchBall( CBall* pBall )
 }
 
 
-void CPaddle::SetBallDirection( CBall* pBall ) const
+void CPaddle::SetBallSpeed( CBall* pBall ) const
 {
 	D3DXVECTOR2 vNormal = pBall->vPosition - D3DXVECTOR2(vPosition.x, vPosition.y + vSize.x/4 );
 	D3DXVec2Normalize( &vNormal, &vNormal );
-	float fSpeedVal = D3DXVec2Length( &pBall->GetSpeed() ) + (BALL_SPEED_VAL_MAX - BALL_SPEED_VAL_MIN) / 100;
+	float fSpeedVal = D3DXVec2Length( &pBall->GetSpeed() ) + (BALL_SPEED_VAL_MAX - BALL_SPEED_VAL_MIN) * BALL_ACCEL;
 	pBall->SetSpeed( vNormal * fSpeedVal );
 }
 

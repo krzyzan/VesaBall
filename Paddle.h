@@ -42,19 +42,19 @@ public:
 		//! £apie kulkê
 		/*!
 			Jeœli kulka jest ju¿ z³apana, nie robi nic.
-			\param pBall	WskaŸnik do ³apanej pi³ki
+			\param pBall	WskaŸnik do ³apanej kulki
 		*/
 	void CatchBall( CBall* pBall );
 
-		//! Ustawia kierunek wektora prêdkoœci pi³ki
+		//! Ustawia wektor prêdkoœci kulki
 		/*!
 			Kierunek jest równoleg³y do prostej poprowadzonej przez œrodek kulki
-			i punkt poni¿ej œrodka deski.
-			\param pBall	WskaŸnik do ³apanej pi³ki
+			i punkt poni¿ej œrodka deski. Wartoœæ prêdkoœci jest nieznacznie zwiêkszana.
+			\param pBall	WskaŸnik do kulki
 		*/
-	void SetBallDirection( CBall* pBall ) const;
+	void SetBallSpeed( CBall* pBall ) const;
 
-		//! Startuje z³apane pi³ki
+		//! Startuje z³apane kulki
 	void LaunchCatchedBalls();
 
 		//! Ustawia szerokoœæ deski
@@ -65,7 +65,7 @@ public:
 		*/
 	void SetWidth( float fNewWidth );
 
-		//! Okreœla czy deska "³apie" pi³ki
+		//! Okreœla czy deska "³apie" kulki
 	bool bGrabPaddle;
 
 	static LPDIRECT3DTEXTURE8 spTexture;

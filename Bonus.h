@@ -36,7 +36,7 @@ public:
 		MegaBall,		//!< Powieksza kulki
 		EightBall,		//!< Ka¿da kulka zamienia sie w osiem kulek.
 
-		MAX_TYPE		//!< Zarezerwowane, s³u¿y do okreœlenia rozmiaru tablic.
+		MAX_TYPE		//!< Zarezerwowane, s³u¿y do okreœlenia iloœci typów bonusów
 	};
 
 public:

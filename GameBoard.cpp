@@ -44,7 +44,7 @@ HRESULT CGameBoard::InitDeviceObjects()
 	listSprite.push_back( new CSprite( pWallTex, D3DXVECTOR2(1.0f-BOARD_R, 0.75f), 0, D3DXVECTOR2((1.00f+BOARD_R)/2, 0.75f/2), 0xFFFFFFFF ) );
 
 	// tworzymy cegie³ki
-	pBrickArray	= new CBrickArray();
+	pBrickArray	= new CBrickArray( D3DXVECTOR2( BOARD_L+BOARD_W/2, 0.30f ), D3DXVECTOR2( BOARD_W, BOARD_W/2 ) );
 	pBrickArray->Load( dwLevelNum );
 
 	return S_OK;

@@ -1,7 +1,7 @@
 #pragma once
 #include "Sprite.h"
 
-	//! Prosty licznik wyœwietlajacy liczby dodatnie
+	//! Licznik wyœwietlajacy liczby dodatnie
     /*!
 		Przed utworzeniem obiektów klasy konieczne jest wczytanie tekstury
 		pod adres #spTexture. W teksturze powinny byæ pionowo umieszczone cyfry
@@ -43,7 +43,7 @@ public:
 	static LPDIRECT3DTEXTURE8 spTexture;
 	LONG lValue;
 
-private:
+protected:
 	POINT dwDigitPixels;
 	DWORD dwNumDigits;
 	float fValue;

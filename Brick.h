@@ -7,6 +7,7 @@ class CSpriteEffect;
 
 const DUR_MAX = 4;
 const BYTE BRICK_TYPE_MAX = 13;
+const BYTE BRICK_TYPE_EXPL = 2;
 
     //! Cegie³ka
     /*!
@@ -18,7 +19,6 @@ const BYTE BRICK_TYPE_MAX = 13;
 	struct SType
 	{
 		DWORD	dwScore;
-		bool	bExplosive;
 		DWORD	dwDurability;
 	};
 
@@ -37,12 +37,12 @@ public:
 		/*!
 			\return Zaalokowany obiekt #CSpriteEffect
 		*/ 
-	CSpriteEffect* CreateBlendEffect() const;
+	CSpriteEffect* CreateBlendEffect( const D3DXVECTOR2 & vSpeed ) const;
 
 		//! Zwiêksza licznik trafieñ
 	void Hit();
 
-		//! Jeœli cegie³ka wytrzymuje kilka uderzeñ pi³ki, uszkadza j¹
+		//! Zmniejsza wytrzyma³oœæ cegie³ki do 1.
 	void Zap();
 
 		//! Zwraca ile razy trafiona
@@ -57,17 +57,17 @@ public:
 	DWORD GetScore() const 
 		{return s_Type[dwType].dwScore;}
 
-		//! Czy trafiona ju¿ tyle razy ¿e zniszczona?
+		//! Zwraca \b true jeœli wytrzyma³oœc spad³a do zera
 	bool IsDestroyed() const 
 		{return dwHitCount == s_Type[dwType].dwDurability;}
 
-		//! Czy mo¿e byæ zniszczona?
+		//! Zwraca \b true jeœli mo¿e byc zniszczona mo¿e byæ zniszczona
 	bool IsDestructible() const 
 		{return s_Type[dwType].dwDurability != DUR_MAX;}
 
-		//! Czy mo¿e byæ zniszczona?
+		//! Zwraca \b true jeœli wybuchowa
 	bool IsExplosive() const 
-		{return s_Type[dwType].bExplosive;}
+		{return dwType == BRICK_TYPE_EXPL;}
 
 		//!
 	static LPDIRECT3DTEXTURE8	spTexture[BRICK_TYPE_MAX][DUR_MAX];

@@ -26,7 +26,7 @@ CCounter::~CCounter()
 {
 }
 
-
+//TODO: RES z polecenia
 void CCounter::Render( LPD3DXSPRITE pSprite ) const
 {
 	D3DXVECTOR2 Position = vPosition - vSize/2 + D3DXVECTOR2(vSize.x, 0);
@@ -34,7 +34,7 @@ void CCounter::Render( LPD3DXSPRITE pSprite ) const
 	for (DWORD r=0; r<dwNumDigits; r++) {
 		Position.x -= vSize.x/dwNumDigits;
 		CONST RECT SrcRect = {0, (lDigit%10)*dwDigitPixels.y, dwDigitPixels.x, (lDigit%10+1)*dwDigitPixels.y };
-		pSprite->Draw( pTexture, &SrcRect, &vScaling, &vRotationCenter, fRotation, &(Position * RES_X), dwColor );
+		pSprite->Draw( pTexture, &SrcRect, &vScaling, &vRotationCenter, fRotation, &(Position * (float)RES_X), dwColor );
 		lDigit /= 10;
 	}
 }

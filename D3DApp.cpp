@@ -1,16 +1,8 @@
 #include "StdAfx.h"
 #include "D3DApp.h"
 
-//-----------------------------------------------------------------------------
-// Global access to the app (needed for the global WndProc())
-//-----------------------------------------------------------------------------
 CD3DApp* CD3DApp::spD3DApp = NULL;
 
-
-//-----------------------------------------------------------------------------
-// Name: WndProc()
-// Desc: Static msg handler which passes messages to the application class.
-//-----------------------------------------------------------------------------
 LRESULT CALLBACK CD3DApp::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	return spD3DApp->MsgProc( hWnd, uMsg, wParam, lParam );
@@ -277,7 +269,6 @@ HRESULT CD3DApp::BuildDeviceList()
 			}
 		}
 
-		// Select any RES_X x RES_Y mode for default (but prefer a 32-bit mode)
 		for( m=0; m<pDevice->dwNumModes; m++ )
 		{
 			if ( pDevice->modes[m].Width==RES_X && pDevice->modes[m].Height==RES_Y )
@@ -409,10 +400,6 @@ BOOL CD3DApp::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
 }
 
 
-//-----------------------------------------------------------------------------
-// Name: MsgProc()
-// Desc: Message proc function to handle key and menu input
-//-----------------------------------------------------------------------------
 LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 									LPARAM lParam )
 {
@@ -465,9 +452,9 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 			break;
 
 		case WM_KEYDOWN:
-			if (wParam == VK_BACK) {
-				SendMessage( hWnd, WM_CLOSE, 0, 0 );//TODO: TMP
-			}
+			//if (wParam == VK_BACK) {
+			//	SendMessage( hWnd, WM_CLOSE, 0, 0 );//TODO: TMP
+			//}
 			break;
 
 		case WM_CLOSE:
@@ -489,7 +476,7 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 	D3DDeviceInfo*	pDeviceInfo  = &pAdapterInfo->devices[pAdapterInfo->dwCurrentDevice];
 	D3DModeInfo*	pModeInfo	 = &pDeviceInfo->modes[pDeviceInfo->dwCurrentMode];
 
-	// Set up the presentation parameters
+	// Ustaw tryb graficzny oraz atrybuty prezentacji
 	ZeroMemory( &d3dpp, sizeof(d3dpp) );
 	d3dpp.Windowed							= FALSE;
 	d3dpp.BackBufferCount					= 1;
@@ -505,8 +492,7 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 	d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
 
 
-	
-	// Create the device
+	// Utwórz urz¹dzenie D3D
 	hr = pD3D->CreateDevice( 0, pDeviceInfo->DeviceType,
 							   hWnd, pModeInfo->dwBehavior, &d3dpp,
 							   &pD3DDevice );
@@ -514,13 +500,14 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 	if ( FAILED( hr ) )
 		return hr;
 	
-	// Clear the viewport
+	// Czyœci ekran
 	pD3DDevice->Present( NULL, NULL, NULL, NULL);
 
-	// Store device Caps
+	// Zapisz mo¿liwoœci urz¹dzenia
 	pD3DDevice->GetDeviceCaps( &d3dCaps );
 	CreateFlags = pModeInfo->dwBehavior;
 
+	// Ustaw urz¹dzenie D3D które uzywaj¹ obiekty CD3DScene
 	CD3DScene::pD3DDevice = pD3DDevice;
 
 	return S_OK;
@@ -531,13 +518,13 @@ HRESULT CD3DApp::Render3DEnvironment()
 {
 	HRESULT hr;
 
-	// Test the cooperative level to see if it's okay to render
+	// Testuje czy mo¿na renderowaæ
 	if ( FAILED( hr = pD3DDevice->TestCooperativeLevel() ) ) {
-		// If the device was lost, do not render until we get it back
+		// Jeœli D3DERR_DEVICELOST, nie renderuj dopóki nie odzyskamy urz¹dzenia.
 		if ( D3DERR_DEVICELOST == hr )
 			return S_OK;
 
-		// Check if the device needs to be reset.
+		// SprawdŸ czy urzadzenie musi byæ zresetowane
 		if ( D3DERR_DEVICENOTRESET == hr ) {
 			if ( FAILED( hr = Reset3DEnvironment() ) )
 				return hr;
@@ -545,18 +532,28 @@ HRESULT CD3DApp::Render3DEnvironment()
 		return hr;
 	}
 
+	// G³ówna pêtla programu
 	float fElapsedTime = Timer.GetElapsedTime();
 
-	if ( FAILED( hr = SceneReadKeyboardEvents() ) )
+	if ( FAILED( hr = ReadKeyboardEvents() ) )
 		return hr;
 
-	if ( FAILED( hr = SceneReadMouseEvents() ) )
+	if ( FAILED( hr = ReadMouseEvents() ) )
 		return hr;
 
 	if ( FAILED( hr = sD3DScenes.top()->FrameMove( fElapsedTime ) ) )
 		return hr;
 
+	if ( FAILED( hr = pD3DDevice->BeginScene() ) )
+		return hr;
+
 	if ( FAILED( hr = sD3DScenes.top()->FrameRender() ) )
+		return hr;
+
+	if ( FAILED( hr = pD3DDevice->EndScene() ) )
+		return hr;
+
+	if ( FAILED( hr = pD3DDevice->Present( NULL, NULL, NULL, NULL ) ) )
 		return hr;
 
 	if ( FAILED( hr = ChangeScene() ) )
@@ -565,23 +562,19 @@ HRESULT CD3DApp::Render3DEnvironment()
 	return S_OK;
 }
 
-//-----------------------------------------------------------------------------
-// Name:
-// Desc:
-//-----------------------------------------------------------------------------
 HRESULT CD3DApp::Reset3DEnvironment()
 {
 	HRESULT hr;
 
-	// Release all vidmem objects
+	// Zwolnij wszystkie obiekty karty w aktualnej scenie
 	if ( FAILED( hr = sD3DScenes.top()->InvalidateDeviceObjects() ) )
 		return hr;
 
-	// Reset the device
+	// Zresetuj urz¹dzenie
 	if ( FAILED( hr = pD3DDevice->Reset( &d3dpp ) ) )
 		return hr;
 
-	// Initialize the app's device-dependent objects
+	// Inicjalizuj wszystkie obiekty karty w aktualnej scenie
 	if ( FAILED( hr = sD3DScenes.top()->RestoreDeviceObjects() ) )
 		return hr;
 
@@ -620,30 +613,31 @@ HRESULT CD3DApp::InitializeKeyboardInput()
 {
     HRESULT hr;
 
-    // Obtain an interface to the system keyboard device.
+    // Pobierz interfejs klawiatury
     if( FAILED( hr = pDI->CreateDevice( GUID_SysKeyboard, &pDIKeyboard, NULL ) ) )
         return hr;
     
-    // Set the data format to "keyboard format" - a predefined data format 
+    // Ustaw format danych na predefiowany format klawiatury
     if( FAILED( hr = pDIKeyboard->SetDataFormat( &c_dfDIKeyboard ) ) )
         return hr;
     
-    // Set the cooperativity level
     if( FAILED( hr = pDIKeyboard->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND ) ) )
         return hr;
 
+	// W³¹cz buforowany odczyt z urz¹dzenia
 	DIPROPDWORD dipdw;
     dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
     dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
     dipdw.diph.dwObj        = 0;
     dipdw.diph.dwHow        = DIPH_DEVICE;
-    dipdw.dwData            = KEYBRD_BUFFER_SIZE; // Arbitary buffer size
+    dipdw.dwData            = KEYBRD_BUFFER_SIZE;
 
     if( FAILED( hr = pDIKeyboard->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
          return hr;
 
-    // Acquire the newly created device
-    pDIKeyboard->Acquire();
+    // Pobierz nowo utworzony interfejs
+	if( FAILED( hr = pDIKeyboard->Acquire() ) )
+		return hr;
 
     return S_OK;
 }
@@ -653,9 +647,11 @@ HRESULT CD3DApp::InitializeMouseInput()
 {
     HRESULT hr;
 
+	// Pobierz interfejs myszki
 	if( FAILED( hr = pDI->CreateDevice( GUID_SysMouse, &pDIMouse, NULL ) ) )
 		return hr;
 
+	// Ustaw format danych na predefiowany format myszki
 	if( FAILED( hr = pDIMouse->SetDataFormat( &c_dfDIMouse ) ) )
 		return hr;
 
@@ -665,25 +661,28 @@ HRESULT CD3DApp::InitializeMouseInput()
 	if( FAILED( hr = pDIMouse->SetEventNotification( CreateEvent(NULL, FALSE, FALSE, NULL) ) ) )
 		return hr;
 
+	// W³¹cz buforowany odczyt z urz¹dzenia
     DIPROPDWORD dipdw;
     dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
     dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
     dipdw.diph.dwObj        = 0;
     dipdw.diph.dwHow        = DIPH_DEVICE;
-    dipdw.dwData            = MOUSE_BUFFER_SIZE; // Arbitary buffer size
+    dipdw.dwData            = MOUSE_BUFFER_SIZE;
 
     if ( FAILED( hr = pDIMouse->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
         return hr;
 
-	pDIMouse->Acquire(); 
+    // Pobierz nowo utworzony interfejs
+	if( FAILED( hr = pDIMouse->Acquire() ) )
+		return hr;
 
 	return S_OK;
 }
 
 
-HRESULT CD3DApp::SceneReadMouseEvents()
+HRESULT CD3DApp::ReadMouseEvents()
 {
-	DIDEVICEOBJECTDATA didod[ MOUSE_BUFFER_SIZE ];  // Receives buffered data 
+	DIDEVICEOBJECTDATA didod[ MOUSE_BUFFER_SIZE ]; 
 	DWORD              dwElements;
 	HRESULT            hr;
 
@@ -703,9 +702,9 @@ HRESULT CD3DApp::SceneReadMouseEvents()
 }
 
 
-HRESULT CD3DApp::SceneReadKeyboardEvents()
+HRESULT CD3DApp::ReadKeyboardEvents()
 {
-	DIDEVICEOBJECTDATA didod[ KEYBRD_BUFFER_SIZE ];  // Receives buffered data 
+	DIDEVICEOBJECTDATA didod[ KEYBRD_BUFFER_SIZE ];
 	DWORD              dwElements;
 	HRESULT            hr;
 
@@ -724,7 +723,7 @@ HRESULT CD3DApp::SceneReadKeyboardEvents()
 }
 
 
-HRESULT CD3DApp::SetupScene( CD3DScene* pScene )
+HRESULT CD3DApp::StartNewScene( CD3DScene* pScene )
 {
 	HRESULT hr;
 
@@ -743,7 +742,7 @@ HRESULT CD3DApp::SetupScene( CD3DScene* pScene )
 	return S_OK;
 }
 
-HRESULT CD3DApp::EndScene()
+HRESULT CD3DApp::StartParentScene()
 {
 	HRESULT hr;
 
@@ -773,10 +772,10 @@ HRESULT CD3DApp::ChangeScene()
 	CD3DScene* pCurrentScene = sD3DScenes.top()->GetNextScene();
 
 	if (pCurrentScene == NULL)
-		return EndScene();
+		return StartParentScene();
 	
 	if (pCurrentScene != sD3DScenes.top())
-		return SetupScene( pCurrentScene );
+		return StartNewScene( pCurrentScene );
 
 	return S_OK;
 }
