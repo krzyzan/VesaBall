@@ -10,28 +10,28 @@ v0.10
 	- Wersja poczatkowa dziedziczona od CD3DApp
 
 v0.11
-	- Dodana klasa CObject
+	- Dodana klasa CSprite
 	- Dodana klasa CBall
 	- Dodana klasa CPaddle
 
 v0.12
 	- G³ówna tablica spritów jest teraz list¹ (szybko kasuje w œrodku)
-	- CObject::Draw() podzielone na Render() i FrameMove()
-	- CObject'y s¹ usuwane z listy w CD3DBallApp::FrameMove() je¿eli bDeleteMe = TRUE;
+	- CSprite::Draw() podzielone na Render() i FrameMove()
+	- CSprite'y s¹ usuwane z listy w CD3DBallApp::FrameMove() je¿eli bDeleteMe = TRUE;
 	- CBall kasuje siê gdy wyleci za dolna krawêdŸ ekranu
 	- Grafika przeniesiona do katalogu gfx
 
 v0.13
 	- Kana³ alpha w teksturach
-	- CObject::vPosition jest na œrodku obiektu (by³ w rogu)
+	- CSprite::vPosition jest na œrodku obiektu (by³ w rogu)
 	- Ruch kulek niezale¿ny od czasu
 
 v0.14
 	- Skalowanie obiektów i t³a zale¿nie od rozdzielczoœci
-	- CObject::vPosition jest typu FLOAT od 0.0f do 1.0f (!)
+	- CSprite::vPosition jest typu FLOAT od 0.0f do 1.0f (!)
 	- dodany Reset() w konstruktorze CTimer, 
 		bo inaczej nie dzia³a w konfiguracji Release u Laski (dziwne, nie???)
-	- CObject::FrameMove() jest teraz CObject::FrameMove( FLOAT fElapsedTime )
+	- CSprite::FrameMove() jest teraz CSprite::FrameMove( FLOAT fElapsedTime )
 		i wszystkie obiekty dostaj¹ wspólny czas z timerRenderLimiter
 	- Poprawne obliczanie odbiæ
 	- ZIKO: Ustawianie RotationCenter na œrodku sprita
@@ -46,7 +46,7 @@ v0.15
 	- Poczatek kodu Game Over (na razie wy³¹czony)
 
 v0.16
-	- CObject::CObject pobiera teraz Size, a nie oblicza z rozmiarów tekstury
+	- CSprite::CSprite pobiera teraz Size, a nie oblicza z rozmiarów tekstury
 	- Wspólna klasa bazowa dla ruchomych sprite'ów: CMovingSprite
 
 v0.17
@@ -92,7 +92,13 @@ v0.55
 
 v0.60
 	- Bonus: MagneticPaddle
-	- Bonus: GhostBall
+	- Bonus: ThruBrick
+
+v0.70
+	- Bonus: ShrinkPaddle, ExpandPaddle
+	- Bonus: MegaBall, SplitBall
+	- Poprawione miejsce tworzenia iskier
+
     	
 ToDo:
 	- zrobic GameOver oraz wyjœcie do menu z levelu

@@ -1,27 +1,16 @@
 #pragma once
 
-#include <list>
-using namespace std;
 #include <dinput.h>
-#include "movingobject.h"
-
-class CMenuItem;
+#include "Sprite.h"
 
 
 class CCursor :
-	public CMovingSprite
+	public CSprite
 {
 public:
-	CCursor( LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice, list<CMenuItem*>* pListMenuItem );
+	CCursor( LPDIRECT3DTEXTURE8 Texture );
 	virtual ~CCursor();
 
-	HRESULT FrameMove( FLOAT fElapsedTime );
+	HRESULT MouseMove( DIMOUSESTATE2* dims2 );
 	void Render( LPD3DXSPRITE pSprite ) const;
-
-private:
-	LPDIRECTINPUTDEVICE8	pDIDevice;
-	list<CMenuItem*>*		pListMenuItem;
-	CMenuItem*				pOldMenuItem;
-	CMenuItem*				pPressedMenuItem;
-	BOOL					bOldButtonState;
 };

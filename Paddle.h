@@ -7,28 +7,29 @@
 using namespace std;
 #include <list>
 #include <dinput.h>
-#include "MovingObject.h"
+#include "MovingSprite.h"
 
+class CBall;
 
-class CBall;		//TODO: TMP?
 
 class CPaddle : 
-	public CMovingSprite  
+	public CSprite  
 {
 public:
-	CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECTINPUTDEVICE8 DIDevice );
+	CPaddle::CPaddle( LPDIRECT3DTEXTURE8 Texture, LPDIRECT3DTEXTURE8 LightningTex );
 	virtual ~CPaddle();
 
-	HRESULT FrameMove( FLOAT fElapsedTime );
 	void Render( LPD3DXSPRITE pSprite ) const;
+	HRESULT MouseMove(DIMOUSESTATE2* dims2 );
 	
-	void LaunchBall( CBall* pBall, FLOAT speed );		//TODO: protected?
-	void CatchBall( CBall* pBall );						//TODO: protected?
+	void LaunchBall( CBall* pBall );
+	void CatchBall( CBall* pBall );
+
+	void MultiplyWidth( float fFactor );
+
+	BOOL bGrabPaddle;
 
 private:
-	LPDIRECTINPUTDEVICE8 pDIDevice;
-	CObject* pPaddleLightning;
-	FLOAT fTimeToLightningChange;
-
 	list<CBall*> listCatchedBalls;
+	CSprite* pLightning;
 };

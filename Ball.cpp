@@ -12,30 +12,22 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-list<CMovingSprite*>*	CBall::s_pListFrameMove;
-list<CObject*>*			CBall::s_pListRender;
-LPDIRECT3DTEXTURE8		CBall::s_pSparkTexture;
-
-
 CBall::CBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed )
-	: CMovingSprite( Texture, D3DXVECTOR2(1.0f/64, 1.0f/64), 0, Position, Speed, D3DXVECTOR2(0, 0), 0xFFFFFFFF )
+	: CMovingSprite( Texture, D3DXVECTOR2(AVG_BALL_SIZE, AVG_BALL_SIZE), 0, Position, Speed, D3DXVECTOR2(0, 0), 0xFFFFFFFF )
 {
+	bCatched	= false;
 }
+
 
 CBall::~CBall()
 {
 }
 
-void CBall::PrepareEnvironment( list<CObject*>* pListRender, list<CMovingSprite*>* pListFrameMove, LPDIRECT3DTEXTURE8 pSparkTexture)
-{
-	s_pListRender = pListRender;
-	s_pListFrameMove = pListFrameMove;
-	s_pSparkTexture = pSparkTexture;
-}
 
 HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 {
-	CMovingSprite::FrameMove( fElapsedTime );
+	if (!bCatched)
+		CMovingSprite::FrameMove( fElapsedTime );
 
 	// kasuj gdy wyjdzie za ekran
 	if (vPosition.y > BOARD_B + vSize.y/2 ) {
@@ -59,27 +51,38 @@ HRESULT CBall::FrameMove( FLOAT fElapsedTime )
 		vSpeed.y *= -1;
 	}
 
+	/*
 	if (vPosition.y + vSize.y/2 > BOARD_B) {
 		vPosition.y = 2*BOARD_B - vPosition.y - vSize.y;
 		vSpeed.y *= -1;
 	}
+	*/
 
 
 	return S_OK;
-}
+} 
 
 // Iskry przy odbiciu
-void CBall::StrikeSparkles( const D3DXVECTOR2 & vSide )
+void CBall::CreateSparkles( const D3DXVECTOR2 & vSide, list<CSprite*>* pListRender, list<CMovingSprite*>* pListFrameMove, LPDIRECT3DTEXTURE8 pSparkTexture )
 {
 	D3DXVECTOR2 vSparkSize		= D3DXVECTOR2(1.0f/256, 1.0f/256);
 	D3DXVECTOR2 vSparkPosition	= vPosition + vSide;
-	D3DXVECTOR2 vSparkGravity	= D3DXVECTOR2( 0.0f, 0.4f );
+	D3DXVECTOR2 vSparkGravity	= D3DXVECTOR2( 0.0f, 0.2f );
 	for (int i=0; i<8; i++) {
-			FLOAT fSparkDuration = frand(0.4f, 1.0f);
+			FLOAT fSparkDuration = frand(0.5f, 1.0f);
 			D3DXVECTOR2 vSparkSpeed = D3DXVECTOR2( frand(-1.0f, 1.0f), frand(-1.0f, 1.0f) )/10 + vSpeed/4;
-			CEffectSprite* pEffectSprite = new CEffectSprite( s_pSparkTexture, vSparkSize, 
+			CEffectSprite* pEffectSprite = new CEffectSprite( pSparkTexture, vSparkSize, 
 				vSparkPosition, vSparkSpeed, vSparkGravity, fSparkDuration, 0xFFFFFFFF );
-			s_pListFrameMove->push_back( pEffectSprite );
-			s_pListRender->push_back( pEffectSprite );
+			pListFrameMove->push_back( pEffectSprite );
+			pListRender->push_back( pEffectSprite );
 	}
+}
+
+void CBall::MultiplySpeed( float fFactor )
+{
+	float fNewSpeed = D3DXVec2Length( &vSpeed ) * fFactor;
+	fNewSpeed = max( fNewSpeed, MIN_BALL_SPEED );
+	fNewSpeed = min( fNewSpeed, MAX_BALL_SPEED );
+	D3DXVec2Normalize( &vSpeed, &vSpeed );
+	vSpeed *= fNewSpeed;
 }

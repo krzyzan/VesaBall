@@ -125,6 +125,9 @@
 				RelativePath=".\Brick.cpp">
 			</File>
 			<File
+				RelativePath=".\Counter.cpp">
+			</File>
+			<File
 				RelativePath=".\Cursor.cpp">
 			</File>
 			<File
@@ -140,6 +143,9 @@
 				RelativePath=".\EffectSprite.cpp">
 			</File>
 			<File
+				RelativePath=".\GameEditor.cpp">
+			</File>
+			<File
 				RelativePath=".\GameEngine.cpp">
 			</File>
 			<File
@@ -149,13 +155,13 @@
 				RelativePath=".\MenuItem.cpp">
 			</File>
 			<File
-				RelativePath=".\MovingObject.cpp">
-			</File>
-			<File
-				RelativePath=".\Object.cpp">
+				RelativePath=".\MovingSprite.cpp">
 			</File>
 			<File
 				RelativePath=".\Paddle.cpp">
+			</File>
+			<File
+				RelativePath=".\Sprite.cpp">
 			</File>
 			<File
 				RelativePath=".\StdAfx.cpp">
@@ -181,6 +187,9 @@
 				RelativePath=".\Brick.h">
 			</File>
 			<File
+				RelativePath=".\Counter.h">
+			</File>
+			<File
 				RelativePath=".\Cursor.h">
 			</File>
 			<File
@@ -196,6 +205,9 @@
 				RelativePath=".\EffectSprite.h">
 			</File>
 			<File
+				RelativePath=".\GameEditor.h">
+			</File>
+			<File
 				RelativePath=".\GameEngine.h">
 			</File>
 			<File
@@ -205,13 +217,13 @@
 				RelativePath=".\MenuItem.h">
 			</File>
 			<File
-				RelativePath=".\MovingObject.h">
-			</File>
-			<File
-				RelativePath=".\Object.h">
+				RelativePath=".\MovingSprite.h">
 			</File>
 			<File
 				RelativePath=".\Paddle.h">
+			</File>
+			<File
+				RelativePath=".\Sprite.h">
 			</File>
 			<File
 				RelativePath=".\StdAfx.h">

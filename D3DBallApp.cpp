@@ -33,7 +33,7 @@ HRESULT CD3DBallApp::RestoreDeviceObjects()
 HRESULT CD3DBallApp::RenderLoop()
 {
 	switch ( pScene->RenderLoop() ) {
-		case CGameMenu::START:
+		case CGameMenu::UID_START:
 			pScene->InvalidateDeviceObjects();
 			pScene->DeleteDeviceObjects();
 			SAFE_DELETE( pScene );
@@ -41,7 +41,7 @@ HRESULT CD3DBallApp::RenderLoop()
 			pScene->InitDeviceObjects();
 			pScene->RestoreDeviceObjects();
 			break;
-		case CGameMenu::QUIT:
+		case CGameMenu::UID_QUIT:
 			SendMessage( hWnd, WM_CLOSE, 0, 0 );
 			break;
 		case E_FAIL:

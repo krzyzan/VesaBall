@@ -1,9 +1,9 @@
 #pragma once
-#include "Object.h"
+#include "Sprite.h"
 
 
 class CMovingSprite :
-	public CObject
+	public CSprite
 {
 public:
 	CMovingSprite( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, float Rotation, 
@@ -16,5 +16,5 @@ public:
 
 	virtual HRESULT FrameMove( FLOAT fElapsedTime );
 
-	D3DXVECTOR2 IsColliding( CObject* pSprite );		//TODO: zmieniæ nazwê
+	D3DXVECTOR2 IsColliding( CSprite* pSprite );		//TODO: zmieniæ nazwê
 };

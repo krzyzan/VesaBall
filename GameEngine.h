@@ -1,8 +1,5 @@
 #pragma once
 
-#define BRICK_X		20
-#define BRICK_Y		30
-
 #include "D3DAppScene.h"
 #include "timer.h"
 
@@ -11,6 +8,13 @@ class CBrick;
 class CMovingSprite;
 class CPaddle;
 class CBonus;
+class CCounter;
+
+/////////////////////
+
+const int BRICK_X = 20;
+const int BRICK_Y = 25;
+const float BRICK_TABLE_H = 0.5f;
 
 class CGameEngine :
 	public CD3DAppScene
@@ -25,31 +29,52 @@ public:
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
 
-	CBall*   AddBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
-	CBrick*  AddBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size );
-	CPaddle* AddPaddle( LPDIRECT3DTEXTURE8 PaddleTex, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECT3DTEXTURE8 BallTex );
+private:
+	void AddBall( CBall* pBall );
+	void AddBrick( CBrick* pBrick );
+	void AddPaddle( CPaddle* Paddle );
+	void AddBonus( CBonus* pBonus );
+
+	void MoveObjects( FLOAT fElapsedTime );
+	void CollideObjects();
+	void RenderObjects();
+	void DestroyObjects();
+
+	void ApplyBonus( DWORD Type, bool Value );
+	void CollideBallBrick( CBall* pBall, CBrick* pBrick );
+	void CollideBallPaddle( CBall* pBall );
+	void CatchBonus( CBonus* pBonus );
 	
-protected:
+	void Reset();
+	void LoadLevel( char* strFileName );
+	void SaveLevel( char* strFileName );
+
 	LPD3DXSPRITE			pSprite;
 
+	list<CSprite*>			listRender;
 	list<CMovingSprite*>	listFrameMove;
-
-	CPaddle*				pPaddle;
 	list<CBall*>			listBall;
-	list<CBrick*>			listBrick;
+	CBrick*					pBrickTable[BRICK_X][BRICK_Y];
 	list<CBonus*>			listBonus;
+	CCounter*				pCounter; 
+	CPaddle*				pPaddle;
+
+	// TODO: poprawiæ tekstury scenerii
+	LPDIRECT3DTEXTURE8*		pBonusTextures;
+	LPDIRECT3DTEXTURE8		pSparkTex;
+	LPDIRECT3DTEXTURE8		pStatusBarTex;
+	LPDIRECT3DTEXTURE8		pWallTex;
+	LPDIRECT3DTEXTURE8		pCounterTex;
+	LPDIRECT3DTEXTURE8		pPaddleTex;
+	LPDIRECT3DTEXTURE8		pBrickTex;
+	LPDIRECT3DTEXTURE8		pLightningTex;
+	LPDIRECT3DTEXTURE8		pBallTex;
 
 	HWND					hWnd;					//TODO: TMP
 	CTimer					timerRenderLimiter;
 	FLOAT					fTimeToRender;
 	DWORD					numFrameMove, numRender;
-	
-	BOOL*					pGameStates;
-	LPDIRECT3DTEXTURE8*		pBonusTextures;
 
-
-private:
-	HRESULT MoveObjects( FLOAT fElapsedTime );
-	HRESULT RenderObjects();
-	HRESULT DestroyObjects();
+	bool					bThruBrick;
+	bool					bFallingBricks;
 };

@@ -1,5 +1,5 @@
 #pragma once
-#include "MovingObject.h"
+#include "MovingSprite.h"
 
 class CEffectSprite :
 	public CMovingSprite

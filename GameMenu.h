@@ -1,20 +1,23 @@
 #pragma once
 
+#include <list>
+using namespace std;
+
 #include "d3dappscene.h"
 
-class CMovingSprite;
 class CMenuItem;
+class CCursor;
 
 
 class CGameMenu :
 	public CD3DAppScene
 {
 public:
-	enum MSG_UID {
-		START	= 100,
-		EDITOR,
-		QUIT,
-		GAME_OVER		//TODO: TMP
+	enum UID_MSG {
+		UID_START	= 100,
+		UID_EDITOR,
+		UID_QUIT,
+		UID_GAME_OVER		//TODO: TMP
 	};
 
 	CGameMenu( LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPUTDEVICE8 DIDevice );
@@ -30,8 +33,13 @@ public:
 	HRESULT AddMenuItem( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position, D3DCOLOR Blending, HRESULT UID );
 	HRESULT AddCursor( LPDIRECT3DTEXTURE8 pTex );
 
-	LPD3DXSPRITE				pSprite;
+	LPD3DXSPRITE		pSprite;
 
-	list<CMovingSprite*>		listFrameMove;
-	list<CMenuItem*>			listMenuItem;
+	list<CSprite*>		listRender;
+	list<CMenuItem*>	listMenuItem;
+	CCursor*			pCursor;
+
+	CMenuItem*			pOldMenuItem;
+	CMenuItem*			pPressedMenuItem;
+	BOOL				bOldButtonState;
 };

@@ -1,9 +1,9 @@
-// Sprite.cpp: implementation of the CObject class.
+// Sprite.cpp: implementation of the CSprite class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "Object.h"
+#include "Sprite.h"
 
 #include "Ball.h"	//TODO: TMP
 
@@ -11,7 +11,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CObject::CObject( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
+CSprite::CSprite( const LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
 				 float Rotation, const D3DXVECTOR2 & Position, D3DCOLOR Blending )
 {
 	pTexture		= Texture;
@@ -23,11 +23,11 @@ CObject::CObject( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
 	bDeleteMe		= FALSE;
 }
 
-CObject::~CObject()
+CSprite::~CSprite()
 {
 }
 
-void CObject::SetSize( const D3DXVECTOR2 & Size )
+void CSprite::SetSize( const D3DXVECTOR2 & Size )
 {
 	vSize			= Size;
 	D3DSURFACE_DESC sd;
@@ -36,7 +36,7 @@ void CObject::SetSize( const D3DXVECTOR2 & Size )
 	vRotationCenter = vSize * RES_X / 2;
 }
 
-void CObject::Render( LPD3DXSPRITE pSprite ) const
+void CSprite::Render( LPD3DXSPRITE pSprite ) const
 {
 	D3DXVECTOR2 Position = (vPosition - vSize/2);
 	if (vScaling.x < 0) Position.x += vSize.x;

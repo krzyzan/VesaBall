@@ -19,8 +19,8 @@ CD3DAppScene::~CD3DAppScene()
 
 HRESULT CD3DAppScene::LoadTexture( char* strFileName, LPDIRECT3DTEXTURE8* pTex )
 {
-    D3DXCreateTextureFromFile( pd3dDevice, strFileName, pTex );
 	// TODO: zrobiæ obs³uge b³êdów
+    D3DXCreateTextureFromFile( pd3dDevice, strFileName, pTex );
 	vtrTexture.push_back( *pTex );
 
 	return S_OK;

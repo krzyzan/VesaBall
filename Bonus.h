@@ -1,5 +1,5 @@
 #pragma once
-#include "movingobject.h"
+#include "MovingSprite.h"
 
 #include <list>
 using namespace std;
@@ -11,20 +11,38 @@ class CBonus :
 public:
 	enum TYPE
 	{
-		GhostBall,
-		MagneticPaddle,
-		//FireBall,
+		ThruBrick,
+		SetOffExploding,
+		FireBall,
+		ShootingPaddle,
+		GrabPaddle,
+
+		ExtraLife,
+		LevelWarp,
+		ZapBricks,
+		SlowBall,
+		ExpandExploding,
+	
+		KillPaddle,
+		ShrinkBall,
+		FastBall,
+		SuperShrink,
+		FallingBricks,
+
+		ExpandPaddle,
+		ShrinkPaddle,
+		SplitBall,
+		MegaBall,
+		EightBall,
+
 		MAX_TYPE
 	};
 
-	CBonus( TYPE Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
+	CBonus( DWORD Type, const LPDIRECT3DTEXTURE8* pBonusTextures, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
 	virtual ~CBonus();
 
 	HRESULT FrameMove( FLOAT fElapsedTime );
-
-	static void PrepareEnvironment( LPDIRECT3DTEXTURE8* pTexture);
-
-	TYPE	eType;
+	DWORD	dwType;
 
 protected:
 	static LPDIRECT3DTEXTURE8*		s_pTextures;
