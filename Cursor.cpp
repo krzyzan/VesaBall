@@ -11,6 +11,7 @@ CCursor::CCursor( LPDIRECT3DTEXTURE8 Texture, LPDIRECTINPUTDEVICE8 DIDevice, lis
 	pListMenuItem = ListMenuItem;
 	pDIDevice = DIDevice;
 	pOldMenuItem = NULL;
+	pPressedMenuItem = NULL;
 	bOldButtonState = false;
 }
 
@@ -35,44 +36,49 @@ HRESULT CCursor::FrameMove( FLOAT fElapsedTime )
 	D3DXVec2Maximize( &vPosition, &vPosition, &D3DXVECTOR2( 0.00f, 0.00f ) );
 	D3DXVec2Minimize( &vPosition, &vPosition, &D3DXVECTOR2( 1.00f, 0.75f ) );
 
-	//TODO: Przegl¹dnaæ
+	CMenuItem* pCurMenuItem; 
+	
+	if ( pPressedMenuItem ) {
+		if (fabs(pPressedMenuItem->vPosition.y - vPosition.y) < pPressedMenuItem->vSize.y/2 &&
+				fabs(pPressedMenuItem->vPosition.x - vPosition.x) < pPressedMenuItem->vSize.x/2 )
+			pCurMenuItem = pPressedMenuItem;
+		else {
+			pCurMenuItem = NULL;
+		}
+	}
+	else {
+		list<CMenuItem*>::iterator iMenuItem;
+		for (iMenuItem = pListMenuItem->begin(); iMenuItem != pListMenuItem->end(); iMenuItem++)
+			if (fabs((*iMenuItem)->vPosition.y - vPosition.y) < (*iMenuItem)->vSize.y/2 &&
+				fabs((*iMenuItem)->vPosition.x - vPosition.x) < (*iMenuItem)->vSize.x/2 )
+					break;
+		pCurMenuItem = (iMenuItem != pListMenuItem->end()) ? *iMenuItem : NULL;
+	}
 
-
-	list<CMenuItem*>::iterator iMenuItem;
-	for (iMenuItem = pListMenuItem->begin(); iMenuItem != pListMenuItem->end(); iMenuItem++)
-		if (fabs((*iMenuItem)->vPosition.y - vPosition.y) < (*iMenuItem)->vSize.y/2 &&
-			fabs((*iMenuItem)->vPosition.x - vPosition.x) < (*iMenuItem)->vSize.x/2 )
-				break;
-
-	CMenuItem* pCurMenuItem = (iMenuItem != pListMenuItem->end()) ? *iMenuItem : NULL;
 	BOOL bCurButtonState = dims2.rgbButtons[0];
 
-	BOOL bButtonPressed = ( !bOldButtonState &&  bCurButtonState );
-	BOOL bButtonReleased = ( bOldButtonState && !bCurButtonState );
 
 	if (pCurMenuItem != pOldMenuItem) {
 		if (pOldMenuItem)
-			pOldMenuItem->dwBlending &= 0xFFFFCC00;
+			pOldMenuItem->SetHighlighted( false );
 		if (pCurMenuItem)
-			pCurMenuItem->dwBlending |= ~0xFFFFCC00;
+			pCurMenuItem->SetHighlighted( true );
 	}
 
-	if (pOldMenuItem && bButtonPressed ) {
-		pOldMenuItem->Press();
-		pPressedMenuItem = pPressedMenuItem;
+	// przycisk wcisniety
+	if (pCurMenuItem && !bOldButtonState &&  bCurButtonState ) {
+		pPressedMenuItem = pCurMenuItem; 
+		pPressedMenuItem->SetPressed( true );
 	}
 
-	if (pOldMenuItem && bButtonReleased ) {
-		pOldMenuItem->Release();
+	// przycisk puszczony
+	if (pPressedMenuItem && bOldButtonState && !bCurButtonState ) {
+		pPressedMenuItem->SetPressed( false );
+		if (pCurMenuItem == pPressedMenuItem)
+			return pCurMenuItem->GetUID();
+		pPressedMenuItem = NULL;
 	}
 
-	/*
-	if (pOldMenuItem && pCurMenuItem != pOldMenuItem && dims2.rgbButtons[0]) {
-		pOldMenuItem->Release();
-	}
-	*/
-
-	//return pOldMenuItem->dwUID;
 	pOldMenuItem = pCurMenuItem;
 	bOldButtonState = bCurButtonState;
 

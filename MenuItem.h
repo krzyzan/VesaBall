@@ -1,6 +1,9 @@
 #pragma once
 #include "sprite.h"
 
+#define SHADOW_DISTANCE D3DXVECTOR2(0.005f, 0.005f)
+
+
 class CMenuItem :
 	public CSprite
 {
@@ -10,12 +13,12 @@ public:
 	virtual ~CMenuItem();
 
 	void Render( LPD3DXSPRITE pSprite ) const;
-	void Press();
-	void Release();
-
-	HRESULT dwUID;
-	BOOL bPressed;
+	
+	void SetPressed( BOOL bPressed );
+	void SetHighlighted( BOOL bHighlighted );
+	HRESULT GetUID() const { return dwUID; }
 
 private:
 	CSprite* pShadow;
+	HRESULT dwUID;
 };

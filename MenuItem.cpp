@@ -6,11 +6,10 @@ CMenuItem::CMenuItem( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
 	: CSprite( Texture, Size, 0, Position, Blending )
 {
 	dwUID = UID;
-	bPressed = false;
 
 	pShadow = new CSprite( *this );
 	pShadow->dwBlending = 0x2F000000;
-	pShadow->vPosition += D3DXVECTOR2(0.005f, 0.005f);
+	pShadow->vPosition += SHADOW_DISTANCE;
 }
 
 CMenuItem::~CMenuItem()
@@ -24,20 +23,18 @@ void CMenuItem::Render( LPD3DXSPRITE pSprite ) const
 	CSprite::Render( pSprite );
 }
 
-void CMenuItem::Press()
-{
-	if (!bPressed)
-	{
-		bPressed = true;
-		vPosition += D3DXVECTOR2(0.002f, 0.002f);
-	}
-}
-
-void CMenuItem::Release()
+void CMenuItem::SetPressed( BOOL bPressed )
 {
 	if (bPressed)
-	{
-		bPressed = false;
-		vPosition -= D3DXVECTOR2(0.002f, 0.002f);
-	}
+		vPosition += SHADOW_DISTANCE/2;
+	else
+		vPosition -= SHADOW_DISTANCE/2;
+}
+
+void CMenuItem::SetHighlighted( BOOL bHighlighted )
+{
+	if (bHighlighted)
+		dwBlending |= ~0xFFFFCC00;
+	else
+		dwBlending &=  0xFFFFCC00;
 }

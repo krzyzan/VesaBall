@@ -87,6 +87,17 @@ HRESULT CGameMenu::AddMenuItem( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Siz
 	return S_OK;
 }
 
+
+HRESULT CGameMenu::AddMenuTitle( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, 
+	const D3DXVECTOR2 & Position, D3DCOLOR Blending )
+{
+	CMenuItem* pMenuItem = new CMenuItem( pTex, Size, Position, Blending, 0 );
+	listRender.push_back( pMenuItem );
+
+	return S_OK;
+}
+
+
 HRESULT CGameMenu::AddCursor( LPDIRECT3DTEXTURE8 pTex )
 {
 	CCursor* pCursor = new CCursor( pTex, pDIDevice, &listMenuItem );
@@ -95,16 +106,6 @@ HRESULT CGameMenu::AddCursor( LPDIRECT3DTEXTURE8 pTex )
 
 	return S_OK;
 }
-
-HRESULT CGameMenu::AddMenuTitle( LPDIRECT3DTEXTURE8 pTex, const D3DXVECTOR2 & Size, 
-	const D3DXVECTOR2 & Position, D3DCOLOR Blending )
-{
-	CSprite* pSprite = new CSprite(	pTex, Size, 0, Position, Blending );
-	listRender.push_back( pSprite );
-
-	return S_OK;
-}
-
 
 CGameMenu::~CGameMenu()
 {
