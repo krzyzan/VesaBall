@@ -6,8 +6,8 @@
 #pragma once
 
 // Global defines
-#define RES_X		640
-#define RES_Y		480
+#define RES_X		1024
+#define RES_Y		768
 
 // TODO: reference additional headers your program requires here
 

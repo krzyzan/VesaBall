@@ -21,8 +21,10 @@ public:
 	virtual void Render( LPD3DXSPRITE pSprite ) const;
 	virtual void BallHits( CBall* pBall, const D3DXVECTOR2 & vSide );
 
+	void SetSize( const D3DXVECTOR2 & Size );
+
 	LPDIRECT3DTEXTURE8	pTexture;
-	D3DXVECTOR2			vScaling;
+	D3DXVECTOR2			vScaling;			//TODO: private?
 	D3DXVECTOR2			vRotationCenter;
 	FLOAT				fRotation;
 	D3DXVECTOR2			vPosition;

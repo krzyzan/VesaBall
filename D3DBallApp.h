@@ -1,5 +1,5 @@
 // D3DBallApp.h: interface for the CD3DBallApp class.
-// v0.40
+// v0.45
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -75,11 +75,19 @@ v0.40
 	- Klasa CMenuItem, CCursor
 	- Menu gry
 	- Przepisanie kodu obliczaj¹cego zderzenia obiektów (potrzebne do klasy CBonus)
+	- Start kulki z deski
+	- £apanie kulek za pomoc¹ deski
+
+v0.45
+	- CMenuItem: wciskanie, cienie
+	- Poprawione tekstury
+	- Wy³adowania elektryczne przy ³apaniu kulek
+	- Czyszczenie kodu
+
     	
 ToDo:
 	- Zrobic start pi³ki z deski
 	- Wywaliæ niepotrzebne argumenty z konstruktorów
-	- Zrobiæ porz¹dek ze sta³ymi jak 0.75
 	- zmieniæ listy na vectory
 	- Zrobiæ porzadek z destruktorami ( wykasowaæ niepotrzebne, wszystkie musz¹ byæ virtual )
 	- Rzeczy niezwi¹zane z ruchem (np. blending, efekty) wrzucic do Render
@@ -107,7 +115,7 @@ class CD3DAppScene;
 class CD3DBallApp :
 	public CD3DApp  
 {
-	enum UID_SCENE_RESULT {
+	enum MSG_UID {
 		MENU_START	= 100,
 		MENU_EDITOR,
 		MENU_QUIT,
@@ -127,7 +135,6 @@ public:
 protected:
 	HRESULT CreateMenu();
 	HRESULT CreateLevel();
-	HRESULT EndScene();
 
 	CD3DAppScene*	pScene;
 };

@@ -33,11 +33,8 @@ HRESULT CCursor::FrameMove( FLOAT fElapsedTime )
 	//	return;
 	vPosition += vMovement * 0.002f;
 
-	if (vPosition.x < 0.00f) vPosition.x = 0.00f;
-	if (vPosition.x > 1.00f) vPosition.x = 1.00f;
-	if (vPosition.y < 0.00f) vPosition.y = 0.00f;
-	if (vPosition.y > 0.75f) vPosition.y = 0.75f;
-
+	D3DXVec2Maximize( &vPosition, &vPosition, &D3DXVECTOR2(0.00f,0.00f ) );
+	D3DXVec2Minimize( &vPosition, &vPosition, &D3DXVECTOR2(1.00f,0.75f ) );
 
 	//TODO: Przegl¹dnaæ
 	list<CMenuItem*>::iterator iMenuItem;
@@ -49,8 +46,13 @@ HRESULT CCursor::FrameMove( FLOAT fElapsedTime )
 		{
 			pMenuItem->dwBlending |= ~0xFFFFCC00;
 
-			if (dims2.rgbButtons[0]) 
-				return pMenuItem->dwUID;
+			if (dims2.rgbButtons[0]) {
+				pMenuItem->Press();
+			}
+			else
+				if (pMenuItem->bPressed)
+					return pMenuItem->dwUID;
+
 		}
 		else
 			pMenuItem->dwBlending &=  0xFFFFCC00;

@@ -21,9 +21,11 @@ public:
 	void StrikeSparkles( const D3DXVECTOR2 & vPositionFromCenter );
 	D3DXVECTOR2 IsColliding( CSprite* pSprite );
 
+	list<CMovingSprite*>*	pListFrameMove;		//TODO: protected
+
+
 protected:
 	list<CSprite*>*			pListRender;
-	list<CMovingSprite*>*	pListFrameMove;
 	list<CSprite*>*			pListObst;
 	LPDIRECT3DTEXTURE8		pSparkTexture;
 };

@@ -9,5 +9,12 @@ public:
 		const D3DXVECTOR2 & Position, D3DCOLOR Blending, HRESULT UID );
 	virtual ~CMenuItem();
 
+	void Press();
+	void Render( LPD3DXSPRITE pSprite ) const;
+
 	HRESULT dwUID;
+	BOOL bPressed;
+
+private:
+	CSprite* pShadow;
 };

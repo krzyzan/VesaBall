@@ -20,6 +20,7 @@ CLevel::CLevel( /*TODO: TMP*/HWND wnd, LPDIRECT3DDEVICE8 d3dDevice, LPDIRECTINPU
 
 CLevel::~CLevel()
 {
+	/*
 	char str[100] = "FrameMove() / Render(): ";
 	char* p = str + strlen(str);
 	_gcvt(((FLOAT)numFrameMove)/numRender, 4, p);
@@ -29,6 +30,7 @@ CLevel::~CLevel()
 	_gcvt(numRender/timerRenderLimiter.GetTime(), 4, p);
 
 	MessageBox( hWnd, str, "Internal counters", MB_OK );
+	*/
 }
 
 
@@ -61,10 +63,6 @@ HRESULT CLevel::RenderLoop()
 	MoveObjects( fElapsedTime );
 	
 	DestroyObjects();
-
-	// GAME OVER !!!!
-	if (listBall.empty())
-		return E_FAIL;
 
 ///////////////////////////////////////
 	
@@ -121,7 +119,6 @@ HRESULT CLevel::DestroyObjects()
 	list<CMovingSprite*>::iterator	iMovingSprite;
 	list<CSprite*>::iterator		iSprite;
 	list<CSprite*>::iterator		iBallObst;
-	list<CBall*>::iterator			iBall;
 
 	// Kasujemy z listy przeszkód dla kulek
 	iBallObst = listBallObst.begin(); 
@@ -139,15 +136,6 @@ HRESULT CLevel::DestroyObjects()
 			iMovingSprite = listFrameMove.erase( iMovingSprite );
 		else
 			iMovingSprite++;
-	}
-
-	// Kasujemy z listy kulek
-	iBall = listBall.begin(); 
-	while (iBall != listBall.end()) {
-		if ((*iBall)->bDeleteMe)
-			iBall = listBall.erase( iBall );
-		else
-			iBall++;
 	}
 
 	// Kasujemy z listy renderowania
@@ -184,33 +172,35 @@ HRESULT CLevel::RenderObjects()
 }
 
 
-HRESULT CLevel::AddBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, LPDIRECT3DTEXTURE8 SparkTexture )
+CBall* CLevel::AddBall( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, LPDIRECT3DTEXTURE8 SparkTexture )
 {
 	CBall* pBall = new CBall( Texture, Position, Speed, &listBallObst,  &listRender, &listFrameMove, SparkTexture );
 	listRender.push_back( pBall );
 	listFrameMove.push_back( pBall );
-	listBall.push_back( pBall );
 
-	return S_OK;
+	return pBall;
 }
 
 
-HRESULT CLevel::AddBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size )
+CBrick* CLevel::AddBrick( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size )
 {
 	CBrick* pBrick = new CBrick( Texture, Position, Size, &listRender, &listFrameMove );
 	listRender.push_back( pBrick );
 	listBallObst.push_back( pBrick );
 
-	return S_OK;
+	return pBrick;
 }
 
-
-HRESULT CLevel::AddPaddle( LPDIRECT3DTEXTURE8 Texture )
+CPaddle* CLevel::AddPaddle( LPDIRECT3DTEXTURE8 PaddleTex, LPDIRECT3DTEXTURE8 LightningTex, LPDIRECT3DTEXTURE8 BallTex, LPDIRECT3DTEXTURE8 SparkleTex )
 {
-	CPaddle* pPaddle = new CPaddle( Texture, pDIDevice );
+	CPaddle* pPaddle = new CPaddle( PaddleTex, LightningTex, pDIDevice );
+	CBall* pBall = AddBall( BallTex, pPaddle->vPosition + D3DXVECTOR2(0.01f, 0), D3DXVECTOR2(), SparkleTex );
+	pBall->vPosition.y = pPaddle->vPosition.y - pPaddle->vSize.y/2 - pBall->vSize.y/2;	//TODO: TMP
+	pPaddle->CatchBall( pBall );
+
 	listRender.push_back( pPaddle );
 	listFrameMove.push_back( pPaddle );
 	listBallObst.push_back( pPaddle );
 
-	return S_OK;
+	return pPaddle;
 }
