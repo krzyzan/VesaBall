@@ -1,5 +1,5 @@
 // D3DBallApp.cpp: implementation of the CD3DBallApp class.
-// v1.13
+// v1.14
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -13,9 +13,6 @@ CD3DBallApp::CD3DBallApp( HINSTANCE hInstance )
 {	
 	numFrameMove	= 0;
 	numRender		= 0;
-
-	RenderingTimer.Reset();
-	RenderingTimer.Start();
 }
 
 CD3DBallApp::~CD3DBallApp()
@@ -43,10 +40,13 @@ HRESULT CD3DBallApp::InitDeviceObjects()
 	for (int i=0; i<10; i++)
 		for (int j=0; j<10; j++) {
 			sprite = new CBall( pTex[1], 
-				D3DXVECTOR2(FLOAT(rand()%(RES_X-32))+16, FLOAT(rand()%(RES_X-32))+16),
+				D3DXVECTOR2( FLOAT((rand()%1000-200)+100)/1000, FLOAT((rand()%750-200)+100)/1000 ),
 				deck );
 			listSprite.push_back( sprite );
 		}
+
+	timerRender.Start();
+	timerFrameMove.Start();
 
 	return S_OK;
 }
@@ -54,32 +54,30 @@ HRESULT CD3DBallApp::InitDeviceObjects()
 
 HRESULT CD3DBallApp::Render()
 {
-	if(  RenderingTimer.GetAppTime() > 1.0f/120 ) {
+	if (timerRender.GetAppTime() < 1.0f/120) 
+		return S_OK;
 
-		numRender++;
-		//pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
+	numRender++;
+	//pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
 
-		pd3dDevice->BeginScene();
-		pSprite->Begin();
+	pd3dDevice->BeginScene();
+	pSprite->Begin();
 
-	//temp
+//temp
+	pSprite->Draw( pTex[4], NULL, &D3DXVECTOR2((FLOAT)RES_X/1024, (FLOAT)RES_Y/512), NULL, 0, NULL, 0xFF7F7F7F );
+//koniec temp
 
-		pSprite->Draw( pTex[4], NULL, &D3DXVECTOR2(1.0f, 1.5f), NULL, 0, NULL, 0xFF7F7F7F );
-	//koniec temp
 
+	list<CSprite*>::iterator iSprite;
+	for (iSprite = listSprite.begin(); iSprite != listSprite.end(); iSprite++)
+		(*iSprite)->Render( pSprite );
 
-		list<CSprite*>::iterator iSprite;
-		for (iSprite = listSprite.begin(); iSprite != listSprite.end(); iSprite++)
-			(*iSprite)->Render( pSprite );
+	pSprite->End();
+	pd3dDevice->EndScene();
 
-		pSprite->End();
-		pd3dDevice->EndScene();
-
-		// Show the frame on the primary surface.
-		pd3dDevice->Present( NULL, NULL, NULL, NULL );
-		RenderingTimer.Reset();
-
-	}
+	// Show the frame on the primary surface.
+	pd3dDevice->Present( NULL, NULL, NULL, NULL );
+	timerRender.Reset();
 
 	return S_OK;
 }
@@ -87,11 +85,12 @@ HRESULT CD3DBallApp::Render()
 
 HRESULT CD3DBallApp::FrameMove()
 {
+	FLOAT fElapsedTime = timerFrameMove.GetElapsedTime();
 	numFrameMove++;
 
 	list<CSprite*>::iterator iSprite;
 	for (iSprite = listSprite.begin(); iSprite != listSprite.end(); iSprite++)
-		(*iSprite)->FrameMove();
+		(*iSprite)->FrameMove( fElapsedTime );
 
 	// Kasujemy sprite'y
 	for (iSprite = listSprite.begin(); iSprite != listSprite.end(); iSprite++)

@@ -14,7 +14,7 @@ public:
 	CDeck::CDeck( LPDIRECT3DTEXTURE8 iTexture, LPDIRECTINPUTDEVICE8 ipDIDevice );
 	virtual ~CDeck();
 
-	virtual void FrameMove();
+	virtual void FrameMove( FLOAT fElapsedTime );
 
 private:
 	LPDIRECTINPUTDEVICE8	pDIDevice;

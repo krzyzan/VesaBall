@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////
 
 CDeck::CDeck( LPDIRECT3DTEXTURE8 iTexture, LPDIRECTINPUTDEVICE8 ipDIDevice )
- : CSprite( iTexture, D3DXVECTOR2(1,1), D3DXVECTOR2(0,0), 0, D3DXVECTOR2(RES_X/2, RES_Y-DECK_UP), 0xFFFFFFFF)
+ : CSprite( iTexture, D3DXVECTOR2(1,1), D3DXVECTOR2(0,0), 0, D3DXVECTOR2(0.5f, DECK_Y), 0xFFFFFFFF)
 {
 	pDIDevice = ipDIDevice;
 }
@@ -19,7 +19,7 @@ CDeck::~CDeck()
 
 }
 
-void CDeck::FrameMove()
+void CDeck::FrameMove( FLOAT fElapsedTime )
 {
 	DIMOUSESTATE2 dims2;
 
@@ -28,8 +28,8 @@ void CDeck::FrameMove()
   	if ( NULL == pDIDevice->GetDeviceState( sizeof(DIMOUSESTATE2), &dims2 ))
 		pDIDevice->Acquire();
 
-	vPosition.x	+= dims2.lX*2;
+	vPosition.x	+= (FLOAT)dims2.lX * 1.5f / RES_X;
 
-	if (vPosition.x < 0		+ vTexSize.x/2) vPosition.x = 0		+ vTexSize.x/2;
-	if (vPosition.x > RES_X	- vTexSize.x/2) vPosition.x = RES_X	- vTexSize.x/2;
+	if (vPosition.x < 0.0f + vSize.x/2) vPosition.x = 0.0f + vSize.x/2;
+	if (vPosition.x > 1.0f - vSize.x/2) vPosition.x = 1.0f - vSize.x/2;
 }

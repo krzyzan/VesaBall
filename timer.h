@@ -20,80 +20,81 @@
 class CTimer
 {
 private:
-	BOOL	 m_bUsingQPF;
-	LONGLONG m_llQPFTicksPerSec;
-	LONGLONG m_llStopTime;
-	LONGLONG m_llLastElapsedTime;
-	LONGLONG m_llBaseTime;
+	BOOL	 bUsingQPF;
+	LONGLONG llQPFTicksPerSec;
+	LONGLONG llStopTime;
+	LONGLONG llLastElapsedTime;
+	LONGLONG llBaseTime;
 
 public:
 	CTimer()
 	{
-		m_llQPFTicksPerSec	= 0;
+		llQPFTicksPerSec	= 0;
 		LARGE_INTEGER qwTicksPerSec;
 		QueryPerformanceFrequency( &qwTicksPerSec );
-		m_llQPFTicksPerSec = qwTicksPerSec.QuadPart;
+		llQPFTicksPerSec = qwTicksPerSec.QuadPart;
+		Reset();
 	}
 
 	FLOAT GetElapsedTime()
 	{
 		LARGE_INTEGER qwTime;
-		if ( m_llStopTime != 0) qwTime.QuadPart = m_llStopTime;
+		if ( llStopTime != 0) qwTime.QuadPart = llStopTime;
 		else QueryPerformanceCounter( &qwTime );
-		double fElapsedTime = (double) ( qwTime.QuadPart - m_llLastElapsedTime ) / (double) m_llQPFTicksPerSec;
-		m_llLastElapsedTime = qwTime.QuadPart;
+		double fElapsedTime = (double) ( qwTime.QuadPart - llLastElapsedTime ) / (double) llQPFTicksPerSec;
+		llLastElapsedTime = qwTime.QuadPart;
 		return (FLOAT) fElapsedTime;
 	}
 
 	FLOAT GetAppTime()
 	{
 		LARGE_INTEGER qwTime;
-		if ( m_llStopTime != 0) qwTime.QuadPart = m_llStopTime;
+		if ( llStopTime != 0) qwTime.QuadPart = llStopTime;
 		else QueryPerformanceCounter( &qwTime );
-		double fAppTime = (double) ( qwTime.QuadPart - m_llBaseTime ) / (double) m_llQPFTicksPerSec;
+		double fAppTime = (double) ( qwTime.QuadPart - llBaseTime ) / (double) llQPFTicksPerSec;
 		return (FLOAT) fAppTime;
 	}
 
 	void Reset()
 	{
 		LARGE_INTEGER qwTime;
-		if ( m_llStopTime != 0) qwTime.QuadPart = m_llStopTime;
+		if ( llStopTime != 0) qwTime.QuadPart = llStopTime;
 		else QueryPerformanceCounter( &qwTime );
-		m_llBaseTime		= qwTime.QuadPart;
-		m_llLastElapsedTime = qwTime.QuadPart;
+		llBaseTime		= qwTime.QuadPart;
+		llLastElapsedTime = qwTime.QuadPart;
 	}
 
 	void Start()
 	{
 		LARGE_INTEGER qwTime;
 		QueryPerformanceCounter( &qwTime );
-		m_llBaseTime += qwTime.QuadPart - m_llStopTime;
-		m_llStopTime = 0;
-		m_llLastElapsedTime = qwTime.QuadPart;
+		llBaseTime += qwTime.QuadPart - llStopTime;
+		llStopTime = 0;
+		llLastElapsedTime = qwTime.QuadPart;
 	}
 
 	void Stop()
 	{
 		LARGE_INTEGER qwTime;
-		if ( m_llStopTime != 0) qwTime.QuadPart = m_llStopTime;
+		if ( llStopTime != 0) qwTime.QuadPart = llStopTime;
 		else QueryPerformanceCounter( &qwTime );
-		m_llStopTime = qwTime.QuadPart;
-		m_llLastElapsedTime = qwTime.QuadPart;
+		llStopTime = qwTime.QuadPart;
+		llLastElapsedTime = qwTime.QuadPart;
 	}
 
 	void TimerAdvance()
 	{
 		LARGE_INTEGER qwTime;
-		if ( m_llStopTime != 0) qwTime.QuadPart = m_llStopTime;
+		if ( llStopTime != 0) qwTime.QuadPart = llStopTime;
 		else QueryPerformanceCounter( &qwTime );
-		m_llStopTime += m_llQPFTicksPerSec/10;
+		llStopTime += llQPFTicksPerSec/10;
 	}
 
 	FLOAT GetAbsoluteTime()
 	{
 		LARGE_INTEGER qwTime;
 		QueryPerformanceCounter( &qwTime );
-		double fTime = qwTime.QuadPart / (double) m_llQPFTicksPerSec;
+		double fTime = qwTime.QuadPart / (double) llQPFTicksPerSec;
 		return (FLOAT) fTime;
 	}
 };

@@ -16,7 +16,7 @@ public:
 	virtual ~CSprite();
 
 	virtual void Render( LPD3DXSPRITE pSprite );
-	virtual void FrameMove() = 0;
+	virtual void FrameMove( FLOAT fElapsedTime ) = 0;
 
 	LPDIRECT3DTEXTURE8	pTexture;
 	D3DXVECTOR2			vScaling;
@@ -27,5 +27,5 @@ public:
 
 	BOOL				bDeleteMe;
 
-	D3DXVECTOR2			vTexSize;
+	D3DXVECTOR2			vSize;
 };

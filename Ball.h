@@ -6,7 +6,6 @@
 
 #include "Sprite.h"
 #include "Deck.h"
-#include "timer.h"	//TMP
 
 class CBall : public CSprite  
 {
@@ -14,10 +13,9 @@ public:
 	CBall( LPDIRECT3DTEXTURE8 iTexture, D3DXVECTOR2 iPosition, CDeck* ipDeck );
 	virtual ~CBall();
 
-	void FrameMove();
+	void FrameMove( FLOAT fElapsedTime );
 
 protected:
-	D3DXVECTOR2 vDirection;
-	CDeck* pDeck;
-	CTimer		Timer; //TMP
+	D3DXVECTOR2	vDirection;
+	CDeck*		pDeck;
 };
