@@ -6,15 +6,19 @@
 #include "gameengine.h"
 #include "gameeditor.h"
 
-CGameMenu::CGameMenu( LPDIRECT3DDEVICE8 d3dDevice )
-	: CD3DScene( d3dDevice )
+CGameMenu::CGameMenu()
 {
 	pSprite		= NULL;
 	pCursor		= NULL;
 
-	pPressedMenuItem = NULL;
-	pClickedMenuItem = NULL;
+	pPressedItem = NULL;
 }
+
+
+CGameMenu::~CGameMenu()
+{
+}
+
 
 HRESULT CGameMenu::InitDeviceObjects()
 {
@@ -44,8 +48,8 @@ HRESULT CGameMenu::InitDeviceObjects()
 	pCursor = new CCursor( pTex );
 	listRender.push_back( pCursor );
 
-	pCurMenuItem = GetPointedMenuItem();
-	if (pCurMenuItem) pCurMenuItem->SetHighlighted( true );
+	pCurrentItem = GetPointedMenuItem();
+	if (pCurrentItem) pCurrentItem->SetHighlighted( true );
 
 	return S_OK;
 }
@@ -86,32 +90,43 @@ HRESULT CGameMenu::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
     {
         case DIMOFS_X:
 		case DIMOFS_Y:
-			pOldMenuItem = pCurMenuItem;
-			pCurMenuItem = GetPointedMenuItem();
-			if (pPressedMenuItem && pCurMenuItem != pPressedMenuItem)
-				pCurMenuItem = NULL;
-			if (pCurMenuItem != pOldMenuItem) {
+			pOldMenuItem = pCurrentItem;
+			pCurrentItem = GetPointedMenuItem();
+			if (pPressedItem && pCurrentItem != pPressedItem)
+				pCurrentItem = NULL;
+			if (pCurrentItem != pOldMenuItem) {
 				if (pOldMenuItem)
 					pOldMenuItem->SetHighlighted( false );
-				if (pCurMenuItem)
-					pCurMenuItem->SetHighlighted( true );
+				if (pCurrentItem)
+					pCurrentItem->SetHighlighted( true );
 			}
             break;
 	
 
         case DIMOFS_BUTTON0:
 			if (didod->dwData & 0x80) {		// przycisk nacisniety
-					if ( pCurMenuItem ) {
-					pPressedMenuItem = pCurMenuItem; 
-					pPressedMenuItem->SetPressed( true );
+					if ( pCurrentItem ) {
+					pPressedItem = pCurrentItem; 
+					pPressedItem->SetPressed( true );
 				}
 			}
 			else {
-				if (pPressedMenuItem ) {		// przycisk puszczony
-					pPressedMenuItem->SetPressed( false );
-					if (pCurMenuItem == pPressedMenuItem)
-						pClickedMenuItem = pCurMenuItem;
-					pPressedMenuItem = NULL;
+				if (pPressedItem ) {		// przycisk puszczony
+					if (pCurrentItem == pPressedItem) {
+						switch (pCurrentItem->GetUID()) {
+							case UID_START:
+								SetCurrentScene( new CGameEngine() );
+								break;
+							case UID_EDITOR:
+								SetCurrentScene( new CGameEditor() );
+								break;
+							case UID_QUIT:
+								SetCurrentScene( NULL );
+								break;
+						}
+					}
+					pPressedItem->SetPressed( false );
+					pPressedItem = NULL;
 				}
 			}
 			break;
@@ -123,6 +138,9 @@ HRESULT CGameMenu::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
 
 HRESULT CGameMenu::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
 {
+	if (didod->dwOfs == DIK_ESCAPE && (didod->dwData & 0x80) )
+		SetCurrentScene( NULL );
+
 	return S_OK;
 }
 
@@ -146,28 +164,10 @@ HRESULT CGameMenu::FrameRender()
 	pSprite->End();
 	pD3DDevice->EndScene();
 	
+	// Show the frame on the primary surface.
+	pD3DDevice->Present( NULL, NULL, NULL, NULL );
+
 	return S_OK;
-}
-
-CD3DScene* CGameMenu::GetNextScene()
-{
-	CD3DScene* pScene = this;
-	if (pClickedMenuItem) {
-		switch (pClickedMenuItem->GetUID()) {
-			case UID_START:
-				pScene = new CGameEngine( pD3DDevice );
-				break;
-			case UID_EDITOR:
-				pScene = new CGameEditor( pD3DDevice );
-				break;
-			case UID_QUIT:
-				pScene = NULL;
-				break;
-		}
-		pClickedMenuItem = NULL;
-	}
-
-	return pScene;
 }
 
 
@@ -187,9 +187,4 @@ HRESULT CGameMenu::DeleteDeviceObjects()
 		delete (*iSprite++);
 
 	return S_OK;
-}
-
-
-CGameMenu::~CGameMenu()
-{
 }

@@ -7,8 +7,8 @@ class CGameBoard :
 	public CD3DScene
 {
 public:
-	CGameBoard( LPDIRECT3DDEVICE8 d3dDevice );
-	virtual ~CGameBoard(void);
+	CGameBoard();
+	virtual ~CGameBoard();
 
 	HRESULT InitDeviceObjects();
 	HRESULT RestoreDeviceObjects();
@@ -19,15 +19,10 @@ public:
 
 	HRESULT FrameRender();
 
-	CD3DScene* GetNextScene();
-	
 protected:
 	LPD3DXSPRITE		pSprite;
 	
 	list<CSprite*>		listSprite;
 	CBrickArray*		pBrickArray;
 	DWORD				dwLevelNum;
-
-private:
-	bool		bQuit;
 };

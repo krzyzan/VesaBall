@@ -2,12 +2,10 @@
 #include "BrickArray.h"
 
 
-//TODO: wrzuciæ efekty blendingu, listê efektów, listê wybuchów?
-
 CBrickArray::CBrickArray()
 {
-	vSize = D3DXVECTOR2( 0.95f, 0.50f );
-	vPosition = D3DXVECTOR2( 0.50f, 0.30f );
+	vSize = D3DXVECTOR2( BOARD_W, BOARD_W/2 );
+	vPosition = D3DXVECTOR2( BOARD_L+BOARD_W/2, 0.30f );
 
 	ZeroMemory( pBrick, sizeof( pBrick ) );
 	dwBrickCounter = 0;
@@ -16,30 +14,11 @@ CBrickArray::CBrickArray()
 
 CBrickArray::~CBrickArray()
 {
-	Clear();
+	POINT pos;
+	for (pos.y=0; pos.y<BRICK_ARRAY_Y; pos.y++)
+		for (pos.x=0; pos.x<BRICK_ARRAY_X; pos.x++)
+			RemoveBrick( pos );
 }
-
-
-void CBrickArray::ZapBricks() 
-{
-	for (int x=0; x<BRICK_ARRAY_X; x++)
-		for (int y=0; y<BRICK_ARRAY_Y; y++)
-			if (pBrick[x][y])
-				pBrick[x][y]->Zap();
-}
-
-
-void CBrickArray::FallBricks() 
-{
-	for (int x=0; x<BRICK_ARRAY_X; x++)
-		for (int y=BRICK_ARRAY_Y-2; y>=0; y--)
-			if (pBrick[x][y] && pBrick[x][y]->IsDestructible() && !pBrick[x][y+1] ) {
-				pBrick[x][y+1] = pBrick[x][y];
-				pBrick[x][y] = NULL;
-				pBrick[x][y+1]->vPosition.y += pBrick[x][y+1]->vSize.y;
-			}
-}
-
 
 void CBrickArray::Render( LPD3DXSPRITE pSprite ) const
 {
@@ -53,11 +32,13 @@ void CBrickArray::Render( LPD3DXSPRITE pSprite ) const
 void CBrickArray::InsertBrick( DWORD type, const POINT & pos )
 {
 	pBrick[pos.x][pos.y] = new CBrick( type, 
-		D3DXVECTOR2( vPosition.x - vSize.x/2 + vSize.x/BRICK_ARRAY_X*(0.5f + pos.x), vPosition.y - vSize.y/2 + vSize.y/BRICK_ARRAY_Y*(0.5f + pos.y) ), 
+		vPosition - vSize/2 + D3DXVECTOR2( vSize.x/BRICK_ARRAY_X*(0.5f + pos.x), vSize.y/BRICK_ARRAY_Y*(0.5f + pos.y) ), 
 		D3DXVECTOR2( vSize.x/BRICK_ARRAY_X, vSize.y/BRICK_ARRAY_Y) );
+	
 	if ( pBrick[pos.x][pos.y]->IsDestructible() )
 		dwBrickCounter++;
 }
+
 
 void CBrickArray::RemoveBrick( const POINT & pos ) 
 { 
@@ -71,33 +52,9 @@ void CBrickArray::RemoveBrick( const POINT & pos )
 }
 
 
-bool CBrickArray::Contains( const D3DXVECTOR2 & vPos ) const
-{
-	return	fabs(vPosition.y - vPos.y) < vSize.y/2 &&
-			fabs(vPosition.x - vPos.x) < vSize.x/2;
-}
-
-
-POINT CBrickArray::GetArrayCoords( const D3DXVECTOR2 & vPos ) const
-{
-	POINT pos;
-	pos.x = (LONG)(((vPos.x - vPosition.x) / vSize.x + 0.5f) * BRICK_ARRAY_X);
-	pos.y = (LONG)(((vPos.y - vPosition.y) / vSize.y + 0.5f) * BRICK_ARRAY_Y);
-	return pos;
-}
-
-
-void CBrickArray::Clear()
-{
-	POINT pos;
-	for (pos.y=0; pos.y<BRICK_ARRAY_Y; pos.y++)
-		for (pos.x=0; pos.x<BRICK_ARRAY_X; pos.x++)
-			RemoveBrick( pos );
-}
-
 void CBrickArray::Load( DWORD dwLevelNum )
 {
-	Clear();
+	CBrickArray::~CBrickArray();
 
 	char strFileName[MAX_PATH];
 	sprintf( strFileName, "lev/%d.lev", dwLevelNum );
@@ -136,3 +93,40 @@ void CBrickArray::Save( DWORD dwLevelNum ) const
 	}
 	file.close();
 };
+
+
+bool CBrickArray::Contains( const D3DXVECTOR2 & vPos ) const
+{
+	return	fabs(vPosition.y - vPos.y) < vSize.y/2 &&
+			fabs(vPosition.x - vPos.x) < vSize.x/2;
+}
+
+
+POINT CBrickArray::GetArrayCoords( const D3DXVECTOR2 & vPos ) const
+{
+	POINT pos;
+	pos.x = (LONG)(((vPos.x - vPosition.x) / vSize.x + 0.5f) * BRICK_ARRAY_X);
+	pos.y = (LONG)(((vPos.y - vPosition.y) / vSize.y + 0.5f) * BRICK_ARRAY_Y);
+	return pos;
+}
+
+
+void CBrickArray::ZapBricks() 
+{
+	for (int x=0; x<BRICK_ARRAY_X; x++)
+		for (int y=0; y<BRICK_ARRAY_Y; y++)
+			if (pBrick[x][y])
+				pBrick[x][y]->Zap();
+}
+
+
+void CBrickArray::FallBricks() 
+{
+	for (int x=0; x<BRICK_ARRAY_X; x++)
+		for (int y=BRICK_ARRAY_Y-2; y>=0; y--)
+			if (pBrick[x][y] && pBrick[x][y]->IsDestructible() && !pBrick[x][y+1] ) {
+				pBrick[x][y+1] = pBrick[x][y];
+				pBrick[x][y] = NULL;
+				pBrick[x][y+1]->vPosition.y += pBrick[x][y+1]->vSize.y;
+			}
+}

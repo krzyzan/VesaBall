@@ -20,8 +20,8 @@ public:
 		UID_QUIT,
 	};
 
-	CGameMenu( LPDIRECT3DDEVICE8 d3dDevice );
-	~CGameMenu();
+	CGameMenu();
+	virtual ~CGameMenu();
 
 	HRESULT InitDeviceObjects();
 	HRESULT RestoreDeviceObjects();
@@ -34,8 +34,6 @@ public:
 	HRESULT FrameMove( float fElapsedTime );
 	HRESULT FrameRender();
 	
-	CD3DScene* GetNextScene();
-
 private:
 	CMenuItem*			GetPointedMenuItem() const;
 
@@ -45,7 +43,6 @@ private:
 	list<CMenuItem*>	listMenuItem;
 	CCursor*			pCursor;
 
-	CMenuItem*			pCurMenuItem;
-	CMenuItem*			pPressedMenuItem;
-	CMenuItem*			pClickedMenuItem;
+	CMenuItem*			pCurrentItem;
+	CMenuItem*			pPressedItem;
 };

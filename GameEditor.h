@@ -7,7 +7,7 @@ class CGameEditor :
 	public CGameBoard
 {
 public:
-	CGameEditor( LPDIRECT3DDEVICE8 d3dDevice );
+	CGameEditor();
 	virtual ~CGameEditor();
 
 	HRESULT InitDeviceObjects();

@@ -1,25 +1,35 @@
-#include "stdafx.h"
-#include "d3dscene.h"
+#include "StdAfx.h"
+#include "D3Dscene.h"
 
-CD3DScene::CD3DScene( LPDIRECT3DDEVICE8 d3dDevice )
+LPDIRECT3DDEVICE8 CD3DScene::pD3DDevice;
+
+CD3DScene::CD3DScene()
 {
-	pD3DDevice	= d3dDevice;
+	pCurrentScene = this;
 }
 
 
 CD3DScene::~CD3DScene()
 {
 	// zwalniamy tekstury
-	vector<LPDIRECT3DTEXTURE8>::iterator iTex;
-	for (iTex = vctrTextures.begin(); iTex != vctrTextures.end(); iTex++)
-		SAFE_RELEASE(*iTex);
+	while (!stackTextures.empty()) {
+		stackTextures.top()->Release();
+        stackTextures.pop();
+	}
 }
 
+CD3DScene* CD3DScene::GetNextScene()
+{
+	CD3DScene* pScene = pCurrentScene;
+	pCurrentScene = this;
+
+	return pScene;
+}
 
 HRESULT CD3DScene::LoadTexture( char* strFileName, LPDIRECT3DTEXTURE8* pTex )
 {
     D3DXCreateTextureFromFile( pD3DDevice, strFileName, pTex );
-	vctrTextures.push_back( *pTex );
+	stackTextures.push( *pTex );
 
 	return S_OK;
 }

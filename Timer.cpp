@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "timer.h"
+#include "StdAfx.h"
+#include "Timer.h"
 
 CTimer::CTimer()
 {

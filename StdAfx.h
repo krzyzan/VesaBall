@@ -42,9 +42,6 @@ const float BOARD_B = 0.75f;				// bottom
 const float BOARD_W	= (BOARD_R-BOARD_L);	//width
 const float BOARD_H	= (BOARD_B-BOARD_T);	//height
 
-const float BONUS_PROB = 0.3f;
-
-
 const float PADDLE_WIDTH_MIN = BOARD_W / 16;
 const float PADDLE_WIDTH_MAX = BOARD_W / 2;
 const float PADDLE_WIDTH_AVG = (PADDLE_WIDTH_MIN + PADDLE_WIDTH_MAX) / 2;

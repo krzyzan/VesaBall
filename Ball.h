@@ -1,8 +1,6 @@
 #pragma once
 
-#include "MovingSprite.h"
-
-class CBrick;
+#include "SpriteMoving.h"
 
 
 const D3DXVECTOR2 BALL_SIZE_MIN = D3DXVECTOR2( 1.0f / 128, 1.0f / 128);
@@ -15,37 +13,49 @@ const float BALL_SPEED_VAL_AVG = 0.40f;
 
     //! Kulka
     /*!
-      Przed utworzeniem obiektów klasy konieczne jest wczytanie tekstury
-	  pod adres #s_pTexture.
+		\warning Przed utworzeniem obiektów klasy konieczne jest wczytanie tekstury	pod adres #spTexture.
     */ 
 class CBall :
-	public CMovingSprite  
+	public CSpriteMoving  
 {
 public:
 		//! Konstruktor
 		/*!
+			Tworzy kulkê o normalnym rozmiarze u¿ywaj¹c tekstury #spTexture
 			\param Position		Pozycja pocz¹tkowa
 			\param Speed		Prêdkoœæ pocz¹tkowa
 		*/ 
 	CBall( const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
-		//! Ruch kulki
+
+	virtual ~CBall();
+
+		//! Wykonuje ruch kulki
 		/*!
+			Jeœli kulka jest "z³apana" przez deskê nie robi nic.
+			W przeciwnym wypadku wykonuje #CSpriteMoving::FrameMove( float fElapsedTime )
 			\param fElapsedTime	Czas od ostatniego wywo³ania
 		*/ 
 	void FrameMove( float fElapsedTime );
+		
 		//! Ustawia prêdkoœæ, "zaokraglaj¹c" jej wartoœæ do przedzia³u <BALL_SPEED_MIN, BALL_SPEED_MAX>
 		/*!
 			\param vNewSpeed	Nowa prêdkoœæ.
 		*/ 
 	void SetSpeed( const D3DXVECTOR2 & vNewSpeed );
-		//! Odbija kulkê od cegie³ki
+		
+		//! Odbija kulkê od obiektu
 		/*!
-			\param pBrick		WskaŸnik do cegie³ki
-			\param vSide		Wektor punktu w którym nastepuje kolizja wzgledem œrodka kulki
+			\param pSprite		WskaŸnik do obiektu
+			\param vSide		Wektor punktu wzgledem œrodka kulki w którym nastepuje kolizja
 		*/ 
-	void Reflect( CBrick* pBrick, const D3DXVECTOR2 & vSide );
+	void Reflect( CSprite* pSprite, const D3DXVECTOR2 & vSide );
+	
 		//! Je¿eli TRUE, ruchem kulki zajmuje siê #CPaddle, domyslnie FALSE
 	bool bCatched;
-		//! Adres wspólnej tekstury. \b UWAGA! Ustawiæ przed tworzeniem obiektów klasy.
-	static LPDIRECT3DTEXTURE8 s_pTexture;
+
+		//! Adres wspólnej tekstury. 
+		/*!
+			\warning Ustawiæ przed tworzeniem obiektów klasy.
+		*/
+	static LPDIRECT3DTEXTURE8 spTexture;
 };

@@ -4,8 +4,8 @@
 	//! Prosty licznik wyœwietlajacy liczby dodatnie
     /*!
 		Przed utworzeniem obiektów klasy konieczne jest wczytanie tekstury
-		pod adres #s_pTexture. W teksturze powinny byæ pionowo umieszczone cyfry
-		01234567890.
+		pod adres #spTexture. W teksturze powinny byæ pionowo umieszczone cyfry
+		0123456789.
     */ 
 class CCounter :
 	public CSprite
@@ -16,29 +16,35 @@ public:
 			\param Value		Wartoœæ pocz¹tkowa
 			\param Size			Rozmiar
 			\param Position		Pozycja
-			\param DigitHeight	Wysokoœæ pojedynczej cyfry w pikselach
-			\param NumDigits	Iloœæ wyœwietlanych cyfr
+			\param DigitPixels	Rozmiar cyfry w teksturze podana w pikselach
+			\param NumDigits	Liczba wyœwietlanych cyfr
 		*/ 
 	CCounter( LONG Value, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position, 
-		DWORD DigitHeight, DWORD NumDigits );
+		POINT DigitPixels, DWORD NumDigits );
+		
+	virtual ~CCounter();
+
 		//! Renderuje licznik
 		/*!
 			\param pSprite	adres \e ID3DXSprite u¿ywanego do renderowania
 		*/ 
 	void Render( LPD3DXSPRITE pSprite ) const;
-		//! Aktualizuje wyœwietlan¹ liczbê 
+		
+		//! Aktualizuje wyœwietlan¹ liczbê
 		/*!
 			\param fElapsedTime Czas od ostatniego wywo³ania
 		*/
 	void Update( float fElapsedTime );
-		//! Adres wspólnej tekstury. \b UWAGA! Ustawiæ przed tworzeniem obiektów klasy.
-	static LPDIRECT3DTEXTURE8 s_pTexture;
 
+		//! Adres wspólnej tekstury.
+		/*!
+			\warning Ustawiæ przed tworzeniem obiektów klasy.
+		*/
+	static LPDIRECT3DTEXTURE8 spTexture;
 	LONG lValue;
 
 private:
-	DWORD dwDigitHeight;
+	POINT dwDigitPixels;
 	DWORD dwNumDigits;
-
 	float fValue;
 };

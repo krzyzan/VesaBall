@@ -2,12 +2,10 @@
 #include "GameBoard.h"
 #include "BrickArray.h"
 
-CGameBoard::CGameBoard( LPDIRECT3DDEVICE8 d3dDevice )
-	: CD3DScene( d3dDevice )
+
+CGameBoard::CGameBoard()
 {
 	pSprite		= NULL;
-	bQuit		= false;
-
 	dwLevelNum	= 0;
 }
 
@@ -20,24 +18,24 @@ CGameBoard::~CGameBoard()
 HRESULT CGameBoard::InitDeviceObjects()
 {
 	// tekstury cegie³ek
-	LoadTexture( "gfx/Brick_red.png",	&CBrick::s_pTexture[ 0][0] );
-	LoadTexture( "gfx/Brick_orange.png",&CBrick::s_pTexture[ 1][0] );
-	LoadTexture( "gfx/Brick_yellow.png",&CBrick::s_pTexture[ 2][0] );
-	LoadTexture( "gfx/Brick_olive.png",	&CBrick::s_pTexture[ 3][0] );
-	LoadTexture( "gfx/Brick_green.png",	&CBrick::s_pTexture[ 4][0] );
-	LoadTexture( "gfx/Brick_marine.png",&CBrick::s_pTexture[ 5][0] );
-	LoadTexture( "gfx/Brick_cyan.png",	&CBrick::s_pTexture[ 6][0] );
-	LoadTexture( "gfx/Brick_blue.png",	&CBrick::s_pTexture[ 7][0] );
-	LoadTexture( "gfx/Brick_violet.png",&CBrick::s_pTexture[ 8][0] );
-	LoadTexture( "gfx/Brick_purple.png",&CBrick::s_pTexture[ 9][0] );
-	LoadTexture( "gfx/Brick_metal.png",	&CBrick::s_pTexture[10][0] );
+	LoadTexture( "gfx/Brick_red.png",	&CBrick::spTexture[ 0][0] );
+	LoadTexture( "gfx/Brick_orange.png",&CBrick::spTexture[ 1][0] );
+	LoadTexture( "gfx/Brick_yellow.png",&CBrick::spTexture[ 2][0] );
+	LoadTexture( "gfx/Brick_olive.png",	&CBrick::spTexture[ 3][0] );
+	LoadTexture( "gfx/Brick_green.png",	&CBrick::spTexture[ 4][0] );
+	LoadTexture( "gfx/Brick_marine.png",&CBrick::spTexture[ 5][0] );
+	LoadTexture( "gfx/Brick_cyan.png",	&CBrick::spTexture[ 6][0] );
+	LoadTexture( "gfx/Brick_blue.png",	&CBrick::spTexture[ 7][0] );
+	LoadTexture( "gfx/Brick_violet.png",&CBrick::spTexture[ 8][0] );
+	LoadTexture( "gfx/Brick_purple.png",&CBrick::spTexture[ 9][0] );
+	LoadTexture( "gfx/Brick_metal.png",	&CBrick::spTexture[10][0] );
 
-	LoadTexture( "gfx/Brick_0.png",		&CBrick::s_pTexture[11][0] );
-	LoadTexture( "gfx/Brick_1.png",		&CBrick::s_pTexture[11][1] );
-	LoadTexture( "gfx/Brick_2.png",		&CBrick::s_pTexture[11][2] );
+	LoadTexture( "gfx/Brick_0.png",		&CBrick::spTexture[11][0] );
+	LoadTexture( "gfx/Brick_1.png",		&CBrick::spTexture[11][1] );
+	LoadTexture( "gfx/Brick_2.png",		&CBrick::spTexture[11][2] );
 	
-	LoadTexture( "gfx/Brick_trans0.png",&CBrick::s_pTexture[12][0] );
-	LoadTexture( "gfx/Brick_trans1.png",&CBrick::s_pTexture[12][1] );
+	LoadTexture( "gfx/Brick_trans0.png",&CBrick::spTexture[12][0] );
+	LoadTexture( "gfx/Brick_trans1.png",&CBrick::spTexture[12][1] );
 
 	// sceneria
 	LPDIRECT3DTEXTURE8 pWallTex;
@@ -63,18 +61,9 @@ HRESULT CGameBoard::RestoreDeviceObjects()
 HRESULT CGameBoard::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
 {
 	if (didod->dwOfs == DIK_ESCAPE && (didod->dwData & 0x80) )
-		bQuit = true;
+		SetCurrentScene( NULL );
 
 	return S_OK;
-}
-
-
-CD3DScene* CGameBoard::GetNextScene()
-{
-	if ( bQuit )
-		return NULL;
-
-	return this;
 }
 
 

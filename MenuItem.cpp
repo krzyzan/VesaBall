@@ -1,15 +1,17 @@
 #include "stdafx.h"
 #include "menuitem.h"
 
+const D3DXVECTOR2 SHADOW_POS = D3DXVECTOR2( 0.005f, 0.005f );
+
 CMenuItem::CMenuItem( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
-		 const D3DXVECTOR2 & Position, D3DCOLOR Blending, HRESULT UID )
-	: CSprite( Texture, Size, 0, Position, Blending )
+		 const D3DXVECTOR2 & Position, D3DCOLOR Color, HRESULT UID )
+	: CSprite( Texture, Size, 0, Position, Color )
 {
 	dwUID = UID;
 
 	pShadow = new CSprite( *this );
-	pShadow->dwBlending = 0x2F000000;
-	pShadow->vPosition += D3DXVECTOR2( SHADOW_DISTANCE, SHADOW_DISTANCE );
+	pShadow->SetColor( 0x2F000000 );
+	pShadow->vPosition += SHADOW_POS;
 }
 
 CMenuItem::~CMenuItem()
@@ -23,17 +25,15 @@ void CMenuItem::Render( LPD3DXSPRITE pSprite ) const
 	CSprite::Render( pSprite );
 }
 
-void CMenuItem::SetPressed( BOOL bPressed )
+void CMenuItem::SetPressed( bool bPressed )
 {
-	vPosition += bPressed ? 
-		D3DXVECTOR2(  SHADOW_DISTANCE/2,  SHADOW_DISTANCE/2 ) : 
-		D3DXVECTOR2( -SHADOW_DISTANCE/2, -SHADOW_DISTANCE/2 );
+	vPosition += bPressed ? SHADOW_POS/2 : -SHADOW_POS/2;
 }
 
-void CMenuItem::SetHighlighted( BOOL bHighlighted )
+void CMenuItem::SetHighlighted( bool bHighlighted )
 {
 	if (bHighlighted)
-		dwBlending |= ~0xFFFFCC00;
+		dwColor |= ~0xFFFFCC00;
 	else
-		dwBlending &=  0xFFFFCC00;
+		dwColor &=  0xFFFFCC00;
 }

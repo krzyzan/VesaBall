@@ -7,8 +7,7 @@
 
 #include <fstream>
 
-CGameEditor::CGameEditor( LPDIRECT3DDEVICE8 d3dDevice )
-	: CGameBoard( d3dDevice )
+CGameEditor::CGameEditor()
 {
 	pCursor			= NULL;
 	curType			= 0;
@@ -84,10 +83,9 @@ HRESULT CGameEditor::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
 				pBrickArray->Save( dwLevelNum );
 				return S_OK;
 			case DIK_C:
-				pBrickArray->Clear();
+				pBrickArray->~CBrickArray();
 				return S_OK;
 		}
-
 
 	return CGameBoard::ProcessKeybrdEvent( didod );
 }
@@ -108,11 +106,13 @@ HRESULT CGameEditor::FrameRender()
 	pSprite->Begin();
 
 	CGameBoard::FrameRender();
-
 	pCursor->Render( pSprite );
 
 	pSprite->End();
 	pD3DDevice->EndScene();
+
+	// Show the frame on the primary surface.
+	pD3DDevice->Present( NULL, NULL, NULL, NULL );
 
 	return S_OK;
 }

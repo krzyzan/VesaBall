@@ -26,6 +26,7 @@
 				RuntimeLibrary="5"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
+				AssemblerOutput="4"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -33,7 +34,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib dxerr9.lib"
+				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib"
 				OutputFile="$(OutDir)/VesaBall.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -74,13 +75,14 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="stdafx.h"
+				AssemblerOutput="4"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib winmm.lib"
+				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib"
 				AdditionalLibraryDirectories="d3d8.lib d3dx8.lib"
 				IgnoreDefaultLibraryNames="libci.lib"
 				SubSystem="2"
@@ -137,13 +139,7 @@
 				RelativePath=".\D3DApp.cpp">
 			</File>
 			<File
-				RelativePath=".\D3DAppVesaBall.cpp">
-			</File>
-			<File
 				RelativePath=".\D3DScene.cpp">
-			</File>
-			<File
-				RelativePath=".\EffectSprite.cpp">
 			</File>
 			<File
 				RelativePath=".\GameBoard.cpp">
@@ -161,13 +157,19 @@
 				RelativePath=".\MenuItem.cpp">
 			</File>
 			<File
-				RelativePath=".\MovingSprite.cpp">
-			</File>
-			<File
 				RelativePath=".\Paddle.cpp">
 			</File>
 			<File
 				RelativePath=".\Sprite.cpp">
+			</File>
+			<File
+				RelativePath=".\SpriteAnimated.cpp">
+			</File>
+			<File
+				RelativePath=".\SpriteEffect.cpp">
+			</File>
+			<File
+				RelativePath=".\SpriteMoving.cpp">
 			</File>
 			<File
 				RelativePath=".\StdAfx.cpp">
@@ -205,13 +207,7 @@
 				RelativePath=".\D3DApp.h">
 			</File>
 			<File
-				RelativePath=".\D3DAppVesaBall.h">
-			</File>
-			<File
 				RelativePath=".\D3DScene.h">
-			</File>
-			<File
-				RelativePath=".\EffectSprite.h">
 			</File>
 			<File
 				RelativePath=".\GameBoard.h">
@@ -229,13 +225,19 @@
 				RelativePath=".\MenuItem.h">
 			</File>
 			<File
-				RelativePath=".\MovingSprite.h">
-			</File>
-			<File
 				RelativePath=".\Paddle.h">
 			</File>
 			<File
 				RelativePath=".\Sprite.h">
+			</File>
+			<File
+				RelativePath=".\SpriteAnimated.h">
+			</File>
+			<File
+				RelativePath=".\SpriteEffect.h">
+			</File>
+			<File
+				RelativePath=".\SpriteMoving.h">
 			</File>
 			<File
 				RelativePath=".\StdAfx.h">

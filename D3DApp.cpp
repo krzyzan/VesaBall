@@ -1,15 +1,10 @@
-// D3DApp.cpp: implementation of the CD3DApp class.
-// v2.00
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "StdAfx.h"
 #include "D3DApp.h"
 
 //-----------------------------------------------------------------------------
 // Global access to the app (needed for the global WndProc())
 //-----------------------------------------------------------------------------
-CD3DApp* CD3DApp::s_pD3DApp = NULL;
+CD3DApp* CD3DApp::spD3DApp = NULL;
 
 
 //-----------------------------------------------------------------------------
@@ -18,44 +13,95 @@ CD3DApp* CD3DApp::s_pD3DApp = NULL;
 //-----------------------------------------------------------------------------
 LRESULT CALLBACK CD3DApp::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	return s_pD3DApp->MsgProc( hWnd, uMsg, wParam, lParam );
+	return spD3DApp->MsgProc( hWnd, uMsg, wParam, lParam );
 }
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
-CD3DApp::CD3DApp()
+CD3DApp::CD3DApp( TCHAR* WindowTitle )
 {
-	s_pD3DApp		= this;
+	spD3DApp		= this;
 
-	bActive			= FALSE;
-	bReady			= FALSE;
+	bActive			= false;
+	bReady			= false;
+
 	CreateFlags		= 0L;
 
-	strWindowTitle	= _T("VesaBall");
+	strWindowTitle	= WindowTitle;
 	MinDepthBits	= 16;
 	MinStencilBits	= 0;
 }
 
-HRESULT CD3DApp::Cleanup3DEnvironment()
+
+HRESULT CD3DApp::Create( HINSTANCE hInstance )
 {
-	bActive = FALSE;
-	bReady  = FALSE;
+	HRESULT hr;
+	
+	pD3D = Direct3DCreate8( D3D_SDK_VERSION );
 
-	if ( pD3DDevice ) {
-        InvalidateDeviceObjects();
-		DeleteDeviceObjects();
-	}
-    
-	SAFE_RELEASE( pD3DDevice );
-	SAFE_RELEASE( pD3D );
+	if (FAILED( hr = BuildDeviceList() ) )
+		return hr;
 
-	// Clean up everything and exit the app
-	FinalCleanup();
+	WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,
+						  NULL, NULL, NULL, 
+						  NULL, strWindowTitle };
+	RegisterClass( &wndClass );
+
+	hWnd = CreateWindow( strWindowTitle, strWindowTitle, 
+			WS_POPUP|WS_SYSMENU|WS_VISIBLE,	
+			CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, hInstance, 0L );
+
+	if (FAILED( hr = Initialize3DEnvironment() ) )
+		return hr;
+
+	if (FAILED( hr = DirectInput8Create( hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&pDI, NULL ) ) )
+		return hr;
+
+	if (FAILED( hr = InitializeMouseInput() ) )
+		return hr;
+
+	if (FAILED( hr = InitializeKeyboardInput() ) )
+		return hr;
+
+	srand( (DWORD)Timer.GetAbsoluteTime() );
+
+	Timer.Start();
+
+	bActive = TRUE;
+	bReady = TRUE;
 
 	return S_OK;
 }
+
+
+HRESULT CD3DApp::Run()
+{
+	BOOL bGotMsg;
+	MSG  msg;
+	PeekMessage( &msg, NULL, 0U, 0U, PM_NOREMOVE );
+
+	while (WM_QUIT != msg.message) {
+		// Use PeekMessage() if the app is active, so we can use idle time to
+		// render the scene. Else, use GetMessage() to avoid eating CPU time.
+		if ( bActive )
+			bGotMsg = PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE );
+		else
+			bGotMsg = GetMessage( &msg, NULL, 0U, 0U );
+
+		if ( bGotMsg ) {
+			TranslateMessage( &msg );
+			DispatchMessage( &msg );
+		}
+		else {
+			if ( bActive && bReady ) {
+				if ( FAILED( Render3DEnvironment() ) )
+					SendMessage( hWnd, WM_CLOSE, 0, 0 );
+			}
+		}
+	}
+
+	return (INT)msg.wParam;
+}
+
 
 //-----------------------------------------------------------------------------
 // Name: BuildDeviceList()
@@ -128,8 +174,7 @@ HRESULT CD3DApp::BuildDeviceList()
 		}
 	}
 
-   
-
+	
 	// Add devices to adapter
 	for( UINT iDevice = 0; iDevice < dwNumDeviceTypes; iDevice++ )
 	{
@@ -268,47 +313,6 @@ HRESULT CD3DApp::BuildDeviceList()
 }
 
 
-
-//-----------------------------------------------------------------------------
-// Name: Run()
-// Desc:
-//-----------------------------------------------------------------------------
-HRESULT CD3DApp::Run()
-{
-	// Now we're ready to recieve and process Windows messages.
-	BOOL bGotMsg;
-	MSG  msg;
-	PeekMessage( &msg, NULL, 0U, 0U, PM_NOREMOVE );
-
-	while (WM_QUIT != msg.message)
-	{
-		// Use PeekMessage() if the app is active, so we can use idle time to
-		// render the scene. Else, use GetMessage() to avoid eating CPU time.
-		if ( bActive )
-			bGotMsg = PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE );
-		else
-			bGotMsg = GetMessage( &msg, NULL, 0U, 0U );
-
-		if ( bGotMsg )
-		{
-			TranslateMessage( &msg );
-			DispatchMessage( &msg );
-		}
-		else
-		{
-			// Render a frame during idle time (no messages are waiting)
-			if ( bActive && bReady )
-			{
-				if ( FAILED( Render3DEnvironment() ) )
-					SendMessage( hWnd, WM_CLOSE, 0, 0 );
-			}
-		}
-	}
-
-	return (INT)msg.wParam;
-}
-
-
 //-----------------------------------------------------------------------------
 // Name: FindDepthStencilFormat()
 // Desc: Finds a depth/stencil format for the given device that is compatible
@@ -415,7 +419,7 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 	switch( uMsg )
 	{
   		case WM_SETCURSOR:
-			// Turn off Windows cursor in fullscreen mode
+            // Turn off Windows cursor in fullscreen mode
 			if ( bActive && bReady )
 			{
 				SetCursor( NULL );
@@ -461,11 +465,8 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 			break;
 
 		case WM_KEYDOWN:
-			switch( wParam )
-			{
-				case VK_BACK:			//TODO: TMP
-					SendMessage( hWnd, WM_CLOSE, 0, 0 );
-					break;
+			if (wParam == VK_BACK) {
+				SendMessage( hWnd, WM_CLOSE, 0, 0 );//TODO: TMP
 			}
 			break;
 
@@ -479,13 +480,9 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 	return DefWindowProc( hWnd, uMsg, wParam, lParam );
 }
 
-//-----------------------------------------------------------------------------
-// Name: Initialize3DEnvironment()
-// Desc:
-//-----------------------------------------------------------------------------
+
 HRESULT CD3DApp::Initialize3DEnvironment()
 {
-
 	HRESULT hr;
 
 	D3DAdapterInfo* pAdapterInfo = &Adapter;
@@ -495,7 +492,7 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 	// Set up the presentation parameters
 	ZeroMemory( &d3dpp, sizeof(d3dpp) );
 	d3dpp.Windowed							= FALSE;
-	d3dpp.BackBufferCount					= 2;
+	d3dpp.BackBufferCount					= 1;
 	d3dpp.MultiSampleType					= pDeviceInfo->MultiSampleType;
 	d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
 	d3dpp.EnableAutoDepthStencil			= TRUE;
@@ -514,60 +511,55 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 							   hWnd, pModeInfo->dwBehavior, &d3dpp,
 							   &pD3DDevice );
 
-	if ( SUCCEEDED(hr) )
-	{
-		// Clear the viewport
-		pD3DDevice->Present( NULL, NULL, NULL, NULL);
+	if ( FAILED( hr ) )
+		return hr;
+	
+	// Clear the viewport
+	pD3DDevice->Present( NULL, NULL, NULL, NULL);
 
-		// When moving from fullscreen to windowed mode, it is important to
-		// adjust the window size after recreating the device rather than
-		// beforehand to ensure that you get the window size you want.	For
-		// example, when switching from 640x480 fullscreen to windowed with
-		// a 1000x600 window on a 1024x768 desktop, it is impossible to set
-		// the window size to 1000x600 until after the display mode has
-		// changed to 1024x768, because windows cannot be larger than the
-		// desktop.
+	// Store device Caps
+	pD3DDevice->GetDeviceCaps( &d3dCaps );
+	CreateFlags = pModeInfo->dwBehavior;
 
-		// Store device Caps
-		pD3DDevice->GetDeviceCaps( &d3dCaps );
-		CreateFlags = pModeInfo->dwBehavior;
+	CD3DScene::pD3DDevice = pD3DDevice;
 
-		return S_OK;
-	}
-
-	return hr;
+	return S_OK;
 }
 
-//-----------------------------------------------------------------------------
-// Name: Render3DEnvironment()
-// Desc: Draws the scene.
-//-----------------------------------------------------------------------------
+
 HRESULT CD3DApp::Render3DEnvironment()
 {
 	HRESULT hr;
 
 	// Test the cooperative level to see if it's okay to render
-	if ( FAILED( hr = pD3DDevice->TestCooperativeLevel() ) )
-	{
+	if ( FAILED( hr = pD3DDevice->TestCooperativeLevel() ) ) {
 		// If the device was lost, do not render until we get it back
 		if ( D3DERR_DEVICELOST == hr )
 			return S_OK;
 
 		// Check if the device needs to be reset.
-		if ( D3DERR_DEVICENOTRESET == hr )
-		{
-			if ( FAILED( hr = Resize3DEnvironment() ) )
+		if ( D3DERR_DEVICENOTRESET == hr ) {
+			if ( FAILED( hr = Reset3DEnvironment() ) )
 				return hr;
 		}
 		return hr;
 	}
 
-	// Render the scene as normal
-	if ( FAILED( hr = FrameMove( Timer.GetElapsedTime() ) ) )
+	float fElapsedTime = Timer.GetElapsedTime();
+
+	if ( FAILED( hr = SceneReadKeyboardEvents() ) )
 		return hr;
 
-	// Render the scene as normal
-	if ( FAILED( hr = FrameRender() ) )
+	if ( FAILED( hr = SceneReadMouseEvents() ) )
+		return hr;
+
+	if ( FAILED( hr = sD3DScenes.top()->FrameMove( fElapsedTime ) ) )
+		return hr;
+
+	if ( FAILED( hr = sD3DScenes.top()->FrameRender() ) )
+		return hr;
+
+	if ( FAILED( hr = ChangeScene() ) )
 		return hr;
 
 	return S_OK;
@@ -577,12 +569,12 @@ HRESULT CD3DApp::Render3DEnvironment()
 // Name:
 // Desc:
 //-----------------------------------------------------------------------------
-HRESULT CD3DApp::Resize3DEnvironment()
+HRESULT CD3DApp::Reset3DEnvironment()
 {
 	HRESULT hr;
 
 	// Release all vidmem objects
-	if ( FAILED( hr = InvalidateDeviceObjects() ) )
+	if ( FAILED( hr = sD3DScenes.top()->InvalidateDeviceObjects() ) )
 		return hr;
 
 	// Reset the device
@@ -590,61 +582,201 @@ HRESULT CD3DApp::Resize3DEnvironment()
 		return hr;
 
 	// Initialize the app's device-dependent objects
-	hr = RestoreDeviceObjects();
-	if ( FAILED(hr) )
+	if ( FAILED( hr = sD3DScenes.top()->RestoreDeviceObjects() ) )
 		return hr;
 
 	return S_OK;
 }
 
-//-----------------------------------------------------------------------------
-// Name: Create()
-// Desc:
-//-----------------------------------------------------------------------------
-HRESULT CD3DApp::Create( HINSTANCE hInstance )
+
+HRESULT CD3DApp::Cleanup3DEnvironment()
+{
+	// Wyczyœæ wszystko i wyjdŸ z aplikacji
+	bActive = FALSE;
+	bReady  = FALSE;
+
+	if ( pD3DDevice ) {
+		if (!sD3DScenes.empty())
+			sD3DScenes.top()->InvalidateDeviceObjects();
+		while (!sD3DScenes.empty()) {
+			sD3DScenes.top()->DeleteDeviceObjects();
+			delete sD3DScenes.top();
+			sD3DScenes.pop();
+		}
+	}
+
+	SAFE_RELEASE( pDIMouse );
+	SAFE_RELEASE( pDIKeyboard );
+	SAFE_RELEASE( pDI );
+
+	SAFE_RELEASE( pD3DDevice );
+	SAFE_RELEASE( pD3D );
+
+	return S_OK;
+}
+
+
+HRESULT CD3DApp::InitializeKeyboardInput()
+{
+    HRESULT hr;
+
+    // Obtain an interface to the system keyboard device.
+    if( FAILED( hr = pDI->CreateDevice( GUID_SysKeyboard, &pDIKeyboard, NULL ) ) )
+        return hr;
+    
+    // Set the data format to "keyboard format" - a predefined data format 
+    if( FAILED( hr = pDIKeyboard->SetDataFormat( &c_dfDIKeyboard ) ) )
+        return hr;
+    
+    // Set the cooperativity level
+    if( FAILED( hr = pDIKeyboard->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND ) ) )
+        return hr;
+
+	DIPROPDWORD dipdw;
+    dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
+    dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    dipdw.diph.dwObj        = 0;
+    dipdw.diph.dwHow        = DIPH_DEVICE;
+    dipdw.dwData            = KEYBRD_BUFFER_SIZE; // Arbitary buffer size
+
+    if( FAILED( hr = pDIKeyboard->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
+         return hr;
+
+    // Acquire the newly created device
+    pDIKeyboard->Acquire();
+
+    return S_OK;
+}
+
+
+HRESULT CD3DApp::InitializeMouseInput()
+{
+    HRESULT hr;
+
+	if( FAILED( hr = pDI->CreateDevice( GUID_SysMouse, &pDIMouse, NULL ) ) )
+		return hr;
+
+	if( FAILED( hr = pDIMouse->SetDataFormat( &c_dfDIMouse ) ) )
+		return hr;
+
+	if( FAILED( hr = pDIMouse->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND ) ) )
+		return hr;
+
+	if( FAILED( hr = pDIMouse->SetEventNotification( CreateEvent(NULL, FALSE, FALSE, NULL) ) ) )
+		return hr;
+
+    DIPROPDWORD dipdw;
+    dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
+    dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    dipdw.diph.dwObj        = 0;
+    dipdw.diph.dwHow        = DIPH_DEVICE;
+    dipdw.dwData            = MOUSE_BUFFER_SIZE; // Arbitary buffer size
+
+    if ( FAILED( hr = pDIMouse->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
+        return hr;
+
+	pDIMouse->Acquire(); 
+
+	return S_OK;
+}
+
+
+HRESULT CD3DApp::SceneReadMouseEvents()
+{
+	DIDEVICEOBJECTDATA didod[ MOUSE_BUFFER_SIZE ];  // Receives buffered data 
+	DWORD              dwElements;
+	HRESULT            hr;
+
+	if (NULL == pDIMouse) 
+		return S_OK;
+	
+	dwElements = MOUSE_BUFFER_SIZE;
+	if (FAILED( hr = pDIMouse->GetDeviceData( sizeof(DIDEVICEOBJECTDATA), didod, &dwElements, 0 ) ) )
+		return hr;
+
+	for (DWORD i = 0; i < dwElements; i++) {
+		if (FAILED( sD3DScenes.top()->ProcessMouseEvent( &didod[i] ) ) )
+			return hr;
+	}
+
+	return S_OK;
+}
+
+
+HRESULT CD3DApp::SceneReadKeyboardEvents()
+{
+	DIDEVICEOBJECTDATA didod[ KEYBRD_BUFFER_SIZE ];  // Receives buffered data 
+	DWORD              dwElements;
+	HRESULT            hr;
+
+	if( NULL == pDIKeyboard ) 
+		return S_OK;
+
+	dwElements = KEYBRD_BUFFER_SIZE;
+	if (FAILED( hr = pDIKeyboard->GetDeviceData( sizeof(DIDEVICEOBJECTDATA), didod, &dwElements, 0 ) ) )
+		return hr;
+
+	for (DWORD i = 0; i < dwElements; i++)
+		if (FAILED( sD3DScenes.top()->ProcessKeybrdEvent( &didod[i] ) ) )
+			return hr;
+
+	return S_OK;
+}
+
+
+HRESULT CD3DApp::SetupScene( CD3DScene* pScene )
 {
 	HRESULT hr;
-	// Create the Direct3D object
-	pD3D = Direct3DCreate8( D3D_SDK_VERSION );
 
-	// Build a list of Direct3D adapters, modes and devices.
-	BuildDeviceList();
+	if (!sD3DScenes.empty())
+		if (FAILED( hr = sD3DScenes.top()->InvalidateDeviceObjects() ) )
+			return hr;
+
+	sD3DScenes.push( pScene );
+	
+ 	if (FAILED( hr = sD3DScenes.top()->InitDeviceObjects() ) )
+		return hr;
+
+ 	if (FAILED( hr = sD3DScenes.top()->RestoreDeviceObjects() ) )
+		return hr;
+
+	return S_OK;
+}
+
+HRESULT CD3DApp::EndScene()
+{
+	HRESULT hr;
+
+	if (FAILED( hr = sD3DScenes.top()->InvalidateDeviceObjects() ) )
+		return hr;
+
+	if (FAILED( sD3DScenes.top()->DeleteDeviceObjects() ) )
+		return hr;
+
+	delete sD3DScenes.top();
+	sD3DScenes.pop();
+
+	if (sD3DScenes.empty()) {
+		SendMessage( hWnd, WM_CLOSE, 0, 0 );
+		return S_OK;
+	}
+
+	if (FAILED( sD3DScenes.top()->RestoreDeviceObjects() ) )
+		return hr;
+
+	return S_OK;
+}
 
 
-	// Register the windows class
-	//WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,
-	//					  LoadIcon( hInstance, MAKEINTRESOURCE(IDI_MAIN_ICON) ),
-	//					  LoadCursor( NULL, IDC_ARROW ),
-	//					  (HBRUSH)GetStockObject(WHITE_BRUSH), 
-	//					  NULL, strWindowTitle };
-	WNDCLASS wndClass = { 0, WndProc, 0, 0, hInstance,
-						  NULL, NULL, NULL, 
-						  NULL, strWindowTitle };
-	RegisterClass( &wndClass );
+HRESULT CD3DApp::ChangeScene()
+{
+	CD3DScene* pCurrentScene = sD3DScenes.top()->GetNextScene();
 
-	// Create the render window 
-	hWnd = CreateWindow( strWindowTitle, strWindowTitle, 
-			WS_POPUP|WS_SYSMENU|WS_VISIBLE,	
-			CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, hInstance, 0L );
+	if (pCurrentScene == NULL)
+		return EndScene();
+	
+	if (pCurrentScene != sD3DScenes.top())
+		return SetupScene( pCurrentScene );
 
-	// Initialize the 3D environment for the app
-	Initialize3DEnvironment();
-
-	// Initialize the app's device-dependent objects
- 	hr = InitDeviceObjects();
- 	if ( SUCCEEDED(hr) )
- 	{
- 		hr = RestoreDeviceObjects();
- 		if ( SUCCEEDED(hr) )
- 		{
- 			Timer.Start();
- 			// The app is ready to go
- 			bActive = TRUE;
- 			bReady = TRUE;
- 
- 			return S_OK;
- 		}
- 	}
- 
- 	return hr;
+	return S_OK;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <stack>
 using namespace std;
 
 #include <d3dx8.h>
@@ -8,86 +8,89 @@ using namespace std;
 
 	//! Scena
 	/*!
+		\par
 		Klasa abstrakcyjna, opisuje pojedyncz¹ scenê - czêœæ programu stanowi¹c¹ logiczn¹ ca³oœæ, 
-		jak np. g³ówne menu gry, ekran wyników, menu opcji itp. Zapewnia proste zarz¹dzanie teksturami.
+		jak np. g³ówne menu gry, ekran wyników, menu opcji itp. Stanowi "szkielet" dla klas które od niej dziedzicz¹,
+		\par
+		Wspó³pracuje œciœle ze zaprzyjaŸnion¹ klas¹ #CD3DApp, która zajmuje siê wykonywaniem funkcji w odpowiedniej kolejnoœci.
+		U³atwia to poprawne alokowanie obiektów w pamiêci karty graficznej, 
+		które musza byæ zwalniane gdy urz¹dzenie karty jest resetowane (np. u¿ytkownik zminimalizowa³ aplikacjê naciskaj¹c Alt-Tab).
+		\par
+		Zapewnia tak¿e proste zarz¹dzanie teksturami zwalniaj¹c je automatycznie, gdy scena siê koñczy.
 	*/
 class CD3DScene
 {
 public:
 		//! Konstruktor
-		/*!
-			\param d3dDevice	Adres zainicjalizowanego obiektu Direct3D
-		*/
-	CD3DScene( LPDIRECT3DDEVICE8 d3dDevice );
+	CD3DScene();
 		
+protected:
 		//! Destruktor
 		/*!
 			Automatycznie zwalnia wszystkie tekstury za³adowane przy pomocy funkcji #LoadTexture()
 		*/
 	virtual ~CD3DScene();
 
-		//! Tworzy obiekty sceny niezale¿ne od urz¹dzenia graficznego
+		//! Inicjuje obiekty u¿ywajace pamiêci systemowej
 		/*!
-			Musi byæ zaimplementowana w klasie dziedziczonej.
+			W tej funkcji klasa dziedziczona powinna zainicjowaæ wszystkie obiekty, 
+			oprócz tych które znajduj¹ siê w pamiêci kart graficznej. W szczególnoœci tutaj
+			nale¿y za³adowaæ potrzebne tekstury za pomoc¹ za pomoc¹ #LoadTexture().
+			Jest to dozwolone poniewa¿ s¹ one automatycznie przerzucane do pamiêci systemowej, 
+			gdy urz¹dzenie graficzne jest resetowane.
 		*/
-	virtual HRESULT InitDeviceObjects()			= 0;
+	virtual HRESULT InitDeviceObjects() = 0;
 		
-		//! Tworzy obiekty sceny zale¿ne od urz¹dzenia graficznego
+		//! Inicjuje obiekty u¿ywaj¹ce pamiêci karty
 		/*!
-			Musi byæ zaimplementowana w klasie dziedziczonej.
+			W tej funkcji klasa dziedziczona powinna zainicjowaæ tylko te obiekty, 
+			które znajduj¹ siê w pamiêci kart graficznej. W szczególnoœci dotyczy to buforów wierzcho³ków, 
+			wiêc równie¿ obiektów \e ID3DXSprite.
 		*/
-	virtual HRESULT RestoreDeviceObjects()		= 0;
+	virtual HRESULT RestoreDeviceObjects() = 0;
 		
-		//! Usuwa obiekty zale¿ne od urz¹dzenia graficznego
+		//! Zwalnia obiekty uzywaj¹ce pamiêci karty
 		/*!
-			Musi byæ zaimplementowana w klasie dziedziczonej.
+			W tej funkcji klasa dziedziczona powinna zwolniæ obiekty zainicjowane w #RestoreDeviceObjects().
 		*/
-	virtual HRESULT InvalidateDeviceObjects()	= 0;
+	virtual HRESULT InvalidateDeviceObjects() = 0;
 		
-		//! Usuwa obiekty niezale¿ne od urz¹dzenia graficznego
+		//! Zwalnia obiekty u¿ywaj¹ce pamiêci systemowej
 		/*!
-			Musi byæ zaimplementowana w klasie dziedziczonej.
+			W tej funkcji klasa dziedziczona powinna zwolniæ obiekty zainicjowane w #InitDeviceObjects().
 		*/
-	virtual HRESULT DeleteDeviceObjects()		= 0;
+	virtual HRESULT DeleteDeviceObjects() = 0;
 
 		//! Przetwarza dane wejœciowe z myszki
 		/*!
-			Musi byæ zaimplementowana w klasie dziedziczonej.
+			Funkcja jest wywo³ywana dla ka¿dego elementu z bufora urz¹dzenia.
 			\param didod	Dane z bufora
 		*/
-	virtual HRESULT ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )	= 0;
+	virtual HRESULT ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod ) = 0;
 		
 		//! Przetwarza dane wejœciowe z klawiatury
 		/*!
-			Musi byæ zaimplementowana w klasie dziedziczonej.
+			Funkcja jest wywo³ywana dla ka¿dego elementu z bufora urz¹dzenia.
 			\param didod	Dane z bufora
 		*/
-	virtual HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )= 0;
+	virtual HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod ) = 0;
 		
-		//! Wykunuje ruch obiektów sceny
-		/*!
-			Musi byæ zaimplementowana w klasie dziedziczonej.
-		*/
-	virtual HRESULT FrameMove( float fElapsedTime )	= 0;
+		//! Wykonuje ruch obiektów sceny
+	virtual HRESULT FrameMove( float fElapsedTime ) = 0;
 		
 		//! Renderuje obiekty sceny
-		/*!
-			Musi byæ zaimplementowana w klasie dziedziczonej.
-		*/
-	virtual HRESULT FrameRender()					= 0;
+	virtual HRESULT FrameRender() = 0;
 		
-		//! Zwraca wskaŸnik do nastepnej sceny
+		//! Ustawia wskaŸnik do nastepnej sceny
 		/*!
-			Musi byæ zaimplementowana w klasie dziedziczonej.
-			Jeœli wchodzimy do sceny podrzednej (np. z menu g³ównego do menu opcji) 
-			funkcja powinna utworzyæ obiekt dziedziczony od #CD3DScene i zwróciæ jej adres.
-			Jeœli scena zakoñczy³a siê powinna zwróciæ \b NULL. U¿ywana tylko w #CD3DApp
-			\return	Adres bie¿¹cej sceny
-			
+			Jeœli istnieje potrzeba utworzenia sceny podrzêdnej (np. wchodzimy z menu g³ównego do menu opcji) 
+			funkcja umo¿liwia to. W tym celu nale¿y utworzyæ obiekt klasy dziedziczonej od #CD3DScene
+			i jego adres podaæ jako argument. Jeœli bie¿¹ca scena zakoñczy³a siê podaæ na \b NULL. 
+			\param pScene	Adres scene podrzêdnej lub null jeœli mamy zakoñczyæ tê scenê.
 		*/
-	virtual CD3DScene* GetNextScene()		= 0;
+	void SetCurrentScene( CD3DScene* pScene ) 
+		{ pCurrentScene = pScene; }
 
-protected:
 		//! Wczytuje teksturê z pliku. 
 		/*!
 			Tekstura zostanie automatycznie zwolniona w destruktorze klasy.
@@ -96,9 +99,12 @@ protected:
 		*/
 	HRESULT LoadTexture( char* strFileName, LPDIRECT3DTEXTURE8* pTex );
 
-		//! Obiekt Direct3D
-	LPDIRECT3DDEVICE8 pD3DDevice;
+		//! Obiekt Direct3D wspólny dla wszystkich scen
+	static LPDIRECT3DDEVICE8 pD3DDevice;
 
 private:
-	vector<LPDIRECT3DTEXTURE8> vctrTextures;
+	CD3DScene* GetNextScene();
+	CD3DScene* pCurrentScene;
+	stack<LPDIRECT3DTEXTURE8> stackTextures;
+	friend class CD3DApp;
 };
