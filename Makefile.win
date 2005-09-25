@@ -1,0 +1,89 @@
+# Project: VesaBall
+# Makefile created by Dev-C++ 4.9.9.0
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = 
+OBJ  = VesaBall.o Ball.o Bonus.o Brick.o BrickArray.o Counter.o Cursor.o D3DApp.o D3DScene.o GameBoard.o GameEditor.o GameEngine.o GameMenu.o MenuItem.o Paddle.o Sprite.o SpriteAnimated.o SpriteEffect.o SpriteMoving.o StdAfx.o Timer.o $(RES)
+LINKOBJ  = VesaBall.o Ball.o Bonus.o Brick.o BrickArray.o Counter.o Cursor.o D3DApp.o D3DScene.o GameBoard.o GameEditor.o GameEngine.o GameMenu.o MenuItem.o Paddle.o Sprite.o SpriteAnimated.o SpriteEffect.o SpriteMoving.o StdAfx.o Timer.o $(RES)
+LIBS =  -L"C:/Dev-Cpp/lib" -mwindows C:/Dev-Cpp/lib/libdinput8.a C:/Dev-Cpp/lib/libdxguid.a C:/Dev-Cpp/lib/libd3dx8.a C:/Dev-Cpp/lib/libd3d8.a  
+INCS =  -I"C:/Dev-Cpp/include" 
+CXXINCS =  -I"C:/Dev-Cpp/include/c++/3.3.1"  -I"C:/Dev-Cpp/include/c++/3.3.1/mingw32"  -I"C:/Dev-Cpp/include/c++/3.3.1/backward"  -I"C:/Dev-Cpp/lib/gcc-lib/mingw32/3.3.1/include"  -I"C:/Dev-Cpp/include" 
+BIN  = VesaBall.exe
+CXXFLAGS = $(CXXINCS)  
+CFLAGS = $(INCS)  
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before VesaBall.exe all-after
+
+
+clean: clean-custom
+	rm -f $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o "VesaBall.exe" $(LIBS)
+
+VesaBall.o: VesaBall.cpp
+	$(CPP) -c VesaBall.cpp -o VesaBall.o $(CXXFLAGS)
+
+Ball.o: Ball.cpp
+	$(CPP) -c Ball.cpp -o Ball.o $(CXXFLAGS)
+
+Bonus.o: Bonus.cpp
+	$(CPP) -c Bonus.cpp -o Bonus.o $(CXXFLAGS)
+
+Brick.o: Brick.cpp
+	$(CPP) -c Brick.cpp -o Brick.o $(CXXFLAGS)
+
+BrickArray.o: BrickArray.cpp
+	$(CPP) -c BrickArray.cpp -o BrickArray.o $(CXXFLAGS)
+
+Counter.o: Counter.cpp
+	$(CPP) -c Counter.cpp -o Counter.o $(CXXFLAGS)
+
+Cursor.o: Cursor.cpp
+	$(CPP) -c Cursor.cpp -o Cursor.o $(CXXFLAGS)
+
+D3DApp.o: D3DApp.cpp
+	$(CPP) -c D3DApp.cpp -o D3DApp.o $(CXXFLAGS)
+
+D3DScene.o: D3DScene.cpp
+	$(CPP) -c D3DScene.cpp -o D3DScene.o $(CXXFLAGS)
+
+GameBoard.o: GameBoard.cpp
+	$(CPP) -c GameBoard.cpp -o GameBoard.o $(CXXFLAGS)
+
+GameEditor.o: GameEditor.cpp
+	$(CPP) -c GameEditor.cpp -o GameEditor.o $(CXXFLAGS)
+
+GameEngine.o: GameEngine.cpp
+	$(CPP) -c GameEngine.cpp -o GameEngine.o $(CXXFLAGS)
+
+GameMenu.o: GameMenu.cpp
+	$(CPP) -c GameMenu.cpp -o GameMenu.o $(CXXFLAGS)
+
+MenuItem.o: MenuItem.cpp
+	$(CPP) -c MenuItem.cpp -o MenuItem.o $(CXXFLAGS)
+
+Paddle.o: Paddle.cpp
+	$(CPP) -c Paddle.cpp -o Paddle.o $(CXXFLAGS)
+
+Sprite.o: Sprite.cpp
+	$(CPP) -c Sprite.cpp -o Sprite.o $(CXXFLAGS)
+
+SpriteAnimated.o: SpriteAnimated.cpp
+	$(CPP) -c SpriteAnimated.cpp -o SpriteAnimated.o $(CXXFLAGS)
+
+SpriteEffect.o: SpriteEffect.cpp
+	$(CPP) -c SpriteEffect.cpp -o SpriteEffect.o $(CXXFLAGS)
+
+SpriteMoving.o: SpriteMoving.cpp
+	$(CPP) -c SpriteMoving.cpp -o SpriteMoving.o $(CXXFLAGS)
+
+StdAfx.o: StdAfx.cpp
+	$(CPP) -c StdAfx.cpp -o StdAfx.o $(CXXFLAGS)
+
+Timer.o: Timer.cpp
+	$(CPP) -c Timer.cpp -o Timer.o $(CXXFLAGS)

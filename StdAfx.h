@@ -3,7 +3,8 @@
 // are changed infrequently
 //
 
-#pragma once
+#ifndef STDAFX_H
+#define STDAFX_H
 
 #define _USE_MATH_DEFINES
 #include <stdlib.h>
@@ -46,3 +47,5 @@ const float	GRAV_ACCEL = 0.25f;
 
 inline float frand( float i, float j ) 
 	{ return ((float)rand()/RAND_MAX)*(j-i)+i; };
+
+#endif

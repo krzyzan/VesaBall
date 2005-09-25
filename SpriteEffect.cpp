@@ -30,3 +30,4 @@ bool CSpriteEffect::HasExpired() const
 {
 	return fRemaining < 0; 
 }
+

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BONUS_H
+#define BONUS_H
+
 #include "SpriteMoving.h"
 
     //! Bonus
@@ -57,10 +59,13 @@ public:
 
 		//! Tablica tekstur
 		/*!
-			Statyczna tablica adresów tekstur, dla poszczególnych typów bonusów. \warning Za³adowaæ tekstury przed tworzeniem obiektów klasy.
+			Statyczna tablica adresów tekstur, dla poszczególnych typów bonusów.
+			\warning Za³adowaæ tekstury przed tworzeniem obiektów klasy.
 		*/
 	static LPDIRECT3DTEXTURE8 spTextures[MAX_TYPE];
 
 private:
 	TypeEnum eType;
 };
+
+#endif

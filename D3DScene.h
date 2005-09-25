@@ -1,4 +1,6 @@
-#pragma once
+#ifndef D3DSCENE_H
+#define D3DSCENE_H
+
 
 #include <stack>
 using namespace std;
@@ -40,7 +42,7 @@ protected:
 			Jest to dozwolone poniewa¿ s¹ one automatycznie przerzucane do pamiêci systemowej, 
 			gdy urz¹dzenie graficzne jest resetowane.
 		*/
-	virtual HRESULT InitDeviceObjects() = 0;
+	virtual HRESULT OnInitDevice() = 0;
 		
 		//! Inicjalizuje obiekty u¿ywaj¹ce pamiêci karty
 		/*!
@@ -48,33 +50,33 @@ protected:
 			które znajduj¹ siê w pamiêci kart graficznej. W szczególnoœci dotyczy to buforów wierzcho³ków, 
 			wiêc równie¿ obiektów \e ID3DXSprite.
 		*/
-	virtual HRESULT RestoreDeviceObjects() = 0;
+	virtual HRESULT OnRestoreDevice() = 0;
 		
 		//! Zwalnia obiekty u¿ywaj¹ce pamiêci karty
 		/*!
-			W tej funkcji klasa dziedziczona powinna zwolniæ obiekty zainicjowane w #RestoreDeviceObjects().
+			W tej funkcji klasa dziedziczona powinna zwolniæ obiekty zainicjowane w #OnRestoreDevice().
 		*/
-	virtual HRESULT InvalidateDeviceObjects() = 0;
+	virtual HRESULT OnInvalidateDevice() = 0;
 		
 		//! Zwalnia obiekty u¿ywaj¹ce pamiêci systemowej
 		/*!
-			W tej funkcji klasa dziedziczona powinna zwolniæ obiekty zainicjowane w #InitDeviceObjects().
+			W tej funkcji klasa dziedziczona powinna zwolniæ obiekty zainicjowane w #OnInitDevice().
 		*/
-	virtual HRESULT DeleteDeviceObjects() = 0;
+	virtual HRESULT OnDeleteDevice() = 0;
 
 		//! Przetwarza dane wejœciowe z myszki
 		/*!
 			Funkcja jest wywo³ywana dla ka¿dego elementu z bufora urz¹dzenia.
 			\param didod	Dane z bufora
 		*/
-	virtual HRESULT ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod ) = 0;
+	virtual HRESULT OnMouseEvent( LPDIDEVICEOBJECTDATA didod ) = 0;
 		
 		//! Przetwarza dane wejœciowe z klawiatury
 		/*!
 			Funkcja jest wywo³ywana dla ka¿dego elementu z bufora urz¹dzenia.
 			\param didod	Dane z bufora
 		*/
-	virtual HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod ) = 0;
+	virtual HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod ) = 0;
 		
 		//! Wykonuje ruch obiektów sceny
 	virtual HRESULT FrameMove( float fElapsedTime ) = 0;
@@ -109,3 +111,5 @@ private:
 	stack<LPDIRECT3DTEXTURE8> stackTextures;
 	friend class CD3DApp;
 };
+
+#endif

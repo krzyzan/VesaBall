@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BALL_H
+#define BALL_H
 
 #include "SpriteMoving.h"
 
@@ -48,7 +49,7 @@ public:
 			\param pSprite		WskaŸnik do obiektu
 			\param vSide		Wektor punktu wzgledem œrodka kulki w którym nastepuje kolizja
 		*/ 
-	void Reflect( CSprite* pSprite, const D3DXVECTOR2 & vSide );
+	void Reflect( const CSprite* pSprite, const D3DXVECTOR2 & vSide );
 
 		//! Je¿eli \b true, kulka sie nie porusza, domyœlnie \b false
 	bool bCatched;
@@ -59,3 +60,5 @@ public:
 		*/
 	static LPDIRECT3DTEXTURE8 spTexture;
 };
+
+#endif

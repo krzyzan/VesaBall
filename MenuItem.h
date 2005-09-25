@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MENUITEM_H
+#define MENUITEM_H
+
 #include "Sprite.h"
 
 class CMenuItem :
@@ -37,3 +39,5 @@ private:
 	CSprite* pShadow;
 	DWORD dwUID;
 };
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GAMEMENU_H
+#define GAMEMENU_H
+
 
 #include <list>
 using namespace std;
@@ -23,13 +25,13 @@ public:
 	CGameMenu();
 	virtual ~CGameMenu();
 
-	HRESULT InitDeviceObjects();
-	HRESULT RestoreDeviceObjects();
-	HRESULT InvalidateDeviceObjects();
-	HRESULT DeleteDeviceObjects();
+	HRESULT OnInitDevice();
+	HRESULT OnRestoreDevice();
+	HRESULT OnInvalidateDevice();
+	HRESULT OnDeleteDevice();
 
-	HRESULT ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod );
-	HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT OnMouseEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod );
 
 	HRESULT FrameMove( float fElapsedTime );
 	HRESULT FrameRender();
@@ -46,3 +48,5 @@ private:
 	CMenuItem*			pCurrentItem;
 	CMenuItem*			pPressedItem;
 };
+
+#endif

@@ -10,8 +10,11 @@
 CGameEditor::CGameEditor()
 {
 	pCursor			= NULL;
-	curType			= 0;
+	curType			= 1;
 	pLevelCounter	= 0; 
+
+	bLMB = false;
+	bRMB = false;
 }
 
 
@@ -20,9 +23,9 @@ CGameEditor::~CGameEditor()
 }
 
 
-HRESULT CGameEditor::InitDeviceObjects()
+HRESULT CGameEditor::OnInitDevice()
 {
-	CGameBoard::InitDeviceObjects();
+	CGameBoard::OnInitDevice();
 
 	LPDIRECT3DTEXTURE8 pTex;
 	LoadTexture( "gfx/Cursor_arrow.png", &pTex );
@@ -33,11 +36,25 @@ HRESULT CGameEditor::InitDeviceObjects()
 	POINT DigitPixels = {64,92};
 	pLevelCounter = new CCounter( 0,D3DXVECTOR2(BOARD_W*0.2f, 0.05f*0.75f), D3DXVECTOR2(BOARD_L+BOARD_W*0.125f, 0.05f/2), DigitPixels, 6 );
 
+	// tworzymy legendê cegie³ek
+	POINT arraySize = {10,4};
+	pBrickToolkit = new CBrickArray( arraySize, D3DXVECTOR2( BOARD_L+BOARD_W/2, BOARD_B-BOARD_W/10 ), D3DXVECTOR2( BOARD_W/2, BOARD_W/10 ) );
+	
+	POINT pos;
+	BYTE idType = 0;
+	for (pos.y=0; pos.y<arraySize.y; pos.y++)
+		for (pos.x=0; pos.x<arraySize.x; pos.x++) {
+			idType++;
+			if (idType >= BRICK_TYPE_MAX)
+				return S_OK;
+			pBrickToolkit->InsertBrick( idType, pos);
+		}
+
 	return S_OK;
 }
 
 
-HRESULT CGameEditor::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
+HRESULT CGameEditor::OnMouseEvent( LPDIDEVICEOBJECTDATA didod )
 {
 	switch (didod->dwOfs) {
 		case DIMOFS_X:
@@ -48,33 +65,27 @@ HRESULT CGameEditor::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
 			pCursor->Move( D3DXVECTOR2( 0, (float)(int)didod->dwData ) );
 			break;
 
-        case DIMOFS_BUTTON0:
-        case DIMOFS_BUTTON1:
+		case DIMOFS_BUTTON0:
 			if (didod->dwData & 0x80) {
-				if ( !pBrickArray->Contains( pCursor->vPosition ) ) 
-					break;
-
-				POINT pos = pBrickArray->GetArrayCoordsAt( pCursor->vPosition );
-				CBrick* pBrick = pBrickArray->GetBrick( pos );
-				if (pBrick) {
-					curType = pBrick->GetType();
-					if (didod->dwOfs == DIMOFS_BUTTON0)
-						curType = (curType + 1)%BRICK_TYPE_MAX;
-					pBrickArray->RemoveBrick( pos );
-				}
-
-				if (didod->dwOfs == DIMOFS_BUTTON0) {
-					pBrickArray->InsertBrick( curType, pos );
-					pBrickArray->GetBrick( pos )->Zap();  // Niewidzialne cegie³ki musz¹ byc widoczne w edytorze
+				POINT pos = pBrickToolkit->GetArrayCoordsAt( pCursor->vPosition );
+				if ( pBrickToolkit->IsValid( pos ) ) {
+					CBrick* pBrick = pBrickToolkit->GetBrick( pos );
+					if (pBrick)
+						curType = pBrick->GetType();
 				}
 			}
+			bLMB = ((didod->dwData & 0x80) != 0);
+			break;
+
+		case DIMOFS_BUTTON1:
+			bRMB = ((didod->dwData & 0x80) != 0);
 			break;
     }
 
 	return S_OK;
 }
 
-HRESULT CGameEditor::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
+HRESULT CGameEditor::OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod )
 {
 	if ( didod->dwData & 0x80 )
 		switch (didod->dwOfs) {
@@ -107,13 +118,23 @@ HRESULT CGameEditor::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
 				return S_OK;
 		}
 
-	return CGameBoard::ProcessKeybrdEvent( didod );
+	return CGameBoard::OnKeyboardEvent( didod );
 }
 
 
 HRESULT CGameEditor::FrameMove( float fElapsedTime )
 {
 	pLevelCounter->Update( fElapsedTime );
+
+	if ( bLMB || bRMB ) {
+		POINT pos = pBrickArray->GetArrayCoordsAt( pCursor->vPosition );
+		if ( pBrickArray->IsValid( pos ) ) {
+			pBrickArray->RemoveBrick( pos );
+            if (bLMB)
+				pBrickArray->InsertBrick( curType, pos );
+		}
+	}
+
 	return S_OK;
 }
 
@@ -125,6 +146,7 @@ HRESULT CGameEditor::FrameRender()
 	CGameBoard::FrameRender();
 
 	pSprite->Begin();
+	pBrickToolkit->Render( pSprite );
 	pLevelCounter->Render( pSprite );
 	pCursor->Render( pSprite );
 	pSprite->End();
@@ -133,10 +155,10 @@ HRESULT CGameEditor::FrameRender()
 }
 
 
-HRESULT CGameEditor::DeleteDeviceObjects()
+HRESULT CGameEditor::OnDeleteDevice()
 {
 	SAFE_DELETE( pCursor );
 	SAFE_DELETE( pLevelCounter );
 
-	return CGameBoard::DeleteDeviceObjects();
+	return CGameBoard::OnDeleteDevice();
 }

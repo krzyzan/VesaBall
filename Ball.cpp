@@ -39,7 +39,7 @@ void CBall::SetSpeed( const D3DXVECTOR2 & vNewSpeed )
 }
 
 
-void CBall::Reflect( CSprite* pSprite, const D3DXVECTOR2 & vSide )
+void CBall::Reflect( const CSprite* pSprite, const D3DXVECTOR2 & vSide )
 {
 	if (vSide.y > 0) {
 		vPosition.y = 2*pSprite->vPosition.y - vSize.y - vPosition.y - pSprite->vSize.y;

@@ -55,11 +55,10 @@ HRESULT CD3DApp::Create( HINSTANCE hInstance )
 		return hr;
 
 	srand( (DWORD)Timer.GetAbsoluteTime() );
-
 	Timer.Start();
 
-	bActive = TRUE;
-	bReady = TRUE;
+	bActive = true;
+	bReady = true;
 
 	return S_OK;
 }
@@ -69,9 +68,8 @@ HRESULT CD3DApp::Run()
 {
 	BOOL bGotMsg;
 	MSG  msg;
-	PeekMessage( &msg, NULL, 0U, 0U, PM_NOREMOVE );
 
-	while (WM_QUIT != msg.message) {
+	while (true) {
 		// Use PeekMessage() if the app is active, so we can use idle time to
 		// render the scene. Else, use GetMessage() to avoid eating CPU time.
 		if ( bActive )
@@ -79,16 +77,18 @@ HRESULT CD3DApp::Run()
 		else
 			bGotMsg = GetMessage( &msg, NULL, 0U, 0U );
 
+		if (msg.message == WM_QUIT)
+			break;
+
 		if ( bGotMsg ) {
 			TranslateMessage( &msg );
 			DispatchMessage( &msg );
 		}
-		else {
+		else 
 			if ( bActive && bReady ) {
 				if ( FAILED( Render3DEnvironment() ) )
 					SendMessage( hWnd, WM_CLOSE, 0, 0 );
 			}
-		}
 	}
 
 	return (INT)msg.wParam;
@@ -137,7 +137,8 @@ HRESULT CD3DApp::BuildDeviceList()
 		//	continue;
 
 		// Check if the mode already exists (to filter out refresh rates)
-		for( DWORD m=0L; m<dwNumModes; m++ )
+		DWORD m;
+		for( m=0; m<dwNumModes; m++ )
 		{
 			if ( ( modes[m].Width  == DisplayMode.Width	) &&
 				( modes[m].Height == DisplayMode.Height ) &&
@@ -154,14 +155,15 @@ HRESULT CD3DApp::BuildDeviceList()
 			modes[dwNumModes++] = DisplayMode;
 			
 			// Check if the mode's format already exists
-			for( DWORD f=0; f<dwNumFormats; f++ )
+			DWORD f;
+			for( f=0; f<dwNumFormats; f++ )
 			{
 				if ( DisplayMode.Format == formats[f] )
 					break;
 			}
 
 			// If the format is new, add it to the list
-			if ( f== dwNumFormats )
+			if ( f == dwNumFormats )
 				formats[dwNumFormats++] = DisplayMode.Format;
 		}
 	}
@@ -245,7 +247,8 @@ HRESULT CD3DApp::BuildDeviceList()
 
 		// Add all enumerated display modes with confirmed formats to the
 		// device's list of valid modes
-		for( DWORD m=0L; m<dwNumModes; m++ )
+		DWORD m;
+		for( m=0; m<dwNumModes; m++ )
 		{
 			for( DWORD f=0; f<dwNumFormats; f++ )
 			{
@@ -405,6 +408,10 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 {
 	switch( uMsg )
 	{
+		//case WM_ACTIVATEAPP:
+		//	bActive = (wParam == TRUE);
+		//	return 0;
+
   		case WM_SETCURSOR:
             // Turn off Windows cursor in fullscreen mode
 			if ( bActive && bReady )
@@ -449,12 +456,6 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 				  return 1;
 					break;
 			}
-			break;
-
-		case WM_KEYDOWN:
-			//if (wParam == VK_BACK) {
-			//	SendMessage( hWnd, WM_CLOSE, 0, 0 );//TODO: TMP
-			//}
 			break;
 
 		case WM_CLOSE:
@@ -507,7 +508,7 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 	pD3DDevice->GetDeviceCaps( &d3dCaps );
 	CreateFlags = pModeInfo->dwBehavior;
 
-	// Ustaw urz¹dzenie D3D które uzywaj¹ obiekty CD3DScene
+	// Ustaw urz¹dzenie D3D które u¿ywaj¹ obiekty CD3DScene
 	CD3DScene::pD3DDevice = pD3DDevice;
 
 	return S_OK;
@@ -535,10 +536,10 @@ HRESULT CD3DApp::Render3DEnvironment()
 	// G³ówna pêtla programu
 	float fElapsedTime = Timer.GetElapsedTime();
 
-	if ( FAILED( hr = ReadKeyboardEvents() ) )
+	if ( FAILED( hr = ProcessKeyboardEvents() ) )
 		return hr;
 
-	if ( FAILED( hr = ReadMouseEvents() ) )
+	if ( FAILED( hr = ProcessMouseEvents() ) )
 		return hr;
 
 	if ( FAILED( hr = sD3DScenes.top()->FrameMove( fElapsedTime ) ) )
@@ -567,7 +568,7 @@ HRESULT CD3DApp::Reset3DEnvironment()
 	HRESULT hr;
 
 	// Zwolnij wszystkie obiekty karty w aktualnej scenie
-	if ( FAILED( hr = sD3DScenes.top()->InvalidateDeviceObjects() ) )
+	if ( FAILED( hr = sD3DScenes.top()->OnInvalidateDevice() ) )
 		return hr;
 
 	// Zresetuj urz¹dzenie
@@ -575,7 +576,7 @@ HRESULT CD3DApp::Reset3DEnvironment()
 		return hr;
 
 	// Inicjalizuj wszystkie obiekty karty w aktualnej scenie
-	if ( FAILED( hr = sD3DScenes.top()->RestoreDeviceObjects() ) )
+	if ( FAILED( hr = sD3DScenes.top()->OnRestoreDevice() ) )
 		return hr;
 
 	return S_OK;
@@ -585,14 +586,14 @@ HRESULT CD3DApp::Reset3DEnvironment()
 HRESULT CD3DApp::Cleanup3DEnvironment()
 {
 	// Wyczyœæ wszystko i wyjdŸ z aplikacji
-	bActive = FALSE;
-	bReady  = FALSE;
+	bActive = false;
+	bReady  = false;
 
 	if ( pD3DDevice ) {
 		if (!sD3DScenes.empty())
-			sD3DScenes.top()->InvalidateDeviceObjects();
+			sD3DScenes.top()->OnInvalidateDevice();
 		while (!sD3DScenes.empty()) {
-			sD3DScenes.top()->DeleteDeviceObjects();
+			sD3DScenes.top()->OnDeleteDevice();
 			delete sD3DScenes.top();
 			sD3DScenes.pop();
 		}
@@ -680,7 +681,7 @@ HRESULT CD3DApp::InitializeMouseInput()
 }
 
 
-HRESULT CD3DApp::ReadMouseEvents()
+HRESULT CD3DApp::ProcessMouseEvents()
 {
 	DIDEVICEOBJECTDATA didod[ MOUSE_BUFFER_SIZE ]; 
 	DWORD              dwElements;
@@ -694,7 +695,7 @@ HRESULT CD3DApp::ReadMouseEvents()
 		return hr;
 
 	for (DWORD i = 0; i < dwElements; i++) {
-		if (FAILED( sD3DScenes.top()->ProcessMouseEvent( &didod[i] ) ) )
+		if (FAILED( sD3DScenes.top()->OnMouseEvent( &didod[i] ) ) )
 			return hr;
 	}
 
@@ -702,7 +703,7 @@ HRESULT CD3DApp::ReadMouseEvents()
 }
 
 
-HRESULT CD3DApp::ReadKeyboardEvents()
+HRESULT CD3DApp::ProcessKeyboardEvents()
 {
 	DIDEVICEOBJECTDATA didod[ KEYBRD_BUFFER_SIZE ];
 	DWORD              dwElements;
@@ -716,7 +717,7 @@ HRESULT CD3DApp::ReadKeyboardEvents()
 		return hr;
 
 	for (DWORD i = 0; i < dwElements; i++)
-		if (FAILED( sD3DScenes.top()->ProcessKeybrdEvent( &didod[i] ) ) )
+		if (FAILED( sD3DScenes.top()->OnKeyboardEvent( &didod[i] ) ) )
 			return hr;
 
 	return S_OK;
@@ -728,15 +729,15 @@ HRESULT CD3DApp::StartNewScene( CD3DScene* pScene )
 	HRESULT hr;
 
 	if (!sD3DScenes.empty())
-		if (FAILED( hr = sD3DScenes.top()->InvalidateDeviceObjects() ) )
+		if (FAILED( hr = sD3DScenes.top()->OnInvalidateDevice() ) )
 			return hr;
 
 	sD3DScenes.push( pScene );
 	
- 	if (FAILED( hr = sD3DScenes.top()->InitDeviceObjects() ) )
+ 	if (FAILED( hr = sD3DScenes.top()->OnInitDevice() ) )
 		return hr;
 
- 	if (FAILED( hr = sD3DScenes.top()->RestoreDeviceObjects() ) )
+ 	if (FAILED( hr = sD3DScenes.top()->OnRestoreDevice() ) )
 		return hr;
 
 	return S_OK;
@@ -746,10 +747,10 @@ HRESULT CD3DApp::StartParentScene()
 {
 	HRESULT hr;
 
-	if (FAILED( hr = sD3DScenes.top()->InvalidateDeviceObjects() ) )
+	if (FAILED( hr = sD3DScenes.top()->OnInvalidateDevice() ) )
 		return hr;
 
-	if (FAILED( sD3DScenes.top()->DeleteDeviceObjects() ) )
+	if (FAILED( sD3DScenes.top()->OnDeleteDevice() ) )
 		return hr;
 
 	delete sD3DScenes.top();
@@ -760,7 +761,7 @@ HRESULT CD3DApp::StartParentScene()
 		return S_OK;
 	}
 
-	if (FAILED( sD3DScenes.top()->RestoreDeviceObjects() ) )
+	if (FAILED( sD3DScenes.top()->OnRestoreDevice() ) )
 		return hr;
 
 	return S_OK;

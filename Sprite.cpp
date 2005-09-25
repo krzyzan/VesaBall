@@ -8,7 +8,7 @@ CSprite::CSprite( const LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
 	SetSize( Size );
 	fRotation		= Rotation;
 	vPosition		= Position;
-	dwColor		= Color;
+	dwColor			= Color;
 }
 
 
@@ -32,5 +32,6 @@ void CSprite::Render( LPD3DXSPRITE pSprite ) const
 	D3DXVECTOR2 Position = vPosition - vSize/2;
 	if (vScaling.x < 0) Position.x += vSize.x;
 	if (vScaling.y < 0) Position.y += vSize.y;
-	pSprite->Draw( pTexture, NULL, &vScaling, &vRotationCenter, fRotation, &(Position * (float)RES_X), dwColor );
+	Position *= (float)RES_X;
+	pSprite->Draw( pTexture, NULL, &vScaling, &vRotationCenter, fRotation, &Position, dwColor );
 }

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef COUNTER_H
+#define COUNTER_H
+
 #include "Sprite.h"
 
 	//! Licznik wyœwietlajacy liczby dodatnie
@@ -48,3 +50,5 @@ protected:
 	DWORD dwNumDigits;
 	float fValue;
 };
+
+#endif

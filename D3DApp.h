@@ -1,4 +1,6 @@
-#pragma once
+#ifndef D3DAPP_H
+#define D3DAPP_H
+
 #include <d3dx8.h>
 #include <stack>
 using namespace std;
@@ -24,13 +26,13 @@ enum APPMSGTYPE { MSG_NONE, MSGERR_APPMUSTEXIT, MSGWARN_SWITCHEDTOREF };
 #define D3DAPPERR_MEDIANOTFOUND 	  0x8200000b
 #define D3DAPPERR_RESIZEFAILED		  0x8200000c
 
-const	MOUSE_BUFFER_SIZE	= 16;
-const	KEYBRD_BUFFER_SIZE	= 16;
+const int MOUSE_BUFFER_SIZE		= 16;
+const int KEYBRD_BUFFER_SIZE	= 16;
 
 
 //! Aplikacja Direct3D
 /*!
-	Stanowi ³atwy w u¿yciu interfejs Direct3D. 
+	U³atwia korzystanie z Direct3D. Zajmuje siê inicjalizacj¹ interfejsu D3D oraz enumeracj¹ dostepnych trybów graficznych.
 	Zarz¹dza obiektami #CD3DScene wykonuj¹c w odpowiedniej kolejnoœci ich inicjalizacjê, resetowanie oraz zamykanie.
 */
 
@@ -117,8 +119,8 @@ private:
 	HRESULT	ChangeScene();
 	HRESULT StartParentScene();
 
-	HRESULT ReadMouseEvents();
-	HRESULT ReadKeyboardEvents();
+	HRESULT ProcessMouseEvents();
+	HRESULT ProcessKeyboardEvents();
 
 	// DirectInput
 	HRESULT InitializeMouseInput();
@@ -138,8 +140,8 @@ private:
 
 private:
 	// Wewnêtrzne zmienne okreœlaj¹ce stan aplikacji
-	BOOL					bActive;
-	BOOL					bReady;
+	bool					bActive;
+	bool					bReady;
 
 	// Stos scen
 	stack<CD3DScene*>		sD3DScenes;
@@ -187,3 +189,5 @@ private:
 	// Statyczny handler zdarzeñ, przekazuje zdarzenia do aplikacji spD3DApp.
 	static LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 };
+
+#endif

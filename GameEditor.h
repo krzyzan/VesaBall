@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GAMEEDITOR_H
+#define GAMEEDITOR_H
+
 #include "GameBoard.h"
 
 class CCursor;
@@ -14,39 +16,47 @@ public:
 
 		//! Inicjalizuje obiekty w pamiêci systemowej
 		/*!
-			\copydoc CGameBoard::InitDeviceObjects()
+			\copydoc CGameBoard::OnInitDevice()
 			Tworzy kursor.
 		*/
-	HRESULT InitDeviceObjects();
+	HRESULT OnInitDevice();
 
 		//! Zwalnia obiekty w pamiêci systemowej
-	HRESULT DeleteDeviceObjects();
+	HRESULT OnDeleteDevice();
 
 		//! Przetwarza zdarzenia myszki
 		/*!
-			Lewym przyciskiem u¿ytkownik tworzy cegie³ki lub zmienia ich typ.
-			Prawym usuwa cegie³ki. 	Edytor zapamiêtuje typ ostatnio 
-			zmodyfikowanej\stworzonej\usuniêtej cegie³ki.
+			Lewym przyciskiem u¿ytkownik tworzy cegie³ki.
+			Prawym cegie³ki s¹ usuwane. Typ cegie³ki mozna okreœliæ 
+			klikaj¹c lewym przyciskiem na dolnej tablicy.
 		*/
             
-	HRESULT ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT OnMouseEvent( LPDIDEVICEOBJECTDATA didod );
 
 		//! Przetwarza zdarzenia klawiatury
 		/*!
 			- Klawisz Escape wychodzi bez zapisania.
 			- Klawisz Prawo przechodzi poziom wy¿ej
-			- Klawisz Lewo przechodzi poziom wy¿ej
+			- Klawisz Lewo przechodzi poziom ni¿ej
 			- Klawisz S zapisuje poziom.
 			- Klawisz L wczytuje poziom.
 			- Klawisz C kasuje wszystke cegie³ki.
 		*/
-	HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod );
 	
 	HRESULT FrameMove( float fElapsedTime );
 	HRESULT FrameRender();
 
 protected:
-	CCursor*	pCursor;
-	DWORD		curType;
-	CCounter*	pLevelCounter; 
+	CCursor*		pCursor;
+	BYTE			curType;
+	CCounter*		pLevelCounter; 
+
+	CBrickArray*	pBrickToolkit;
+
+	// stan przycisków myszy
+	bool bLMB;
+	bool bRMB;
 };
+
+#endif

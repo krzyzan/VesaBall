@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SPRITE_EFFECT_H
+#define SPRITE_EFFECT_H
+
 #include "SpriteMoving.h"
 
 //! Efekt znikaj¹cej tekstury.
@@ -39,3 +41,5 @@ protected:
 	float fRemaining;
 	float fDuration;
 };
+
+#endif

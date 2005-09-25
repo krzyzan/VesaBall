@@ -20,7 +20,7 @@ CGameMenu::~CGameMenu()
 }
 
 
-HRESULT CGameMenu::InitDeviceObjects()
+HRESULT CGameMenu::OnInitDevice()
 {
 	LPDIRECT3DTEXTURE8 pTex;
 
@@ -55,7 +55,7 @@ HRESULT CGameMenu::InitDeviceObjects()
 }
 
 
-HRESULT CGameMenu::RestoreDeviceObjects()
+HRESULT CGameMenu::OnRestoreDevice()
 {
 	D3DXCreateSprite( pD3DDevice, &pSprite );
 
@@ -73,7 +73,7 @@ CMenuItem* CGameMenu::GetPOINTedMenuItem() const
 }
 
 
-HRESULT CGameMenu::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
+HRESULT CGameMenu::OnMouseEvent( LPDIDEVICEOBJECTDATA didod )
 {
 	switch (didod->dwOfs) {
 		case DIMOFS_X:
@@ -136,7 +136,7 @@ HRESULT CGameMenu::ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod )
 }
 
 
-HRESULT CGameMenu::ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod )
+HRESULT CGameMenu::OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod )
 {
 	if (didod->dwOfs == DIK_ESCAPE && (didod->dwData & 0x80) )
 		SetCurrentScene( NULL );
@@ -164,7 +164,7 @@ HRESULT CGameMenu::FrameRender()
 }
 
 
-HRESULT CGameMenu::InvalidateDeviceObjects()
+HRESULT CGameMenu::OnInvalidateDevice()
 {
 	SAFE_RELEASE( pSprite );
 	
@@ -172,7 +172,7 @@ HRESULT CGameMenu::InvalidateDeviceObjects()
 }
 
 
-HRESULT CGameMenu::DeleteDeviceObjects()
+HRESULT CGameMenu::OnDeleteDevice()
 {
 	// Kasujemy z listy renderowania
 	list<CSprite*>::iterator iSprite = listRender.begin();

@@ -3,8 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="VesaBall"
-	ProjectGUID="{04F8231C-3600-4F1A-BAB3-EF181905A63C}"
-	RootNamespace="VesaBall"
+	ProjectGUID="{C72535D3-6850-4D1F-88A4-D0689C0E6ACC}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -25,8 +24,6 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="stdafx.h"
-				AssemblerOutput="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -37,10 +34,9 @@
 				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib"
 				OutputFile="$(OutDir)/VesaBall.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="libci.lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/Ball.pdb"
+				ProgramDatabaseFile="$(OutDir)/VesaBall.pdb"
 				SubSystem="2"
 				TargetMachine="1"/>
 			<Tool
@@ -73,21 +69,24 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				RuntimeLibrary="4"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="stdafx.h"
-				AssemblerOutput="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"/>
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="d3d8.lib d3dx8.lib dinput8.lib dxguid.lib"
-				AdditionalLibraryDirectories="d3d8.lib d3dx8.lib"
+				OutputFile="$(OutDir)/VesaBall.exe"
+				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="libci.lib"
+				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
-				EnableCOMDATFolding="2"/>
+				EnableCOMDATFolding="2"
+				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

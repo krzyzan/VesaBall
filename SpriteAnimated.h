@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SPRITEANIMATED_H
+#define SPRITEANIMATED_H
+
 #include "SpriteEffect.h"
 
 //! Animowany sprite
@@ -49,3 +51,5 @@ private:
 	DWORD dwLastFrame;
 	POINT ptFramePixels;
 };
+
+#endif

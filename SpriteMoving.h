@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SPRITE_MOVING_H
+#define SPRITE_MOVING_H
+
 #include "Sprite.h"
 
 //! Ruchomy obiekt
@@ -41,3 +43,5 @@ protected:
 	D3DXVECTOR2	vSpeed;
 	D3DXVECTOR2	vAccel;
 };
+
+#endif

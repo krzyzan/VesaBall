@@ -1,13 +1,14 @@
-#pragma once
+#ifndef BRICK_H
+#define BRICK_H
+
 #include "Sprite.h"
 
 class CBall;
 class CSpriteEffect;
 
 
-const DUR_MAX = 4;
-const BYTE BRICK_TYPE_MAX = 13;
-const BYTE BRICK_TYPE_EXPL = 2;
+const BYTE BRICK_TYPE_MAX = 23;
+const BYTE BRICK_TYPE_EXPL = 8;
 
     //! Cegie³ka
     /*!
@@ -19,7 +20,8 @@ const BYTE BRICK_TYPE_EXPL = 2;
 	struct SType
 	{
 		DWORD	dwScore;
-		DWORD	dwDurability;
+		BYTE	idNextType;
+		bool	bMustHit;
 	};
 
 public:
@@ -29,7 +31,7 @@ public:
 			\param Position	Pozycja pocz¹tkowa
 			\param Size		Rozmiar
 		*/ 
-	CBrick( DWORD Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size );
+	CBrick( BYTE Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size );
 
 	virtual ~CBrick();
 
@@ -39,42 +41,37 @@ public:
 		*/ 
 	CSpriteEffect* CreateBlendEffect( const D3DXVECTOR2 & vSpeed ) const;
 
-		//! Zwiêksza licznik trafieñ
-	void Hit();
+		//! Zwraca indeks typu cegie³ki
+	BYTE GetType() const 
+		{return idType;}
 
-		//! Zmniejsza wytrzyma³oœæ cegie³ki do 1.
-	void Zap();
+		//! Zwraca indeks typu cegie³ki przy uderzeniu
+	BYTE GetNextType() const 
+		{return s_Type[idType].idNextType;}
 
-		//! Zwraca ile razy trafiona
-	DWORD GetHitCount() const 
-		{return dwHitCount;}
-
-		//! Zwraca liczbê okreœlaj¹c¹ typ cegie³ki
-	DWORD GetType() const 
-		{return dwType;}
-
-		//! Zwraca punktacjê za zbicie cegie³ki
+		//! Zwraca punktacjê za trafienie cegie³ki
 	DWORD GetScore() const 
-		{return s_Type[dwType].dwScore;}
+		{return s_Type[idType].dwScore;}
 
-		//! Zwraca \b true jeœli wytrzyma³oœc spad³a do zera
-	bool IsDestroyed() const 
-		{return dwHitCount == s_Type[dwType].dwDurability;}
-
-		//! Zwraca \b true jeœli mo¿e byc zniszczona mo¿e byæ zniszczona
-	bool IsDestructible() const 
-		{return s_Type[dwType].dwDurability != DUR_MAX;}
+		//! Zwraca \b true jeœli trzeba zbiæ cegie³kê ¿eby przejœæ poziom
+	bool MustHit() const 
+		{return s_Type[idType].bMustHit;}
 
 		//! Zwraca \b true jeœli wybuchowa
 	bool IsExplosive() const 
-		{return dwType == BRICK_TYPE_EXPL;}
+		{return idType == BRICK_TYPE_EXPL;}
 
-		//!
-	static LPDIRECT3DTEXTURE8	spTexture[BRICK_TYPE_MAX][DUR_MAX];
+		//! Tablica tekstur
+		/*!
+			Statyczna tablica adresów tekstur, dla poszczególnych typów cegie³ek. 
+			\warning Za³adowaæ tekstury przed tworzeniem obiektów klasy.
+		*/
+	static LPDIRECT3DTEXTURE8	spTexture[BRICK_TYPE_MAX];
 
 private:
-	DWORD dwType;
-	DWORD dwHitCount;
+	BYTE idType;
 
 	static SType				s_Type[BRICK_TYPE_MAX];
 };
+
+#endif

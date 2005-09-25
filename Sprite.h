@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SPRITE_H
+#define SPRITE_H
+
 #include <d3dx8.h>
 
 //! Sprite (tekturowany obiekt 2D)
@@ -58,3 +60,5 @@ protected:
 	D3DXVECTOR2			vRotationCenter;
 	D3DCOLOR			dwColor;
 };
+
+#endif

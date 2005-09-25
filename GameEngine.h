@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAMEENGINE_H
+#define GAMEENGINE_H
 
 #include "GameBoard.h"
 
@@ -21,7 +22,7 @@ public:
 		
 		//! Inicjalizuje obiekty w pamiêci systemowej
 		/*!
-			\copydoc CGameBoard::InitDeviceObjects()
+			\copydoc CGameBoard::OnInitDevice()
 			\par
 			£aduje tekstury:
 			- deski
@@ -35,11 +36,11 @@ public:
 			- licznik ¿yæ
 			- deskê z kulk¹
 		*/
-	HRESULT InitDeviceObjects();
+	HRESULT OnInitDevice();
 
 		//! Zwalnia obiekty w pamiêci systemowej
 		/*!
-			\copydoc CGameBoard::DeleteDeviceObjects()
+			\copydoc CGameBoard::OnDeleteDevice()
 			\par
 			Zwalnia:
 			- deskê
@@ -48,21 +49,21 @@ public:
 			- bonusy
 			- pozycje eksplozji
 		*/
-	HRESULT DeleteDeviceObjects();
+	HRESULT OnDeleteDevice();
 
 		//! Przetwarza zdarzenia z bufora myszki
 		/*!
 			\par
 			Porusza desk¹. Lewy przycisk wypuszcza wszystkie kulki "z³apane" przez deskê.
 		*/
-	HRESULT ProcessMouseEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT OnMouseEvent( LPDIDEVICEOBJECTDATA didod );
 
 		//! Przetwarza zdarzenia z bufora klawiatury
 		/*!
 			\par
 			Klawisz P zatrzymuje grê.
 		*/
-	HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod );
 	
 		//! Wykonuje ruch obiektów sceny oraz oblicza kolizje
 		/*!
@@ -124,7 +125,7 @@ private:
 		*/
 	void DoExplosion( const POINT & pos );
 
-		//! "Zbija" cegie³kê
+		//! Uderzenie w cegie³kê
 		/*!
 			\par
 			Usuwa cegie³kê z tablicy cegie³ek tworz¹c efekt znikania cegie³ki.
@@ -181,3 +182,5 @@ private:
 	float					fTimeToExplosion;
 	list<POINT>				listExplodingPos;
 };
+
+#endif

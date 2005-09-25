@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CURSOR_H
+#define CURSOR_H
 
 #include "Sprite.h"
 
@@ -31,3 +32,5 @@ public:
 	*/
 	HRESULT Move( const D3DXVECTOR2 & vMovement );
 };
+
+#endif

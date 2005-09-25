@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GAMEBOARD_H
+#define GAMEBOARD_H
+
 #include "D3DScene.h"
 #include "BrickArray.h"
 
@@ -18,22 +20,22 @@ protected:
 			Wczytuje do pamiêci potrzebne tekstury. 
 			Tworzy ograniczenia boczne i wczytuje tablicê cegie³ek z pliku.
 		*/
-	HRESULT InitDeviceObjects();
+	HRESULT OnInitDevice();
 
 		//! Inicjalizuje obiekty w pamiêci karty graficznej
 		/*!
 			Tworzy obiekt \b ID3DXSprite u¿ywany do renderowania
 		*/
-	HRESULT RestoreDeviceObjects();
+	HRESULT OnRestoreDevice();
 
 		//! Zwalnia obiekty w pamiêci karty graficznej
-	HRESULT InvalidateDeviceObjects();
+	HRESULT OnInvalidateDevice();
 
 		//! Zwalnia obiekty w pamiêci systemowej
-	HRESULT DeleteDeviceObjects();
+	HRESULT OnDeleteDevice();
 
 		//! Koñczy scenê jeœli u¿ytkownik nacisn¹³ klawisz Escape
-	HRESULT ProcessKeybrdEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod );
 
 		//! Renderuje sceneriê gry
 	HRESULT FrameRender();
@@ -45,3 +47,5 @@ protected:
 	CBrickArray*		pBrickArray;
 	DWORD				dwLevelNum;
 };
+
+#endif

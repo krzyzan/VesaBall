@@ -1,15 +1,14 @@
-#pragma once
+#ifndef BRICK_ARRAY_H
+#define BRICK_ARRAY_H
+
 #include "Brick.h"
 
-const BRICK_ARRAY_X = 20;
-const BRICK_ARRAY_Y = 20;
-
-const DWORD NUM_LEVELS = 6;
+const DWORD NUM_LEVELS = 50;
 
     //! Tablica cegie³ek
 	/*!
 		\par
-		"Pojemnik" na obiekty #CBrick. Umo¿liwia znalezienie cegie³ki w danym punkcie ekranu w czasie sta³ym.
+		Przechowuje obiekty #CBrick. Umo¿liwia znalezienie w sta³ym czasie cegie³ki w danym punkcie ekranu.
 		Zlicza cegie³ki które mo¿na "zbiæ".
 	*/
 class CBrickArray
@@ -17,10 +16,11 @@ class CBrickArray
 public:
 		//! Tworzy pust¹ tablicê cegie³ek
 		/*
+			/param	Size		Liczba kolumn i wierszy
 			/param	Position	Pozycja œrodka tablicy cegie³ek
-			/param	Size		Rozmiar tablicy cegie³ek na ekranie
+			/param	ScreenSize	Rozmiar tablicy cegie³ek na ekranie
 		*/
-	CBrickArray( const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size );
+	CBrickArray( const POINT & Size, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & ScreenSize );
 
 	virtual ~CBrickArray();
 
@@ -35,10 +35,11 @@ public:
 
 		//! Wstawia cegie³kê do tablicy
 		/*!
-			\param	type	Typ cegie³ki
+			\param	idType	Typ cegie³ki
 			\param	pos		Pozycja w tablicy
+			\warning Jeœli na tym miejscu jest cegie³ka nale¿y j¹ najpierw usun¹æ!
 		*/ 
-	void InsertBrick( DWORD type, const POINT & pos );
+	void InsertBrick( BYTE idType, const POINT & pos );
 
 		//! Usuwa cegie³kê
 		/*!
@@ -49,7 +50,7 @@ public:
 
 		//! Zwraca \b true jeœli w tablicy nie ma ju¿ cegie³ek do zbicia
 	bool Empty() const
-		{ return !dwBrickCounter; }
+		{ return !dwBricksLeft; }
 
 		//! Wczytuje tablicê cegie³ek z pliku
 		/*!
@@ -66,11 +67,12 @@ public:
 		*/ 
 	void Save( DWORD dwLevelNum ) const;
 
-		//! Zwraca czy dany punkt na ekranie nale¿y do tablicy cegie³ek
+		//! Zwraca \b true jeœli wspó³rzêdne nale¿¹ do tablicy
 		/*!
-			\param	vPos	Punkt na ekranie
+			\param	pos	Wspó³rzêdne
 		*/
-	bool Contains( const D3DXVECTOR2 & vPos ) const;
+	bool IsValid( const POINT & pos ) const
+		{ return (pos.x>=0) && (pos.x<Max.x) && (pos.y>=0) && (pos.y<Max.y);}
 
 		//! Zwraca wspó³rzêdne w tablicy odpowiadaj¹ce punktowi na ekranie
 		/*!
@@ -92,17 +94,28 @@ public:
 		//! Zmniejsza wytrzyma³oœæ wszystkich cegie³ek do 1
 	void ZapBricks();
 
-		//! Obni¿a cegie³ki.
+		//! Obni¿a cegie³ki
 		/*!
 			Obni¿a te cegie³ki pod którymi jest wolne miejsce.
-			Nie rusza "niezniszczalnych" cegie³ek.
+			Nie rusza "niezniszczalnych" cegie³ek co zapobiega zablokowaniu siê kulki.
 		*/
 	void FallBricks();
+
+		//! Cegie³ki przylegajace do wybuchowych staj¹ siê wybuchowe
+	void ExpandExploding();
+
+		//! Dodaje do listy pozycje wszystkich wybuchowych cegie³ek
+	void PushExplosive( list<POINT>* pList );
 
 private:
 	D3DXVECTOR2 vSize;
 	D3DXVECTOR2 vPosition;
 
-	DWORD dwBrickCounter;
-	CBrick*	pBrick[BRICK_ARRAY_X][BRICK_ARRAY_Y];
+	CBrick***	pBrick;
+	POINT		Max;
+
+	DWORD dwBricksLeft;
 };
+
+#endif
+

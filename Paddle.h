@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PADDLE_H
+#define PADDLE_H
 
 #include <list>
 using namespace std;
@@ -76,3 +77,5 @@ private:
 	list<CBall*> listCatchedBalls;
 	CSprite* pLightning;
 };
+
+#endif
