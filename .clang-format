@@ -1,0 +1,20 @@
+---
+# Formatting style for VesaBall's C++ sources.
+# Based on LLVM, with overrides to match the codebase's existing
+# tab-indented, Allman-brace conventions and to avoid clang-format
+# re-wrapping already manually-aligned long lines.
+BasedOnStyle: LLVM
+UseTab: Always
+TabWidth: 4
+IndentWidth: 4
+ColumnLimit: 0
+BreakBeforeBraces: Allman
+SpaceBeforeParens: ControlStatements
+PointerAlignment: Left
+ReferenceAlignment: Middle
+AccessModifierOffset: -4
+AlignTrailingComments: true
+AllowShortFunctionsOnASingleLine: All
+KeepEmptyLinesAtTheStartOfBlocks: false
+SortIncludes: false
+...

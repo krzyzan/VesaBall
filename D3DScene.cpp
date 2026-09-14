@@ -8,11 +8,11 @@ CD3DScene::CD3DScene()
 	pCurrentScene = this;
 }
 
-
 CD3DScene::~CD3DScene()
 {
 	// release the textures
-	while (!stackTextures.empty()) {
+	while (!stackTextures.empty())
+	{
 		stackTextures.top()->Release();
 		stackTextures.pop();
 	}
@@ -26,10 +26,10 @@ CD3DScene* CD3DScene::GetNextScene()
 	return pScene;
 }
 
-HRESULT CD3DScene::LoadTexture( char* strFileName, LPDIRECT3DTEXTURE8* pTex )
+HRESULT CD3DScene::LoadTexture(char* strFileName, LPDIRECT3DTEXTURE8* pTex)
 {
-	D3DXCreateTextureFromFile( pD3DDevice, strFileName, pTex );
-	stackTextures.push( *pTex );
+	D3DXCreateTextureFromFile(pD3DDevice, strFileName, pTex);
+	stackTextures.push(*pTex);
 
 	return S_OK;
 }

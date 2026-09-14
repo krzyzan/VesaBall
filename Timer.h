@@ -13,21 +13,21 @@ class CTimer
 public:
 	CTimer();
 
-		//! Resets the timer		
+	//! Resets the timer
 	void Reset();
-		//! Starts the timer
+	//! Starts the timer
 	void Start();
-		//! Stops the timer
-	void Stop();				
-		//! Advances the timer by 0.1 seconds
-	void Advance();			
-		//! Gets the absolute system time
+	//! Stops the timer
+	void Stop();
+	//! Advances the timer by 0.1 seconds
+	void Advance();
+	//! Gets the absolute system time
 	float GetAbsoluteTime();
-		//! Gets the time
+	//! Gets the time
 	float GetTime();
-		//! Gets the time since the last call to GetElapsedTime()
+	//! Gets the time since the last call to GetElapsedTime()
 	float GetElapsedTime();
-		//! Returns \b true if the timer is stopped
+	//! Returns \b true if the timer is stopped
 	bool IsStopped();
 
 protected:

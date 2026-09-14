@@ -1,7 +1,6 @@
 #ifndef GAMEMENU_H
 #define GAMEMENU_H
 
-
 #include <list>
 using namespace std;
 
@@ -11,13 +10,12 @@ class CMenuItem;
 class CCursor;
 class CSprite;
 
-
-class CGameMenu :
-	public CD3DScene
+class CGameMenu : public CD3DScene
 {
 public:
-	enum UID_MSG {
-		UID_START	= 100,
+	enum UID_MSG
+	{
+		UID_START = 100,
 		UID_EDITOR,
 		UID_QUIT,
 	};
@@ -30,23 +28,23 @@ public:
 	HRESULT OnInvalidateDevice();
 	HRESULT OnDeleteDevice();
 
-	HRESULT OnMouseEvent( LPDIDEVICEOBJECTDATA didod );
-	HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod );
+	HRESULT OnMouseEvent(LPDIDEVICEOBJECTDATA didod);
+	HRESULT OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod);
 
-	HRESULT FrameMove( float fElapsedTime );
+	HRESULT FrameMove(float fElapsedTime);
 	HRESULT FrameRender();
-	
+
 private:
-	CMenuItem*			GetPOINTedMenuItem() const;
+	CMenuItem* GetPOINTedMenuItem() const;
 
-	LPD3DXSPRITE		pSprite;
+	LPD3DXSPRITE pSprite;
 
-	list<CSprite*>		listRender;
-	list<CMenuItem*>	listMenuItem;
-	CCursor*			pCursor;
+	list<CSprite*> listRender;
+	list<CMenuItem*> listMenuItem;
+	CCursor* pCursor;
 
-	CMenuItem*			pCurrentItem;
-	CMenuItem*			pPressedItem;
+	CMenuItem* pCurrentItem;
+	CMenuItem* pPressedItem;
 };
 
 #endif
