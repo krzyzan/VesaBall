@@ -9,7 +9,7 @@ using namespace std;
 DWORD RES_X;
 DWORD RES_Y;
 
-//! Inicjalizuje Direct3D i w³¹cza menu gry.
+//! Initializes Direct3D and starts the game menu.
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR args, INT argc)
 {
 	ifstream ConfigFile;

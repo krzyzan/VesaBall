@@ -4,9 +4,9 @@
 #include "D3DScene.h"
 #include "BrickArray.h"
 
-	//! Sceneria gry
+	//! Game scenery
 	/*!
-		Ograniczenia boczne oraz tablica cegie³ek
+		Side boundaries and the brick array
 	*/
 class CGameBoard :
 	public CD3DScene
@@ -15,29 +15,29 @@ protected:
 	CGameBoard();
 	virtual ~CGameBoard();
 
-		//! Inicjalizuje obiekty w pamiêci systemowej
+		//! Initializes objects in system memory
 		/*!
-			Wczytuje do pamiêci potrzebne tekstury. 
-			Tworzy ograniczenia boczne i wczytuje tablicê cegie³ek z pliku.
+			Loads the needed textures into memory. 
+			Creates the side boundaries and loads the brick array from a file.
 		*/
 	HRESULT OnInitDevice();
 
-		//! Inicjalizuje obiekty w pamiêci karty graficznej
+		//! Initializes objects in graphics card memory
 		/*!
-			Tworzy obiekt \b ID3DXSprite u¿ywany do renderowania
+			Creates the \b ID3DXSprite object used for rendering
 		*/
 	HRESULT OnRestoreDevice();
 
-		//! Zwalnia obiekty w pamiêci karty graficznej
+		//! Releases objects in graphics card memory
 	HRESULT OnInvalidateDevice();
 
-		//! Zwalnia obiekty w pamiêci systemowej
+		//! Releases objects in system memory
 	HRESULT OnDeleteDevice();
 
-		//! Koñczy scenê jeœli u¿ytkownik nacisn¹³ klawisz Escape
+		//! Ends the scene if the user pressed the Escape key
 	HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod );
 
-		//! Renderuje sceneriê gry
+		//! Renders the game scenery
 	HRESULT FrameRender();
 
 protected:

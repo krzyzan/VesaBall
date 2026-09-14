@@ -17,7 +17,7 @@ CGameBoard::~CGameBoard()
 
 HRESULT CGameBoard::OnInitDevice()
 {
-	// tekstury cegie³ek
+	// brick textures
 	LoadTexture( "gfx/Brick_red.png",		&CBrick::spTexture[ 1] );
 	LoadTexture( "gfx/Brick_metal.png",		&CBrick::spTexture[ 2] );
 	LoadTexture( "gfx/Brick_grey0.png",		&CBrick::spTexture[ 3] );
@@ -42,13 +42,13 @@ HRESULT CGameBoard::OnInitDevice()
 	LoadTexture( "gfx/Brick_bluel.png",		&CBrick::spTexture[22] );
 	
 
-	// sceneria
+	// scenery
 	LPDIRECT3DTEXTURE8 pWallTex;
 	LoadTexture( "gfx/Wall.png", &pWallTex );
 	listSprite.push_back( new CSprite( pWallTex, D3DXVECTOR2(BOARD_L-0.0f, 0.75f), 0, D3DXVECTOR2((BOARD_L+0.00f)/2, 0.75f/2), 0xFFFFFFFF ) );
 	listSprite.push_back( new CSprite( pWallTex, D3DXVECTOR2(1.0f-BOARD_R, 0.75f), 0, D3DXVECTOR2((1.00f+BOARD_R)/2, 0.75f/2), 0xFFFFFFFF ) );
 
-	// tworzymy cegie³ki
+	// create the bricks
 	POINT arraySize = {20, 20};
 	pBrickArray	= new CBrickArray( arraySize, D3DXVECTOR2( BOARD_L+BOARD_W/2, 0.30f ), D3DXVECTOR2( BOARD_W, BOARD_W/2 ) );
 	pBrickArray->Load( dwLevelNum );
@@ -95,7 +95,7 @@ HRESULT CGameBoard::OnInvalidateDevice()
 
 HRESULT CGameBoard::OnDeleteDevice()
 {
-	// Kasujemy z listy renderowania
+	// Remove from the render list
 	list<CSprite*>::iterator iSprite;
 	for (iSprite = listSprite.begin(); iSprite != listSprite.end(); iSprite++)
 		delete (*iSprite++);

@@ -3,32 +3,32 @@
 
 #include "Sprite.h"
 
-	//! Kursor myszy
+	//! Mouse cursor
 class CCursor :
 	public CSprite
 {
 public:
 	
-	//! Konstruktor
+	//! Constructor
 	/*! 
-		Tworzy kursor na œrodku ekranu
+		Creates the cursor at the center of the screen
 	*/
 	CCursor( LPDIRECT3DTEXTURE8 Texture );
 	
 	virtual ~CCursor();
 
-	//! Renderuje kursor na ekranie
+	//! Renders the cursor on screen
 	/*! 
-		Renderuje zaokr¹glaj¹c pozycjê do piksela.
-		Poprawia to efekt wizualny w niskich rozdzielczoœciach.
-        \param pSprite	adres \e ID3DXSprite u¿ywanego do renderowania
+		Renders by rounding the position to the nearest pixel.
+		This improves the visual effect at low resolutions.
+        \param pSprite	address of the \e ID3DXSprite used for rendering
 	*/
 	void Render( LPD3DXSPRITE pSprite ) const;
 	
-	//! Przesuwa kursor
+	//! Moves the cursor
 	/*! 
-		Funkcja dba o to ¿eby kursor nie opuœci³ ekranu.
-		\param vMovement	Wektor przesuniecia
+		The function ensures the cursor does not leave the screen.
+		\param vMovement	Displacement vector
 	*/
 	HRESULT Move( const D3DXVECTOR2 & vMovement );
 };

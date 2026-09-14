@@ -8,65 +8,65 @@ using namespace std;
 
 class CBall;
 
-    //! Deska
+    //! Paddle
     /*!
-		Przed utworzeniem obiektów klasy konieczne jest wczytanie tekstury
-		pod adres #spTexture, #spLightningTexture.
+		Before creating instances of this class, the texture must be loaded
+		into #spTexture, #spLightningTexture.
     */ 
 class CPaddle : 
 	public CSprite  
 {
 public:
-		//! Konstruktor
+		//! Constructor
 		/*!
-			Tworzy deskê na œrodku dolnej krawedzi ekranu u¿ywaj¹c tekstury #spTexture.
+			Creates the paddle at the center of the bottom edge of the screen using the #spTexture texture.
 		*/ 
 	CPaddle();
 
 	virtual ~CPaddle();
 
-		//! Renderuje deskê
+		//! Renders the paddle
 		/*!
-			Jesli z³apano kulki renderuje te¿ efekt b³yskawicy.
-			\param pSprite Obiekt \b ID3DXSprite u¿ywany do renderowania.
+			If balls are caught, also renders the lightning effect.
+			\param pSprite The \b ID3DXSprite object used for rendering.
 		*/
 	void Render( LPD3DXSPRITE pSprite ) const;
 
-		//! Przesuwa deskê w poziomie
+		//! Moves the paddle horizontally
 		/*!
-			Funkcja dba o to aby deska nie opuœci³a ekranu.
-			Jeœli z³apano kulki przesuwa je.
-			\param fHorizMovement Wartoœæ przesuniecia w poziomie
+			The function ensures the paddle does not leave the screen.
+			If balls are caught, moves them too.
+			\param fHorizMovement Horizontal displacement value
 		*/
 	void Move( float fHorizMovement );
 
-		//! £apie kulkê
+		//! Catches a ball
 		/*!
-			Jeœli kulka jest ju¿ z³apana, nie robi nic.
-			\param pBall	WskaŸnik do ³apanej kulki
+			If the ball is already caught, does nothing.
+			\param pBall	Pointer to the ball being caught
 		*/
 	void CatchBall( CBall* pBall );
 
-		//! Ustawia wektor prêdkoœci kulki
+		//! Sets the ball's speed vector
 		/*!
-			Kierunek jest równoleg³y do prostej poprowadzonej przez œrodek kulki
-			i punkt poni¿ej œrodka deski. Wartoœæ prêdkoœci jest nieznacznie zwiêkszana.
-			\param pBall	WskaŸnik do kulki
+			The direction is parallel to the line through the ball's center
+			and a point below the paddle's center. The speed value is slightly increased.
+			\param pBall	Pointer to the ball
 		*/
 	void SetBallSpeed( CBall* pBall ) const;
 
-		//! Startuje z³apane kulki
+		//! Launches the caught balls
 	void LaunchCatchedBalls();
 
-		//! Ustawia szerokoœæ deski
+		//! Sets the paddle's width
 		/*!
-			Funkcja dba o to aby nowa szerokoœæ zawiera³a siê w przedziale <PADDLE_WIDTH_MIN, PADDLE_WIDTH_MAX>
-			Odleg³oœci pomiêdzy z³apanymi kulkami s¹ zmieniane proporcjonalnie.
-			\param fNewWidth	Wartoœæ szerokoœci
+			The function ensures the new width stays within the <PADDLE_WIDTH_MIN, PADDLE_WIDTH_MAX> range
+			Distances between caught balls are scaled proportionally.
+			\param fNewWidth	Width value
 		*/
 	void SetWidth( float fNewWidth );
 
-		//! Okreœla czy deska "³apie" kulki
+		//! Determines whether the paddle "catches" balls
 	bool bGrabPaddle;
 
 	static LPDIRECT3DTEXTURE8 spTexture;

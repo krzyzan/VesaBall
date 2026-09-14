@@ -23,7 +23,7 @@ void CSpriteMoving::FrameMove( float fElapsedTime )
 	vSpeed += vAccel * fElapsedTime;
 	vPosition += vSpeed * fElapsedTime;
 
-	// odbicia od œcian
+	// bounce off the walls
 	if (vPosition.x - vSize.x/2 < BOARD_L) {
 		vPosition.x = 2*BOARD_L - vPosition.x + vSize.x;
 		vSpeed.x *= -1;

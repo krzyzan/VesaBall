@@ -3,7 +3,7 @@
 
 #include "Sprite.h"
 
-//! Ruchomy obiekt
+//! Moving object
 class CSpriteMoving :
 	public CSprite
 {
@@ -14,26 +14,26 @@ public:
 	virtual ~CSpriteMoving(void);
 
 		/*!
-			Porusza obiektem wed³ug równania ruchu: r = a*t^2 + v*t + p0
-			Odbija obiekt od œcian bocznych oraz sufitu.
+			Moves the object according to the equation of motion: r = a*t^2 + v*t + p0
+			Bounces the object off the side walls and the ceiling.
 		*/
 	virtual void FrameMove( float fElapsedTime );
 
-		//! Zwraca \b true jeœli obiekt jest poni¿ej dolnej krawêdzi ekranu i powinien zostaæ skasowany
+		//! Returns \b true if the object is below the bottom edge of the screen and should be removed
 	virtual bool HasExpired() const;
 
-		//! Ustawia prêdkoœæ obiektu
+		//! Sets the object's speed
 		/*!
-			/param Speed	Nowa prêdkoœæ
+			/param Speed	New speed
 		*/
 	void CSpriteMoving::SetSpeed( const D3DXVECTOR2 & Speed )
 		{vSpeed = Speed;}
 	const D3DXVECTOR2 & GetSpeed() const 
 		{return vSpeed;}
 
-		//! Zwraca punkt w którym nastêpuje kolizja z obiektem. 
+		//! Returns the point where the collision with the object occurs. 
 		/*!
-			Jeœli obiekty nie koliduja zwraca \b D3DXVECTOR(0,0)
+			If the objects do not collide, returns \b D3DXVECTOR(0,0)
 		*/
 	D3DXVECTOR2 GetCollisionSide( CSprite* pSprite ) const;
 

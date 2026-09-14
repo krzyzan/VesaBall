@@ -477,7 +477,7 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 	D3DDeviceInfo*	pDeviceInfo  = &pAdapterInfo->devices[pAdapterInfo->dwCurrentDevice];
 	D3DModeInfo*	pModeInfo	 = &pDeviceInfo->modes[pDeviceInfo->dwCurrentMode];
 
-	// Ustaw tryb graficzny oraz atrybuty prezentacji
+	// Set the graphics mode and presentation parameters
 	ZeroMemory( &d3dpp, sizeof(d3dpp) );
 	d3dpp.Windowed							= FALSE;
 	d3dpp.BackBufferCount					= 1;
@@ -493,7 +493,7 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 	d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
 
 
-	// Utwórz urz¹dzenie D3D
+	// Create the D3D device
 	hr = pD3D->CreateDevice( 0, pDeviceInfo->DeviceType,
 							   hWnd, pModeInfo->dwBehavior, &d3dpp,
 							   &pD3DDevice );
@@ -501,14 +501,14 @@ HRESULT CD3DApp::Initialize3DEnvironment()
 	if ( FAILED( hr ) )
 		return hr;
 	
-	// Czyœci ekran
+	// Clear the screen
 	pD3DDevice->Present( NULL, NULL, NULL, NULL);
 
-	// Zapisz mo¿liwoœci urz¹dzenia
+	// Save the device capabilities
 	pD3DDevice->GetDeviceCaps( &d3dCaps );
 	CreateFlags = pModeInfo->dwBehavior;
 
-	// Ustaw urz¹dzenie D3D które u¿ywaj¹ obiekty CD3DScene
+	// Set the D3D device used by CD3DScene objects
 	CD3DScene::pD3DDevice = pD3DDevice;
 
 	return S_OK;
@@ -519,13 +519,13 @@ HRESULT CD3DApp::Render3DEnvironment()
 {
 	HRESULT hr;
 
-	// Testuje czy mo¿na renderowaæ
+	// Test whether rendering is possible
 	if ( FAILED( hr = pD3DDevice->TestCooperativeLevel() ) ) {
-		// Jeœli D3DERR_DEVICELOST, nie renderuj dopóki nie odzyskamy urz¹dzenia.
+		// If D3DERR_DEVICELOST, don't render until we regain the device.
 		if ( D3DERR_DEVICELOST == hr )
 			return S_OK;
 
-		// SprawdŸ czy urzadzenie musi byæ zresetowane
+		// Check whether the device needs to be reset
 		if ( D3DERR_DEVICENOTRESET == hr ) {
 			if ( FAILED( hr = Reset3DEnvironment() ) )
 				return hr;
@@ -533,7 +533,7 @@ HRESULT CD3DApp::Render3DEnvironment()
 		return hr;
 	}
 
-	// G³ówna pêtla programu
+	// Main program loop
 	float fElapsedTime = Timer.GetElapsedTime();
 
 	if ( FAILED( hr = ProcessKeyboardEvents() ) )
@@ -567,15 +567,15 @@ HRESULT CD3DApp::Reset3DEnvironment()
 {
 	HRESULT hr;
 
-	// Zwolnij wszystkie obiekty karty w aktualnej scenie
+	// Release all card objects in the current scene
 	if ( FAILED( hr = sD3DScenes.top()->OnInvalidateDevice() ) )
 		return hr;
 
-	// Zresetuj urz¹dzenie
+	// Reset the device
 	if ( FAILED( hr = pD3DDevice->Reset( &d3dpp ) ) )
 		return hr;
 
-	// Inicjalizuj wszystkie obiekty karty w aktualnej scenie
+	// Initialize all card objects in the current scene
 	if ( FAILED( hr = sD3DScenes.top()->OnRestoreDevice() ) )
 		return hr;
 
@@ -585,7 +585,7 @@ HRESULT CD3DApp::Reset3DEnvironment()
 
 HRESULT CD3DApp::Cleanup3DEnvironment()
 {
-	// Wyczyœæ wszystko i wyjdŸ z aplikacji
+	// Clean up everything and exit the application
 	bActive = false;
 	bReady  = false;
 
@@ -614,18 +614,18 @@ HRESULT CD3DApp::InitializeKeyboardInput()
 {
     HRESULT hr;
 
-    // Pobierz interfejs klawiatury
+    // Get the keyboard interface
     if( FAILED( hr = pDI->CreateDevice( GUID_SysKeyboard, &pDIKeyboard, NULL ) ) )
         return hr;
     
-    // Ustaw format danych na predefiowany format klawiatury
+    // Set the data format to the predefined keyboard format
     if( FAILED( hr = pDIKeyboard->SetDataFormat( &c_dfDIKeyboard ) ) )
         return hr;
     
     if( FAILED( hr = pDIKeyboard->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND ) ) )
         return hr;
 
-	// W³¹cz buforowany odczyt z urz¹dzenia
+	// Enable buffered reading from the device
 	DIPROPDWORD dipdw;
     dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
     dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
@@ -636,7 +636,7 @@ HRESULT CD3DApp::InitializeKeyboardInput()
     if( FAILED( hr = pDIKeyboard->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
          return hr;
 
-    // Pobierz nowo utworzony interfejs
+    // Acquire the newly created interface
 	if( FAILED( hr = pDIKeyboard->Acquire() ) )
 		return hr;
 
@@ -648,11 +648,11 @@ HRESULT CD3DApp::InitializeMouseInput()
 {
     HRESULT hr;
 
-	// Pobierz interfejs myszki
+	// Get the mouse interface
 	if( FAILED( hr = pDI->CreateDevice( GUID_SysMouse, &pDIMouse, NULL ) ) )
 		return hr;
 
-	// Ustaw format danych na predefiowany format myszki
+	// Set the data format to the predefined mouse format
 	if( FAILED( hr = pDIMouse->SetDataFormat( &c_dfDIMouse ) ) )
 		return hr;
 
@@ -662,7 +662,7 @@ HRESULT CD3DApp::InitializeMouseInput()
 	if( FAILED( hr = pDIMouse->SetEventNotification( CreateEvent(NULL, FALSE, FALSE, NULL) ) ) )
 		return hr;
 
-	// W³¹cz buforowany odczyt z urz¹dzenia
+	// Enable buffered reading from the device
     DIPROPDWORD dipdw;
     dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
     dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
@@ -673,7 +673,7 @@ HRESULT CD3DApp::InitializeMouseInput()
     if ( FAILED( hr = pDIMouse->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
         return hr;
 
-    // Pobierz nowo utworzony interfejs
+    // Acquire the newly created interface
 	if( FAILED( hr = pDIMouse->Acquire() ) )
 		return hr;
 

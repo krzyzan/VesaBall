@@ -31,12 +31,12 @@ HRESULT CGameEditor::OnInitDevice()
 	LoadTexture( "gfx/Cursor_arrow.png", &pTex );
 	pCursor = new CCursor( pTex );
 
-	// tworzymy licznik poziomu
+	// create the level counter
 	LoadTexture( "gfx/Digits.png",&CCounter::spTexture );
 	POINT DigitPixels = {64,92};
 	pLevelCounter = new CCounter( 0,D3DXVECTOR2(BOARD_W*0.2f, 0.05f*0.75f), D3DXVECTOR2(BOARD_L+BOARD_W*0.125f, 0.05f/2), DigitPixels, 6 );
 
-	// tworzymy legendê cegie³ek
+	// create the brick legend
 	POINT arraySize = {10,4};
 	pBrickToolkit = new CBrickArray( arraySize, D3DXVECTOR2( BOARD_L+BOARD_W/2, BOARD_B-BOARD_W/10 ), D3DXVECTOR2( BOARD_W/2, BOARD_W/10 ) );
 	

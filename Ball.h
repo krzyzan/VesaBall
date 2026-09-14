@@ -12,51 +12,51 @@ const float BALL_SPEED_VAL_MIN = 0.20f;
 const float BALL_SPEED_VAL_MAX = 0.80f;
 const float BALL_SPEED_VAL_AVG = 0.40f;
 
-    //! Kulka
+    //! Ball
     /*!
-		\warning Przed utworzeniem obiektów klasy konieczne jest wczytanie tekstury	pod adres #spTexture.
+		\warning Before creating instances of this class, the texture must be loaded into #spTexture.
     */ 
 class CBall :
 	public CSpriteMoving  
 {
 public:
-		//! Konstruktor
+		//! Constructor
 		/*!
-			Tworzy kulkê o normalnym rozmiarze u¿ywaj¹c tekstury #spTexture
-			\param Position		Pozycja pocz¹tkowa
-			\param Speed		Prêdkoœæ pocz¹tkowa
+			Creates a ball of normal size using the #spTexture texture
+			\param Position		Initial position
+			\param Speed		Initial speed
 		*/ 
 	CBall( const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed );
 
 	virtual ~CBall();
 
-		//! Wykonuje ruch kulki
+		//! Moves the ball
 		/*!
 			\copydoc CSpriteMoving::FrameMove(float fElapsedTime)
-			Jeœli kulka jest "z³apana" przez deskê, nie robi nic.
-			\param fElapsedTime	Czas od ostatniego wywo³ania
+			If the ball is "caught" by the paddle, does nothing.
+			\param fElapsedTime	Time since the last call
 		*/ 
 	void FrameMove( float fElapsedTime );
 		
-		//! Ustawia prêdkoœæ do najbli¿szej wartoœci w przedziale <BALL_SPEED_MIN, BALL_SPEED_MAX>
+		//! Sets the speed to the nearest value within the <BALL_SPEED_MIN, BALL_SPEED_MAX> range
 		/*!
-			\param vNewSpeed	Nowa prêdkoœæ.
+			\param vNewSpeed	New speed.
 		*/ 
 	void SetSpeed( const D3DXVECTOR2 & vNewSpeed );
 		
-		//! Zmienia kierunek wektora prêdkoœci przy odbiciu od prostok¹tnego obiektu
+		//! Changes the direction of the speed vector when bouncing off a rectangular object
 		/*!
-			\param pSprite		WskaŸnik do obiektu
-			\param vSide		Wektor punktu wzgledem œrodka kulki w którym nastepuje kolizja
+			\param pSprite		Pointer to the object
+			\param vSide		Vector of the collision point relative to the ball's center
 		*/ 
 	void Reflect( const CSprite* pSprite, const D3DXVECTOR2 & vSide );
 
-		//! Je¿eli \b true, kulka sie nie porusza, domyœlnie \b false
+		//! If \b true, the ball does not move; defaults to \b false
 	bool bCatched;
 
-		//! Adres wspólnej tekstury. 
+		//! Address of the shared texture. 
 		/*!
-			\warning Ustawiæ przed tworzeniem obiektów klasy.
+			\warning Set before creating instances of this class.
 		*/
 	static LPDIRECT3DTEXTURE8 spTexture;
 };

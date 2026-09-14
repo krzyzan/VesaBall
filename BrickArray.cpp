@@ -159,11 +159,11 @@ void CBrickArray::FallBricks()
 
 void CBrickArray::ExpandExploding()
 {
-	// tymczasowa lista eksploduj¹cych cegie³ek
+	// temporary list of exploding bricks
 	list<POINT> listPos;
 	PushExplosive( &listPos );
 
-	// dla ka¿dej cegie³ki wybuchowej zmieñ przylegaj¹ce cegie³ki na wybuchowe
+	// for each explosive brick, change adjacent bricks to explosive
 	list<POINT>::iterator iPos;
 	for (iPos=listPos.begin(); iPos!=listPos.end(); iPos++) {
 		POINT posAdj;

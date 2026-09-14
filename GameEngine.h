@@ -11,7 +11,7 @@ class CPaddle;
 class CBonus;
 class CCounter;
 
-	//! Engine gry VesaBall
+	//! VesaBall game engine
 class CGameEngine :
 	public CGameBoard
 {
@@ -20,139 +20,139 @@ public:
 	virtual ~CGameEngine();
 
 		
-		//! Inicjalizuje obiekty w pamiêci systemowej
+		//! Initializes objects in system memory
 		/*!
 			\copydoc CGameBoard::OnInitDevice()
 			\par
-			£aduje tekstury:
-			- deski
-			- kulek
-			- bonusów
-			- liczników
-			- efektów
+			Loads textures:
+			- paddle
+			- balls
+			- bonuses
+			- counters
+			- effects
 			\par
-			Tworzy:
-			- licznik punktów 
-			- licznik ¿yæ
-			- deskê z kulk¹
+			Creates:
+			- score counter 
+			- lives counter
+			- paddle with a ball
 		*/
 	HRESULT OnInitDevice();
 
-		//! Zwalnia obiekty w pamiêci systemowej
+		//! Releases objects in system memory
 		/*!
 			\copydoc CGameBoard::OnDeleteDevice()
 			\par
-			Zwalnia:
-			- deskê
-			- kulki
-			- efekty
-			- bonusy
-			- pozycje eksplozji
+			Releases:
+			- the paddle
+			- balls
+			- effects
+			- bonuses
+			- explosion positions
 		*/
 	HRESULT OnDeleteDevice();
 
-		//! Przetwarza zdarzenia z bufora myszki
+		//! Processes events from the mouse buffer
 		/*!
 			\par
-			Porusza desk¹. Lewy przycisk wypuszcza wszystkie kulki "z³apane" przez deskê.
+			Moves the paddle. The left button releases all balls "caught" by the paddle.
 		*/
 	HRESULT OnMouseEvent( LPDIDEVICEOBJECTDATA didod );
 
-		//! Przetwarza zdarzenia z bufora klawiatury
+		//! Processes events from the keyboard buffer
 		/*!
 			\par
-			Klawisz P zatrzymuje grê.
+			The P key pauses the game.
 		*/
 	HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod );
 	
-		//! Wykonuje ruch obiektów sceny oraz oblicza kolizje
+		//! Moves the scene's objects and computes collisions
 		/*!
 			\par
-			Ruch obiektów sceny oraz kolizje.
-			Kasuje obiekty które "zakoñczy³y siê".
-			Jeœli nie ma ju¿ cegie³ek które mo¿na zebraæ, przechodzi do nastêpnego poziomu
-			Jeœli spad³y wszystkie kulki, u¿ywa ¿ycie.
-			Jeœli nie ma ¿yæ wychodzi z gry.
-			Jeœli gra jest zatrzymana nie robi nic.
-			\param fElapsedTime	Czas który up³yn¹³ od ostatniego wywo³ania funkcji
+			Moves the scene's objects and computes collisions.
+			Removes objects that have "finished".
+			If there are no more bricks left to collect, advances to the next level
+			If all balls have fallen, uses up a life.
+			If there are no lives left, exits the game.
+			If the game is paused, does nothing.
+			\param fElapsedTime	Time elapsed since the last call to this function
 		*/
 	HRESULT FrameMove( float fElapsedTime );
 
-		//! Renderuje scenê
+		//! Renders the scene
 	HRESULT FrameRender();
 
 private:
-		//! Wykonuje ruch obiektów sceny
+		//! Moves the scene's objects
 	void MoveObjects( float fElapsedTime );
 		
-		//! Oblicza kolizje miêdzy obiektami
+		//! Computes collisions between objects
 	void CollideObjects();
 		
-		//! Oblicza kolizjê pomiêdzy kulk¹ a desk¹
+		//! Computes the collision between a ball and the paddle
 		/*!
 			\par
-			Jeœli zebrano bonus deska "³apie" kulki.
-			W przeciwnym wypadku odbija je. K¹t odbicia roœnie na brzegach deski.
-			\param pBall	Kulka
+			If the bonus has been collected, the paddle "catches" balls.
+			Otherwise it bounces them off. The bounce angle increases toward the edges of the paddle.
+			\param pBall	The ball
 		*/
 	void CollideBallPaddle( CBall* pBall );
 	
-		//! Oblicza kolizje pomiêdzy kulk¹ a cegie³kami
+		//! Computes collisions between a ball and the bricks
 		/*!
 			\par
-			Niszczy cegie³ki w któr¹ trafia kulka.
-			Tworzy iskry przy odbiciu.
-			Jeœli z³apano #CBonus::FireBall tworzy eksplozjê.
-			Jeœli \b nie z³apano #CBonus::FireBall odbija kulkê od cegie³ek.
+			Destroys the brick the ball hits.
+			Creates sparks on impact.
+			If #CBonus::FireBall has been collected, creates an explosion.
+			If #CBonus::FireBall has \b not been collected, bounces the ball off the bricks.
 		*/
 	void CollideBallBricks( CBall* pBall );
 	
-		//! Przygotowuje grê do startu
+		//! Prepares the game to start
 	void BoardPrepare();
 
-		//! Czyœci obiekty
+		//! Clears the objects
 	void BoardClear();
 
-		//! Tworzy deske i kulkê
+		//! Creates the paddle and the ball
 	void BoardReset();
 
-		//! Niszczy deskê, wypuszczajêc wszystkie z³apane kulki
+		//! Destroys the paddle, releasing all caught balls
 	void KillPaddle();
 
-		//! Eksplozja, która "zbija" cegie³ki wokó³ siebie.
+		//! An explosion that "destroys" the bricks around it.
 		/*!
-			\param pos	Pozycja cegie³ki w tablicy
+			\param pos	Position of the brick in the array
 		*/
 	void DoExplosion( const POINT & pos );
 
-		//! Uderzenie w cegie³kê
+		//! A hit on a brick
 		/*!
 			\par
-			Usuwa cegie³kê z tablicy cegie³ek tworz¹c efekt znikania cegie³ki.
-			Dodaje punkty za "zbicie" cegie³ki.
-			Z pewnym prawdopodobieñstwem mo¿e pojawiæ siê bonus.
-			Jeœli cegie³ka jest wybuchowa tworzy eksplozjê.
-			\param pos		Pozycja cegie³ki w tablicy
-			\param vSpeed	Prêdkoœæ "zbicia" i tworzonego bonusa
+			Removes the brick from the brick array, creating a vanishing-brick effect.
+			Adds points for "destroying" the brick.
+			A bonus may appear with a certain probability.
+			If the brick is explosive, creates an explosion.
+			\param pos		Position of the brick in the array
+			\param vSpeed	Speed of the "destruction" and of the bonus created
 		*/
 	void DestroyBrick( const POINT & pos, const D3DXVECTOR2 & vSpeed );
 
-		//! W³¹cza efekty z³apanego bonusa
+		//! Activates the effects of a collected bonus
 		/*!
-			\param Type Typ Z³apanego bonusa
+			\param Type Type of the collected bonus
 			\sa CBonus::TypeEnum
 		*/
 	void ApplyBonus( DWORD Type );
 
-		//! Tworzy efekt iskier przy odbiciu kulki
+		//! Creates a spark effect when the ball bounces
 	void CreateSparkles( CBall* pBall, const D3DXVECTOR2 & vSide );
 
-		//! Tworzy "ogon" fireballa
+		//! Creates the fireball's "tail"
 	void CreateFireballTail( CBall* pBall );
 
-		//! Kasuje ruchome obiekty które zakoñczy³y siê
+		//! Removes moving objects that have finished
 		/*!
-			\param pList WskaŸnik do listy obiektów z których kasujemy
+			\param pList Pointer to the list of objects to remove from
 			\sa CMovingSprite::HasExpired()
 		*/
 	void DeleteExpiredObjects( list<CSpriteMoving*> *pList );

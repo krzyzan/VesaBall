@@ -3,44 +3,44 @@
 
 #include "Sprite.h"
 
-	//! Licznik wyœwietlajacy liczby dodatnie
+	//! Counter displaying positive numbers
     /*!
-		Przed utworzeniem obiektów klasy konieczne jest wczytanie tekstury
-		pod adres #spTexture. W teksturze powinny byæ pionowo umieszczone cyfry
-		0123456789.
+		Before creating instances of this class, the texture must be loaded
+		into #spTexture. The texture should contain the digits 0123456789
+		arranged vertically.
     */ 
 class CCounter :
 	public CSprite
 {
 public:
-		//! Konstruktor
+		//! Constructor
 		/*!
-			\param Value		Wartoœæ pocz¹tkowa
-			\param Size			Rozmiar
-			\param Position		Pozycja
-			\param DigitPixels	Rozmiar cyfry w teksturze podana w pikselach
-			\param NumDigits	Liczba wyœwietlanych cyfr
+			\param Value		Initial value
+			\param Size			Size
+			\param Position		Position
+			\param DigitPixels	Digit size within the texture, in pixels
+			\param NumDigits	Number of digits displayed
 		*/ 
 	CCounter( LONG Value, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position, 
 		POINT DigitPixels, DWORD NumDigits );
 		
 	virtual ~CCounter();
 
-		//! Renderuje licznik
+		//! Renders the counter
 		/*!
-			\param pSprite	adres \e ID3DXSprite u¿ywanego do renderowania
+			\param pSprite	address of the \e ID3DXSprite used for rendering
 		*/ 
 	void Render( LPD3DXSPRITE pSprite ) const;
 		
-		//! Aktualizuje wyœwietlan¹ liczbê
+		//! Updates the displayed number
 		/*!
-			\param fElapsedTime Czas od ostatniego wywo³ania
+			\param fElapsedTime Time since the last call
 		*/
 	void Update( float fElapsedTime );
 
-		//! Adres wspólnej tekstury.
+		//! Address of the shared texture.
 		/*!
-			\warning Ustawiæ przed tworzeniem obiektów klasy.
+			\warning Set before creating instances of this class.
 		*/
 	static LPDIRECT3DTEXTURE8 spTexture;
 	LONG lValue;

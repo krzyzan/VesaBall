@@ -8,30 +8,30 @@ class CMenuItem :
 {
 public:
 
-		//! Konstruktor
+		//! Constructor
 		/*!
-			Tworzy pozycje menu
-			\param Texture		Tekstura
-			\param Size			Rozmiar
-			\param Position		Pozycja
-			\param Color		Kolor
-			\param UID			Unikalne ID
+			Creates a menu item
+			\param Texture		Texture
+			\param Size			Size
+			\param Position		Position
+			\param Color		Color
+			\param UID			Unique ID
 		*/ 
 	CMenuItem( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, 
 		const D3DXVECTOR2 & Position, D3DCOLOR Color, HRESULT UID );
 	
 	virtual ~CMenuItem();
 
-		//! Renderuje pozycjê menu oraz rzucany cieñ.
+		//! Renders the menu item and its cast shadow.
 	void Render( LPD3DXSPRITE pSprite ) const;
 
-		//! Ustawia czy naciœniêto
+		//! Sets whether it's pressed
 	void SetPressed( bool bPressed );
 	
-		//! Ustawia czy podœwietlono
+		//! Sets whether it's highlighted
 	void SetHighlighted( bool bHighlighted );
 	
-		//! Zwraca UID
+		//! Returns the UID
 	DWORD GetUID() const 
 		{ return dwUID; }
 

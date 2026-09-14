@@ -8,101 +8,101 @@ using namespace std;
 #include <d3dx8.h>
 #include <dinput.h>
 
-	//! Scena
+	//! Scene
 	/*!
 		\par
-		Klasa abstrakcyjna, opisuje pojedyncz¹ scenê - czêœæ programu stanowi¹c¹ logiczn¹ ca³oœæ, 
-		jak np. g³ówne menu gry, ekran wyników, menu opcji itp. Stanowi "szkielet" dla klas które od niej dziedzicz¹.
-		Jedynym interfejsem do sceny powinien byc konstruktor. 
-		Wywo³ywaniem funkcji w odpowiedniej kolejnoœci oraz zakoñczeniem sceny zajmuje siê zaprzyjaŸniona klasa #CD3DApp.
-		U³atwia to poprawne alokowanie obiektów w pamiêci karty graficznej, 
-		które musza byæ zwalniane gdy urz¹dzenie karty jest resetowane 
-		(np. u¿ytkownik zminimalizowa³ aplikacjê naciskaj¹c Alt-Tab). 
+		Abstract class describing a single scene - a logically self-contained part of the program, 
+		such as the game's main menu, the score screen, the options menu, etc. Serves as a "skeleton" for classes that inherit from it.
+		The only interface to a scene should be its constructor. 
+		Calling the functions in the correct order and ending the scene is handled by the friend class #CD3DApp.
+		This makes it easier to correctly allocate objects in graphics card memory, 
+		which must be released when the card's device is reset 
+		(e.g. the user minimized the application by pressing Alt-Tab). 
 		\par
-		Klasa zapewnia tak¿e proste zarz¹dzanie teksturami zwalniaj¹c je automatycznie, gdy scena siê koñczy.
+		The class also provides simple texture management, releasing them automatically when the scene ends.
 	*/
 class CD3DScene
 {
 public:
-		//! Konstruktor
+		//! Constructor
 	CD3DScene();
 		
 protected:
-		//! Destruktor
+		//! Destructor
 		/*!
-			Automatycznie zwalnia wszystkie tekstury za³adowane przy pomocy funkcji #LoadTexture()
+			Automatically releases all textures loaded via #LoadTexture()
 		*/
 	virtual ~CD3DScene();
 
-		//! Inicjalizuje obiekty u¿ywajace pamiêci systemowej
+		//! Initializes objects that use system memory
 		/*!
-			W tej funkcji klasa dziedziczona powinna zainicjowaæ wszystkie obiekty, 
-			oprócz tych które znajduj¹ siê w pamiêci kart graficznej. W szczególnoœci tutaj
-			nale¿y za³adowaæ potrzebne tekstury za pomoc¹ za pomoc¹ #LoadTexture().
-			Jest to dozwolone poniewa¿ s¹ one automatycznie przerzucane do pamiêci systemowej, 
-			gdy urz¹dzenie graficzne jest resetowane.
+			In this function, the derived class should initialize all objects, 
+			except those that reside in graphics card memory. In particular, this
+			is where any needed textures should be loaded via #LoadTexture().
+			This is allowed because they are automatically moved to system memory, 
+			when the graphics device is reset.
 		*/
 	virtual HRESULT OnInitDevice() = 0;
 		
-		//! Inicjalizuje obiekty u¿ywaj¹ce pamiêci karty
+		//! Initializes objects that use card memory
 		/*!
-			W tej funkcji klasa dziedziczona powinna zainicjowaæ tylko te obiekty, 
-			które znajduj¹ siê w pamiêci kart graficznej. W szczególnoœci dotyczy to buforów wierzcho³ków, 
-			wiêc równie¿ obiektów \e ID3DXSprite.
+			In this function, the derived class should initialize only those objects, 
+			that reside in graphics card memory. In particular, this applies to vertex buffers, 
+			and therefore also to \e ID3DXSprite objects.
 		*/
 	virtual HRESULT OnRestoreDevice() = 0;
 		
-		//! Zwalnia obiekty u¿ywaj¹ce pamiêci karty
+		//! Releases objects that use card memory
 		/*!
-			W tej funkcji klasa dziedziczona powinna zwolniæ obiekty zainicjowane w #OnRestoreDevice().
+			In this function, the derived class should release the objects initialized in #OnRestoreDevice().
 		*/
 	virtual HRESULT OnInvalidateDevice() = 0;
 		
-		//! Zwalnia obiekty u¿ywaj¹ce pamiêci systemowej
+		//! Releases objects that use system memory
 		/*!
-			W tej funkcji klasa dziedziczona powinna zwolniæ obiekty zainicjowane w #OnInitDevice().
+			In this function, the derived class should release the objects initialized in #OnInitDevice().
 		*/
 	virtual HRESULT OnDeleteDevice() = 0;
 
-		//! Przetwarza dane wejœciowe z myszki
+		//! Processes input data from the mouse
 		/*!
-			Funkcja jest wywo³ywana dla ka¿dego elementu z bufora urz¹dzenia.
-			\param didod	Dane z bufora
+			This function is called for each element in the device's buffer.
+			\param didod	Data from the buffer
 		*/
 	virtual HRESULT OnMouseEvent( LPDIDEVICEOBJECTDATA didod ) = 0;
 		
-		//! Przetwarza dane wejœciowe z klawiatury
+		//! Processes input data from the keyboard
 		/*!
-			Funkcja jest wywo³ywana dla ka¿dego elementu z bufora urz¹dzenia.
-			\param didod	Dane z bufora
+			This function is called for each element in the device's buffer.
+			\param didod	Data from the buffer
 		*/
 	virtual HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod ) = 0;
 		
-		//! Wykonuje ruch obiektów sceny
+		//! Moves the scene's objects
 	virtual HRESULT FrameMove( float fElapsedTime ) = 0;
 		
-		//! Renderuje obiekty sceny
+		//! Renders the scene's objects
 	virtual HRESULT FrameRender() = 0;
 		
-		//! Ustawia wskaŸnik do nastepnej sceny
+		//! Sets the pointer to the next scene
 		/*!
-			Jeœli istnieje potrzeba utworzenia sceny podrzêdnej (np. wchodzimy z menu g³ównego do menu opcji) 
-			funkcja umo¿liwia to. W tym celu nale¿y utworzyæ obiekt klasy dziedziczonej od #CD3DScene
-			i jego adres podaæ jako argument. Jeœli bie¿¹ca scena zakoñczy³a siê podaæ na \b NULL. 
-			\param pScene	Adres scene podrzêdnej lub null jeœli mamy zakoñczyæ tê scenê.
+			If a child scene needs to be created (e.g. going from the main menu to the options menu) 
+			this function makes that possible. To do so, create an object of a class derived from #CD3DScene
+			and pass its address as the argument. If the current scene has ended, pass \b NULL. 
+			\param pScene	Address of the child scene, or null if this scene should end.
 		*/
 	void SetCurrentScene( CD3DScene* pScene ) 
 		{ pCurrentScene = pScene; }
 
-		//! Wczytuje teksturê z pliku. 
+		//! Loads a texture from a file. 
 		/*!
-			Tekstura zostanie automatycznie zwolniona w destruktorze klasy.
-			\param strFileName	Nazwa pliku tekstury. Obs³ugiwane formaty: .bmp, .dds, .dib, .jpg, .png, and .tga
-			\param pTex			Adres wskaŸnika do tekstury który otrzymuje za³adowan¹ teksturê.
+			The texture will be automatically released in the class destructor.
+			\param strFileName	Texture file name. Supported formats: .bmp, .dds, .dib, .jpg, .png, and .tga
+			\param pTex			Address of the texture pointer that receives the loaded texture.
 		*/
 	HRESULT LoadTexture( char* strFileName, LPDIRECT3DTEXTURE8* pTex );
 
-		//! Obiekt Direct3D wspólny dla wszystkich scen
+		//! Direct3D object shared by all scenes
 	static LPDIRECT3DDEVICE8 pD3DDevice;
 
 private:

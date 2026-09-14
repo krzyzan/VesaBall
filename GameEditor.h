@@ -6,7 +6,7 @@
 class CCursor;
 class CCounter;
 
-	//! Edytor poziomów
+	//! Level editor
 class CGameEditor :
 	public CGameBoard
 {
@@ -14,33 +14,33 @@ public:
 	CGameEditor();
 	virtual ~CGameEditor();
 
-		//! Inicjalizuje obiekty w pamiêci systemowej
+		//! Initializes objects in system memory
 		/*!
 			\copydoc CGameBoard::OnInitDevice()
-			Tworzy kursor.
+			Creates the cursor.
 		*/
 	HRESULT OnInitDevice();
 
-		//! Zwalnia obiekty w pamiêci systemowej
+		//! Releases objects in system memory
 	HRESULT OnDeleteDevice();
 
-		//! Przetwarza zdarzenia myszki
+		//! Processes mouse events
 		/*!
-			Lewym przyciskiem u¿ytkownik tworzy cegie³ki.
-			Prawym cegie³ki s¹ usuwane. Typ cegie³ki mozna okreœliæ 
-			klikaj¹c lewym przyciskiem na dolnej tablicy.
+			With the left button, the user creates bricks.
+			With the right button, bricks are removed. The brick type can be selected 
+			by left-clicking on the bottom array.
 		*/
             
 	HRESULT OnMouseEvent( LPDIDEVICEOBJECTDATA didod );
 
-		//! Przetwarza zdarzenia klawiatury
+		//! Processes keyboard events
 		/*!
-			- Klawisz Escape wychodzi bez zapisania.
-			- Klawisz Prawo przechodzi poziom wy¿ej
-			- Klawisz Lewo przechodzi poziom ni¿ej
-			- Klawisz S zapisuje poziom.
-			- Klawisz L wczytuje poziom.
-			- Klawisz C kasuje wszystke cegie³ki.
+			- The Escape key exits without saving.
+			- The Right key moves to the next level
+			- The Left key moves to the previous level
+			- The S key saves the level.
+			- The L key loads the level.
+			- The C key clears all bricks.
 		*/
 	HRESULT OnKeyboardEvent( LPDIDEVICEOBJECTDATA didod );
 	
@@ -54,7 +54,7 @@ protected:
 
 	CBrickArray*	pBrickToolkit;
 
-	// stan przycisków myszy
+	// mouse button state
 	bool bLMB;
 	bool bRMB;
 };

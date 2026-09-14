@@ -3,9 +3,9 @@
 
 #include <windows.h>
 
-//! Timer wysokiej rozdzielczoœci
+//! High-resolution timer
 /*!
-	\warning U¿ywa \e QueryPerformanceCounter(), funkcja nie jest obs³ugiwana przez bardzo stare komputery!
+	\warning Uses \e QueryPerformanceCounter(); this function is not supported on very old computers!
 */
 
 class CTimer
@@ -13,21 +13,21 @@ class CTimer
 public:
     CTimer();
 
-		//! Resetuje timer		
+		//! Resets the timer		
     void Reset();
-		//! Startuje timer
+		//! Starts the timer
     void Start();
-		//! Zatrzymuje timer
+		//! Stops the timer
     void Stop();				
-		//! Przesuwa timer o 0.1 seekundy
+		//! Advances the timer by 0.1 seconds
     void Advance();			
-		//! Pobiera absolutny czas sytemowy
+		//! Gets the absolute system time
     float GetAbsoluteTime();
-		//! Pobiera czas
+		//! Gets the time
     float GetTime();
-		//! Pobiera czas od ostatniego wywo³ania GetElapsedTime()
+		//! Gets the time since the last call to GetElapsedTime()
     float GetElapsedTime();
-		//! Zwraca \b true jeœli timer jest zatrzymany
+		//! Returns \b true if the timer is stopped
     bool IsStopped();
 
 protected:

@@ -5,106 +5,106 @@
 
 const DWORD NUM_LEVELS = 50;
 
-    //! Tablica cegie³ek
+    //! Brick array
 	/*!
 		\par
-		Przechowuje obiekty #CBrick. Umo¿liwia znalezienie w sta³ym czasie cegie³ki w danym punkcie ekranu.
-		Zlicza cegie³ki które mo¿na "zbiæ".
+		Stores #CBrick objects. Allows finding the brick at a given screen point in constant time.
+		Counts the bricks that can be "destroyed".
 	*/
 class CBrickArray
 {
 public:
-		//! Tworzy pust¹ tablicê cegie³ek
+		//! Creates an empty brick array
 		/*
-			/param	Size		Liczba kolumn i wierszy
-			/param	Position	Pozycja œrodka tablicy cegie³ek
-			/param	ScreenSize	Rozmiar tablicy cegie³ek na ekranie
+			/param	Size		Number of columns and rows
+			/param	Position	Position of the brick array's center
+			/param	ScreenSize	On-screen size of the brick array
 		*/
 	CBrickArray( const POINT & Size, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & ScreenSize );
 
 	virtual ~CBrickArray();
 
-		//! Usuwa wszystkie cegie³ki z tablicy
+		//! Removes all bricks from the array
 	void Clear();
 
-		//! Renderuje tablice cegie³ek
+		//! Renders the brick array
 		/*!
-			\param pSprite	adres \e ID3DXSprite u¿ywanego do renderowania
+			\param pSprite	address of the \e ID3DXSprite used for rendering
 		*/ 
     void Render( LPD3DXSPRITE pSprite ) const;
 
-		//! Wstawia cegie³kê do tablicy
+		//! Inserts a brick into the array
 		/*!
-			\param	idType	Typ cegie³ki
-			\param	pos		Pozycja w tablicy
-			\warning Jeœli na tym miejscu jest cegie³ka nale¿y j¹ najpierw usun¹æ!
+			\param	idType	Brick type
+			\param	pos		Position in the array
+			\warning If there is already a brick at this position, it must be removed first!
 		*/ 
 	void InsertBrick( BYTE idType, const POINT & pos );
 
-		//! Usuwa cegie³kê
+		//! Removes a brick
 		/*!
-			Je¿eli na podanej pozycji nie ma cegie³ki, nie robi nic.
-			\param	pos		Pozycja w tablicy
+			If there is no brick at the given position, does nothing.
+			\param	pos		Position in the array
 		*/ 
 	void RemoveBrick( const POINT & pos );
 
-		//! Zwraca \b true jeœli w tablicy nie ma ju¿ cegie³ek do zbicia
+		//! Returns \b true if there are no more bricks left to destroy in the array
 	bool Empty() const
 		{ return !dwBricksLeft; }
 
-		//! Wczytuje tablicê cegie³ek z pliku
+		//! Loads the brick array from a file
 		/*!
-			Wszystkie cegie³ki znajduj¹ce siê aktualnie w tablicy s¹ usuwane.
-			\param	dwLevelNum	Numer poziomu
-			\warning Brak obs³ugi b³êdów
+			All bricks currently in the array are removed.
+			\param	dwLevelNum	Level number
+			\warning No error handling
 		*/ 
 	void Load( DWORD dwLevelNum );
 
-		//! Zapisuje tablicê cegie³ek do pliku
+		//! Saves the brick array to a file
 		/*!
-			\param	dwLevelNum	Numer poziomu
-			\warning Brak obs³ugi b³êdów
+			\param	dwLevelNum	Level number
+			\warning No error handling
 		*/ 
 	void Save( DWORD dwLevelNum ) const;
 
-		//! Zwraca \b true jeœli wspó³rzêdne nale¿¹ do tablicy
+		//! Returns \b true if the coordinates belong to the array
 		/*!
-			\param	pos	Wspó³rzêdne
+			\param	pos	Coordinates
 		*/
 	bool IsValid( const POINT & pos ) const
 		{ return (pos.x>=0) && (pos.x<Max.x) && (pos.y>=0) && (pos.y<Max.y);}
 
-		//! Zwraca wspó³rzêdne w tablicy odpowiadaj¹ce punktowi na ekranie
+		//! Returns the array coordinates corresponding to a point on screen
 		/*!
-			\param	vPos	Punkt na ekranie
+			\param	vPos	Point on screen
 		*/
 	POINT GetArrayCoordsAt( const D3DXVECTOR2 & vPos ) const;
 
-		//! Zwraca punkt na ekranie odpowiadaj¹cy wspó³rzêdnym w tablicy
+		//! Returns the on-screen point corresponding to array coordinates
 	D3DXVECTOR2 GetPositionAt( const POINT & pos ) const;
 
-		//! Zwraca wskaŸnik do cegie³ki na okreœlonej pozycji
+		//! Returns a pointer to the brick at the given position
 		/*!
-			\param	pos		Wspó³rzêdne w tablicy
-			\return	WskaŸnik do cegie³ki
+			\param	pos		Array coordinates
+			\return	Pointer to the brick
 		*/
 	CBrick* GetBrick( const POINT & pos ) const 
 		{ return pBrick[pos.x][pos.y]; }
 
-		//! Zmniejsza wytrzyma³oœæ wszystkich cegie³ek do 1
+		//! Reduces the durability of all bricks to 1
 	void ZapBricks();
 
-		//! Obni¿a cegie³ki
+		//! Lowers the bricks
 		/*!
-			Obni¿a te cegie³ki pod którymi jest wolne miejsce.
-			Nie rusza "niezniszczalnych" cegie³ek co zapobiega zablokowaniu siê kulki.
+			Lowers the bricks that have free space beneath them.
+			Does not move "indestructible" bricks, which prevents the ball from getting stuck.
 		*/
 	void FallBricks();
 
-		//! Cegie³ki przylegajace do wybuchowych staj¹ siê wybuchowe
+		//! Bricks adjacent to explosive ones become explosive
 	void ExpandExploding();
 
-		//! Dodaje do listy pozycje wszystkich wybuchowych cegie³ek
+		//! Adds the positions of all explosive bricks to the list
 	void PushExplosive( list<POINT>* pList );
 
 private:

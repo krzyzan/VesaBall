@@ -44,7 +44,7 @@ void CPaddle::Move( float fHorizMovement )
 	vPosition.x += fHorizMovement;
 	pLightning->vPosition.x += fHorizMovement;
 
-	// przesuwamy z³apane kulki razem z desk¹
+	// move the caught balls together with the paddle
 	list<CBall*>::iterator iBall;
 	for (iBall = listCatchedBalls.begin(); iBall != listCatchedBalls.end(); iBall++) {
 		(*iBall)->vPosition.x += fHorizMovement;

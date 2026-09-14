@@ -3,28 +3,28 @@
 
 #include "SpriteEffect.h"
 
-//! Animowany sprite
+//! Animated sprite
 /*!
-	Zajmuje siê wyœwietlaniem animacji. Gdy skoñczy #HasExpired() zwraca true.
+	Handles displaying an animation. When it finishes, #HasExpired() returns true.
 */
 
 class CSpriteAnimated :
 	public CSpriteEffect
 {
 public:
-		//! Konstruktor
+		//! Constructor
 		/*!
-			\param Texture		Tekstura zawieraj¹ce 8x8 ramek u¿ywanych do renderowania.
-			\param Size			Rozmiar
-			\param Rotation		Obrót w radianach
-			\param Position		Pozycja pocz¹tkowa
-			\param Speed		Prêdkoœæ pocz¹tkowa
-			\param Accel		Przyspieszenie
-			\param Color		Kolor i kana³ alfa s¹ mno¿one przez t¹ wartoœæ. Wartoœæ \c 0xFFFFFFFF utrzymuje orginalny kolor Ÿród³owy.
-			\param Duration		Czas trwania, po tym czasie #HasExpired() zwraca \b true
-			\param FirstFrame	Pierwsza ramka animacji
-			\param LastFrame	Ostatnia ramka animacji
-            \param FramePixels	Rozmiar ramki w teksturze podany pikselach
+			\param Texture		Texture containing an 8x8 grid of frames used for rendering.
+			\param Size			Size
+			\param Rotation		Rotation in radians
+			\param Position		Initial position
+			\param Speed		Initial speed
+			\param Accel		Acceleration
+			\param Color		The color and alpha channel are multiplied by this value. The value \c 0xFFFFFFFF preserves the original source color.
+			\param Duration		Duration; after this time #HasExpired() returns \b true
+			\param FirstFrame	First frame of the animation
+			\param LastFrame	Last frame of the animation
+            \param FramePixels	Frame size within the texture, in pixels
 		*/
 	CSpriteAnimated( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,  float Rotation,
 		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel, DWORD Color, 
@@ -32,17 +32,17 @@ public:
 	
 	virtual ~CSpriteAnimated();
 
-		//! Ruch animacji
+		//! Animation movement
 		/*!
-			Oblicza bie¿¹ca ramkê animacji.
-			\param fElapsedTime	Czas od ostatniego wywo³ania
+			Computes the current animation frame.
+			\param fElapsedTime	Time since the last call
 		*/ 
 	void FrameMove( float fElapsedTime );
 
-		//! Renderuje animacjê
+		//! Renders the animation
 		/*!
-			Jesli z³apano kulki renderuje te¿ efekt b³yskawicy.
-			\param pSprite Obiekt \b ID3DXSprite u¿ywany do renderowania.
+			If balls are caught, also renders the lightning effect.
+			\param pSprite The \b ID3DXSprite object used for rendering.
 		*/
 	void Render( LPD3DXSPRITE pSprite ) const;
 

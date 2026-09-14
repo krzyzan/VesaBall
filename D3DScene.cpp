@@ -11,7 +11,7 @@ CD3DScene::CD3DScene()
 
 CD3DScene::~CD3DScene()
 {
-	// zwalniamy tekstury
+	// release the textures
 	while (!stackTextures.empty()) {
 		stackTextures.top()->Release();
         stackTextures.pop();

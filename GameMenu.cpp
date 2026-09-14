@@ -104,14 +104,14 @@ HRESULT CGameMenu::OnMouseEvent( LPDIDEVICEOBJECTDATA didod )
 	
 
         case DIMOFS_BUTTON0:
-			if (didod->dwData & 0x80) {		// przycisk nacisniety
+			if (didod->dwData & 0x80) {		// button pressed
 					if ( pCurrentItem ) {
 					pPressedItem = pCurrentItem; 
 					pPressedItem->SetPressed( true );
 				}
 			}
 			else {
-				if (pPressedItem ) {		// przycisk puszczony
+				if (pPressedItem ) {		// button released
 					if (pCurrentItem == pPressedItem) {
 						switch (pCurrentItem->GetUID()) {
 							case UID_START:
@@ -174,7 +174,7 @@ HRESULT CGameMenu::OnInvalidateDevice()
 
 HRESULT CGameMenu::OnDeleteDevice()
 {
-	// Kasujemy z listy renderowania
+	// Remove from the render list
 	list<CSprite*>::iterator iSprite = listRender.begin();
 	while (iSprite != listRender.end())
 		delete (*iSprite++);

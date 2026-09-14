@@ -3,23 +3,23 @@
 
 #include "SpriteMoving.h"
 
-//! Efekt znikaj¹cej tekstury.
+//! Vanishing-texture effect.
 /*!
-	Wyœwietla p³ynnie znikaj¹c¹ teksturê. Gdy skoñczy #HasExpired() zwraca true.
+	Smoothly fades out a texture. When it finishes, #HasExpired() returns true.
 */
 class CSpriteEffect :
 	public CSpriteMoving
 {
 public:
-		//! Konstruktor
+		//! Constructor
 		/*!
-			\param Texture		Tekstura u¿ywana do renderowania.
-			\param Size			Rozmiar
-			\param Position		Pozycja pocz¹tkowa
-			\param Speed		Prêdkoœæ pocz¹tkowa
-			\param Accel		Przyspieszenie
-			\param Color		Kolor i kana³ alfa s¹ mno¿one przez t¹ wartoœæ. Wartoœæ \c 0xFFFFFFFF utrzymuje orginalny kolor Ÿród³owy.
-			\param Duration		Czas trwania efektu, po tym czasie #HasExpired() zwraca \b true
+			\param Texture		Texture used for rendering.
+			\param Size			Size
+			\param Position		Initial position
+			\param Speed		Initial speed
+			\param Accel		Acceleration
+			\param Color		The color and alpha channel are multiplied by this value. The value \c 0xFFFFFFFF preserves the original source color.
+			\param Duration		Duration of the effect; after this time #HasExpired() returns \b true
 		*/
 	CSpriteEffect( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
 		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel, 
@@ -27,14 +27,14 @@ public:
 	
 	virtual ~CSpriteEffect();
 
-		//! Ruch efektu
+		//! Effect movement
 		/*!
-			Ruch jak w #CSpriteMoving::FrameMove().
-			W zaleznoœci od czasu zmienia wartoœæ kana³u alfa.
+			Movement as in #CSpriteMoving::FrameMove().
+			Changes the alpha channel value depending on time.
 		*/
 	void FrameMove( float fElapsedTime );
 		
-		//! Zwraca \b true jeœli min¹³ czas trwania efektu 
+		//! Returns \b true if the effect's duration has elapsed 
 	bool HasExpired() const;
 
 protected:

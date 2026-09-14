@@ -10,9 +10,9 @@ class CSpriteEffect;
 const BYTE BRICK_TYPE_MAX = 23;
 const BYTE BRICK_TYPE_EXPL = 8;
 
-    //! Cegie³ka
+    //! Brick
     /*!
-		Przed u¿yciem konieczne jest za³adowanie tekstur do tablicy #spTexture.
+		Before use, textures must be loaded into the #spTexture array.
     */
  class CBrick :
 	public CSprite  
@@ -25,46 +25,46 @@ const BYTE BRICK_TYPE_EXPL = 8;
 	};
 
 public:
-		//! Konstruktor
+		//! Constructor
 		/*!
-			\param Type		Typ cegie³ki
-			\param Position	Pozycja pocz¹tkowa
-			\param Size		Rozmiar
+			\param Type		Brick type
+			\param Position	Initial position
+			\param Size		Size
 		*/ 
 	CBrick( BYTE Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size );
 
 	virtual ~CBrick();
 
-		//! Tworzy (alokuje) efekt znikajacej cegie³ki
+		//! Creates (allocates) a vanishing-brick effect
 		/*!
-			\return Zaalokowany obiekt #CSpriteEffect
+			\return The allocated #CSpriteEffect object
 		*/ 
 	CSpriteEffect* CreateBlendEffect( const D3DXVECTOR2 & vSpeed ) const;
 
-		//! Zwraca indeks typu cegie³ki
+		//! Returns the brick's type index
 	BYTE GetType() const 
 		{return idType;}
 
-		//! Zwraca indeks typu cegie³ki przy uderzeniu
+		//! Returns the brick's type index after being hit
 	BYTE GetNextType() const 
 		{return s_Type[idType].idNextType;}
 
-		//! Zwraca punktacjê za trafienie cegie³ki
+		//! Returns the score awarded for hitting the brick
 	DWORD GetScore() const 
 		{return s_Type[idType].dwScore;}
 
-		//! Zwraca \b true jeœli trzeba zbiæ cegie³kê ¿eby przejœæ poziom
+		//! Returns \b true if the brick must be destroyed to clear the level
 	bool MustHit() const 
 		{return s_Type[idType].bMustHit;}
 
-		//! Zwraca \b true jeœli wybuchowa
+		//! Returns \b true if explosive
 	bool IsExplosive() const 
 		{return idType == BRICK_TYPE_EXPL;}
 
-		//! Tablica tekstur
+		//! Texture array
 		/*!
-			Statyczna tablica adresów tekstur, dla poszczególnych typów cegie³ek. 
-			\warning Za³adowaæ tekstury przed tworzeniem obiektów klasy.
+			Static array of texture pointers, one for each brick type. 
+			\warning Load the textures before creating instances of this class.
 		*/
 	static LPDIRECT3DTEXTURE8	spTexture[BRICK_TYPE_MAX];
 
