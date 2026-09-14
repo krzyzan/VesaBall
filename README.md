@@ -12,29 +12,15 @@ The game was originally written for Windows and DirectX 8 (2005-2006) and later 
 - **Level editor** (`CGameEditor`), accessible from the main menu, for creating or modifying levels.
 - **Configurable resolution** via `cfg/res.cfg`.
 
-## Requirements
+## Installing / building from source
 
-- A C++11 (or later) compiler.
-- [CMake](https://cmake.org/) 3.10 or later.
-- [SDL2](https://www.libsdl.org/) and [SDL2_image](https://github.com/libsdl-org/SDL_image) development packages.
-  - macOS (Homebrew): `brew install sdl2 sdl2_image`
-  - Debian/Ubuntu: `apt install libsdl2-dev libsdl2-image-dev`
-  - Windows: via [vcpkg](https://vcpkg.io/) (`vcpkg install sdl2 sdl2-image`) or [MSYS2](https://www.msys2.org/) (`pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image`)
-
-## Building from source
+See [`INSTALL.md`](INSTALL.md) for full prerequisites, per-OS setup, build, run, and troubleshooting steps. Quick version:
 
 ```
 cmake -S . -B build
 cmake --build build
+cd build && ./VesaBall   # Windows: VesaBall.exe
 ```
-
-This produces a `VesaBall` (or `VesaBall.exe` on Windows) executable in `build/`, with the `gfx/`, `lev/`, and `cfg/` asset folders copied alongside it so it can be run directly from there.
-
-> **Note for network/remote-mounted checkouts:** if the repository lives on a network share (SMB/NFS), point the build directory at a local path instead, e.g. `cmake -S . -B /tmp/vesaball-build` — some platforms block executing binaries built on a network mount.
-
-## Running
-
-Run the built executable from its own directory (`build/`, if you followed the steps above), or from the repository root, so it can find `cfg/res.cfg` and the `gfx/`/`lev/` folders alongside it.
 
 ## Controls
 
