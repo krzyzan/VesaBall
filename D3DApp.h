@@ -6,7 +6,7 @@
 using namespace std;
 
 #include "d3dscene.h"
-#include "timer.h"
+#include "Timer.h"
 
 
 //TODO: pozbyæ siê tego
