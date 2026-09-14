@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Paddle.h"
 #include "Ball.h"
 #include "Bonus.h"

@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "D3Dscene.h"
+#include "D3DScene.h"
 
 LPDIRECT3DDEVICE8 CD3DScene::pD3DDevice;
 

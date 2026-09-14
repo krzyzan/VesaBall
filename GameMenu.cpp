@@ -1,10 +1,10 @@
-#include "stdafx.h"
-#include "gamemenu.h"
-#include "menuitem.h"
-#include "cursor.h"
+#include "StdAfx.h"
+#include "GameMenu.h"
+#include "MenuItem.h"
+#include "Cursor.h"
 
-#include "gameengine.h"
-#include "gameeditor.h"
+#include "GameEngine.h"
+#include "GameEditor.h"
 
 CGameMenu::CGameMenu()
 {

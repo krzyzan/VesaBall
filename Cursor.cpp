@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "cursor.h"
+#include "StdAfx.h"
+#include "Cursor.h"
 
 
 const float MOUSE_SPEED = 0.002f;

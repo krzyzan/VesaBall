@@ -5,7 +5,7 @@
 #include <stack>
 using namespace std;
 
-#include "d3dscene.h"
+#include "D3DScene.h"
 #include "Timer.h"
 
 

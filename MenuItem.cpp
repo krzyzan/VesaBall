@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "menuitem.h"
+#include "StdAfx.h"
+#include "MenuItem.h"
 
 const D3DXVECTOR2 SHADOW_POS = D3DXVECTOR2( 0.005f, 0.005f );
 

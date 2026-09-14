@@ -5,7 +5,7 @@
 #include <list>
 using namespace std;
 
-#include "d3dscene.h"
+#include "D3DScene.h"
 
 class CMenuItem;
 class CCursor;
