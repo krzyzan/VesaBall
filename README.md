@@ -72,3 +72,7 @@ doxygen Doxyfile
 ```
 
 Output is written to `html/` (ignored by git).
+
+## License
+
+VesaBall is licensed under the [GNU General Public License v3.0](LICENSE).
