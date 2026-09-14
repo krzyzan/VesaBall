@@ -1,0 +1,18 @@
+# Auto-detect text files and normalize line endings to LF in the repo by default.
+* text=auto
+
+# C++ sources, Windows/Visual Studio and Dev-C++ project files: these were
+# authored on Windows and use CRLF line endings. Keep them CRLF on checkout
+# regardless of platform, since the toolchains that consume them expect it.
+*.cpp text eol=crlf
+*.h text eol=crlf
+*.sln text eol=crlf
+*.vcproj text eol=crlf
+*.dev text eol=crlf
+Makefile.win text eol=crlf
+cfg/res.cfg text eol=crlf
+
+# Level and graphics data: treat as binary, never touch line endings.
+*.lev binary
+gfx/*.png binary
+gfx/*.PNG binary
