@@ -412,8 +412,8 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 		//	bActive = (wParam == TRUE);
 		//	return 0;
 
-  		case WM_SETCURSOR:
-            // Turn off Windows cursor in fullscreen mode
+		case WM_SETCURSOR:
+			// Turn off Windows cursor in fullscreen mode
 			if ( bActive && bReady )
 			{
 				SetCursor( NULL );
@@ -453,7 +453,7 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 				case SC_MAXIMIZE:
 				case SC_KEYMENU:
 				case SC_MONITORPOWER:
-				  return 1;
+					return 1;
 					break;
 			}
 			break;
@@ -461,8 +461,8 @@ LRESULT CD3DApp::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 		case WM_CLOSE:
 			Cleanup3DEnvironment();
 			DestroyWindow( hWnd );
-            PostQuitMessage(0);
-            return 0;
+			PostQuitMessage(0);
+			return 0;
 	}
 
 	return DefWindowProc( hWnd, uMsg, wParam, lParam );
@@ -612,41 +612,41 @@ HRESULT CD3DApp::Cleanup3DEnvironment()
 
 HRESULT CD3DApp::InitializeKeyboardInput()
 {
-    HRESULT hr;
+	HRESULT hr;
 
-    // Get the keyboard interface
-    if( FAILED( hr = pDI->CreateDevice( GUID_SysKeyboard, &pDIKeyboard, NULL ) ) )
-        return hr;
-    
-    // Set the data format to the predefined keyboard format
-    if( FAILED( hr = pDIKeyboard->SetDataFormat( &c_dfDIKeyboard ) ) )
-        return hr;
-    
-    if( FAILED( hr = pDIKeyboard->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND ) ) )
-        return hr;
+	// Get the keyboard interface
+	if( FAILED( hr = pDI->CreateDevice( GUID_SysKeyboard, &pDIKeyboard, NULL ) ) )
+		return hr;
+
+	// Set the data format to the predefined keyboard format
+	if( FAILED( hr = pDIKeyboard->SetDataFormat( &c_dfDIKeyboard ) ) )
+		return hr;
+
+	if( FAILED( hr = pDIKeyboard->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND ) ) )
+		return hr;
 
 	// Enable buffered reading from the device
 	DIPROPDWORD dipdw;
-    dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
-    dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-    dipdw.diph.dwObj        = 0;
-    dipdw.diph.dwHow        = DIPH_DEVICE;
-    dipdw.dwData            = KEYBRD_BUFFER_SIZE;
+	dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
+	dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+	dipdw.diph.dwObj        = 0;
+	dipdw.diph.dwHow        = DIPH_DEVICE;
+	dipdw.dwData            = KEYBRD_BUFFER_SIZE;
 
-    if( FAILED( hr = pDIKeyboard->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
-         return hr;
+	if( FAILED( hr = pDIKeyboard->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
+		return hr;
 
-    // Acquire the newly created interface
+	// Acquire the newly created interface
 	if( FAILED( hr = pDIKeyboard->Acquire() ) )
 		return hr;
 
-    return S_OK;
+	return S_OK;
 }
 
 
 HRESULT CD3DApp::InitializeMouseInput()
 {
-    HRESULT hr;
+	HRESULT hr;
 
 	// Get the mouse interface
 	if( FAILED( hr = pDI->CreateDevice( GUID_SysMouse, &pDIMouse, NULL ) ) )
@@ -663,17 +663,17 @@ HRESULT CD3DApp::InitializeMouseInput()
 		return hr;
 
 	// Enable buffered reading from the device
-    DIPROPDWORD dipdw;
-    dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
-    dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-    dipdw.diph.dwObj        = 0;
-    dipdw.diph.dwHow        = DIPH_DEVICE;
-    dipdw.dwData            = MOUSE_BUFFER_SIZE;
+	DIPROPDWORD dipdw;
+	dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
+	dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+	dipdw.diph.dwObj        = 0;
+	dipdw.diph.dwHow        = DIPH_DEVICE;
+	dipdw.dwData            = MOUSE_BUFFER_SIZE;
 
-    if ( FAILED( hr = pDIMouse->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
-        return hr;
+	if ( FAILED( hr = pDIMouse->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
+		return hr;
 
-    // Acquire the newly created interface
+	// Acquire the newly created interface
 	if( FAILED( hr = pDIMouse->Acquire() ) )
 		return hr;
 
@@ -734,10 +734,10 @@ HRESULT CD3DApp::StartNewScene( CD3DScene* pScene )
 
 	sD3DScenes.push( pScene );
 	
- 	if (FAILED( hr = sD3DScenes.top()->OnInitDevice() ) )
+	if (FAILED( hr = sD3DScenes.top()->OnInitDevice() ) )
 		return hr;
 
- 	if (FAILED( hr = sD3DScenes.top()->OnRestoreDevice() ) )
+	if (FAILED( hr = sD3DScenes.top()->OnRestoreDevice() ) )
 		return hr;
 
 	return S_OK;

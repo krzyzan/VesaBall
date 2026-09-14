@@ -5,7 +5,7 @@
 
 const DWORD NUM_LEVELS = 50;
 
-    //! Brick array
+	//! Brick array
 	/*!
 		\par
 		Stores #CBrick objects. Allows finding the brick at a given screen point in constant time.
@@ -31,7 +31,7 @@ public:
 		/*!
 			\param pSprite	address of the \e ID3DXSprite used for rendering
 		*/ 
-    void Render( LPD3DXSPRITE pSprite ) const;
+	void Render( LPD3DXSPRITE pSprite ) const;
 
 		//! Inserts a brick into the array
 		/*!

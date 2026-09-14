@@ -11,33 +11,33 @@
 class CTimer
 {
 public:
-    CTimer();
+	CTimer();
 
 		//! Resets the timer		
-    void Reset();
+	void Reset();
 		//! Starts the timer
-    void Start();
+	void Start();
 		//! Stops the timer
-    void Stop();				
+	void Stop();				
 		//! Advances the timer by 0.1 seconds
-    void Advance();			
+	void Advance();			
 		//! Gets the absolute system time
-    float GetAbsoluteTime();
+	float GetAbsoluteTime();
 		//! Gets the time
-    float GetTime();
+	float GetTime();
 		//! Gets the time since the last call to GetElapsedTime()
-    float GetElapsedTime();
+	float GetElapsedTime();
 		//! Returns \b true if the timer is stopped
-    bool IsStopped();
+	bool IsStopped();
 
 protected:
-    bool bUsingQPF;
-    bool bTimerStopped;
-    LONGLONG llQPFTicksPerSec;
+	bool bUsingQPF;
+	bool bTimerStopped;
+	LONGLONG llQPFTicksPerSec;
 
-    LONGLONG llStopTime;
-    LONGLONG llLastElapsedTime;
-    LONGLONG llBaseTime;
+	LONGLONG llStopTime;
+	LONGLONG llLastElapsedTime;
+	LONGLONG llBaseTime;
 };
 
 #endif

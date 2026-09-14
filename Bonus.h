@@ -3,10 +3,10 @@
 
 #include "SpriteMoving.h"
 
-    //! Bonus
-    /*!
+	//! Bonus
+	/*!
 		Before use, textures must be loaded into the #spTexture array.
-    */
+	*/
 class CBonus :
 	public CSpriteMoving
 {

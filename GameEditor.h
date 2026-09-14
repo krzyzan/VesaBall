@@ -30,7 +30,7 @@ public:
 			With the right button, bricks are removed. The brick type can be selected 
 			by left-clicking on the bottom array.
 		*/
-            
+
 	HRESULT OnMouseEvent( LPDIDEVICEOBJECTDATA didod );
 
 		//! Processes keyboard events

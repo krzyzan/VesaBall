@@ -8,11 +8,11 @@ using namespace std;
 
 class CBall;
 
-    //! Paddle
-    /*!
+	//! Paddle
+	/*!
 		Before creating instances of this class, the texture must be loaded
 		into #spTexture, #spLightningTexture.
-    */ 
+	*/ 
 class CPaddle : 
 	public CSprite  
 {

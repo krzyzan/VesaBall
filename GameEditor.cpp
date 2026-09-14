@@ -80,7 +80,7 @@ HRESULT CGameEditor::OnMouseEvent( LPDIDEVICEOBJECTDATA didod )
 		case DIMOFS_BUTTON1:
 			bRMB = ((didod->dwData & 0x80) != 0);
 			break;
-    }
+	}
 
 	return S_OK;
 }
@@ -130,7 +130,7 @@ HRESULT CGameEditor::FrameMove( float fElapsedTime )
 		POINT pos = pBrickArray->GetArrayCoordsAt( pCursor->vPosition );
 		if ( pBrickArray->IsValid( pos ) ) {
 			pBrickArray->RemoveBrick( pos );
-            if (bLMB)
+			if (bLMB)
 				pBrickArray->InsertBrick( curType, pos );
 		}
 	}

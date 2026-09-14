@@ -24,7 +24,7 @@ public:
 			\param Duration		Duration; after this time #HasExpired() returns \b true
 			\param FirstFrame	First frame of the animation
 			\param LastFrame	Last frame of the animation
-            \param FramePixels	Frame size within the texture, in pixels
+			\param FramePixels	Frame size within the texture, in pixels
 		*/
 	CSpriteAnimated( LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,  float Rotation,
 		const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel, DWORD Color, 

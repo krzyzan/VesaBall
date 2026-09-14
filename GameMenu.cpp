@@ -87,8 +87,8 @@ HRESULT CGameMenu::OnMouseEvent( LPDIDEVICEOBJECTDATA didod )
 	CMenuItem* pOldMenuItem;
 
 	switch (didod->dwOfs)
-    {
-        case DIMOFS_X:
+	{
+		case DIMOFS_X:
 		case DIMOFS_Y:
 			pOldMenuItem = pCurrentItem;
 			pCurrentItem = GetPOINTedMenuItem();
@@ -100,10 +100,10 @@ HRESULT CGameMenu::OnMouseEvent( LPDIDEVICEOBJECTDATA didod )
 				if (pCurrentItem)
 					pCurrentItem->SetHighlighted( true );
 			}
-            break;
+			break;
 	
 
-        case DIMOFS_BUTTON0:
+		case DIMOFS_BUTTON0:
 			if (didod->dwData & 0x80) {		// button pressed
 					if ( pCurrentItem ) {
 					pPressedItem = pCurrentItem; 
@@ -130,7 +130,7 @@ HRESULT CGameMenu::OnMouseEvent( LPDIDEVICEOBJECTDATA didod )
 				}
 			}
 			break;
-    }
+	}
 
 	return S_OK;
 }

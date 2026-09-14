@@ -21,7 +21,7 @@ public:
 	/*! 
 		Renders by rounding the position to the nearest pixel.
 		This improves the visual effect at low resolutions.
-        \param pSprite	address of the \e ID3DXSprite used for rendering
+		\param pSprite	address of the \e ID3DXSprite used for rendering
 	*/
 	void Render( LPD3DXSPRITE pSprite ) const;
 	

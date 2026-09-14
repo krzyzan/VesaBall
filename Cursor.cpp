@@ -20,7 +20,7 @@ HRESULT CCursor::Move( const D3DXVECTOR2 & vMovement )
 {
 	vPosition += vMovement * MOUSE_SPEED;
 	D3DXVECTOR2 vTopLeft( 0.00f, 0.00f );
- 	D3DXVECTOR2 vBottomRight( 1.00f, 0.75f );
+	D3DXVECTOR2 vBottomRight( 1.00f, 0.75f );
 	D3DXVec2Maximize( &vPosition, &vPosition, &vTopLeft );
 	D3DXVec2Minimize( &vPosition, &vPosition, &vBottomRight );
 

@@ -4,11 +4,11 @@
 #include "Sprite.h"
 
 	//! Counter displaying positive numbers
-    /*!
+	/*!
 		Before creating instances of this class, the texture must be loaded
 		into #spTexture. The texture should contain the digits 0123456789
 		arranged vertically.
-    */ 
+	*/ 
 class CCounter :
 	public CSprite
 {

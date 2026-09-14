@@ -10,11 +10,11 @@ class CSpriteEffect;
 const BYTE BRICK_TYPE_MAX = 23;
 const BYTE BRICK_TYPE_EXPL = 8;
 
-    //! Brick
-    /*!
+	//! Brick
+	/*!
 		Before use, textures must be loaded into the #spTexture array.
-    */
- class CBrick :
+	*/
+class CBrick :
 	public CSprite  
 {
 	struct SType

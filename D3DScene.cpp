@@ -14,7 +14,7 @@ CD3DScene::~CD3DScene()
 	// release the textures
 	while (!stackTextures.empty()) {
 		stackTextures.top()->Release();
-        stackTextures.pop();
+		stackTextures.pop();
 	}
 }
 
@@ -28,7 +28,7 @@ CD3DScene* CD3DScene::GetNextScene()
 
 HRESULT CD3DScene::LoadTexture( char* strFileName, LPDIRECT3DTEXTURE8* pTex )
 {
-    D3DXCreateTextureFromFile( pD3DDevice, strFileName, pTex );
+	D3DXCreateTextureFromFile( pD3DDevice, strFileName, pTex );
 	stackTextures.push( *pTex );
 
 	return S_OK;

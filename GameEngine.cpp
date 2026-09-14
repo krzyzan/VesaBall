@@ -392,7 +392,7 @@ void CGameEngine::CollideBallPaddle( CBall* pBall )
 {
 	if ( pBall->bCatched )
 		return;
-    
+
 	D3DXVECTOR2 vSide = pBall->GetCollisionSide( pPaddle );
 	if (vSide == D3DXVECTOR2(0,0))
 		return;
@@ -405,7 +405,7 @@ void CGameEngine::CollideBallPaddle( CBall* pBall )
 	}
 	pPaddle->SetBallSpeed( pBall );
 
-    if (bFallingBricks)
+	if (bFallingBricks)
 		pBrickArray->FallBricks();
 }
 

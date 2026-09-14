@@ -12,10 +12,10 @@ const float BALL_SPEED_VAL_MIN = 0.20f;
 const float BALL_SPEED_VAL_MAX = 0.80f;
 const float BALL_SPEED_VAL_AVG = 0.40f;
 
-    //! Ball
-    /*!
+	//! Ball
+	/*!
 		\warning Before creating instances of this class, the texture must be loaded into #spTexture.
-    */ 
+	*/ 
 class CBall :
 	public CSpriteMoving  
 {
