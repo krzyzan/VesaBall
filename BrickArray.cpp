@@ -72,17 +72,25 @@ void CBrickArray::Load(DWORD dwLevelNum)
 
 	ifstream file;
 	file.open(strFileName, ios::binary | ios::in);
-	char ch;
+	if (!file.is_open())
+		return;
+
 	POINT pos;
 	for (pos.y = 0; pos.y < Max.y; pos.y++)
 	{
 		for (pos.x = 0; pos.x < Max.x; pos.x++)
 		{
+			char ch = 0;
 			file.get(ch);
-			if (ch)
+			if (file.fail())
+				return;
+			if (ch && (BYTE)ch < BRICK_TYPE_MAX)
 				InsertBrick(ch, pos);
 		}
+		char ch = 0;
 		file.get(ch);
+		if (file.fail())
+			return;
 	}
 	file.close();
 };

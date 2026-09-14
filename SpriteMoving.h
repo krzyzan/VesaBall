@@ -25,7 +25,7 @@ public:
 	/*!
 		/param Speed	New speed
 	*/
-	void CSpriteMoving::SetSpeed(const D3DXVECTOR2 & Speed)
+	void SetSpeed(const D3DXVECTOR2 & Speed)
 	{
 		vSpeed = Speed;
 	}

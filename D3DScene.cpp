@@ -28,7 +28,10 @@ CD3DScene* CD3DScene::GetNextScene()
 
 HRESULT CD3DScene::LoadTexture(char* strFileName, LPDIRECT3DTEXTURE8* pTex)
 {
-	D3DXCreateTextureFromFile(pD3DDevice, strFileName, pTex);
+	HRESULT hr = D3DXCreateTextureFromFile(pD3DDevice, strFileName, pTex);
+	if (FAILED(hr))
+		return hr;
+
 	stackTextures.push(*pTex);
 
 	return S_OK;
