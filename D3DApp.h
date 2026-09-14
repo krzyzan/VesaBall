@@ -6,10 +6,10 @@
 using namespace std;
 
 #include "d3dscene.h"
-#include "timer.h"
+#include "Timer.h"
 
 
-//TODO: pozbyæ siê tego
+//TODO: pozbyï¿½ siï¿½ tego
 
 enum APPMSGTYPE { MSG_NONE, MSGERR_APPMUSTEXIT, MSGWARN_SWITCHEDTOREF };
 
@@ -32,90 +32,90 @@ const int KEYBRD_BUFFER_SIZE	= 16;
 
 //! Aplikacja Direct3D
 /*!
-	U³atwia korzystanie z Direct3D. Zajmuje siê inicjalizacj¹ interfejsu D3D oraz enumeracj¹ dostepnych trybów graficznych.
-	Zarz¹dza obiektami #CD3DScene wykonuj¹c w odpowiedniej kolejnoœci ich inicjalizacjê, resetowanie oraz zamykanie.
+	Uï¿½atwia korzystanie z Direct3D. Zajmuje siï¿½ inicjalizacjï¿½ interfejsu D3D oraz enumeracjï¿½ dostepnych trybï¿½w graficznych.
+	Zarzï¿½dza obiektami #CD3DScene wykonujï¿½c w odpowiedniej kolejnoï¿½ci ich inicjalizacjï¿½, resetowanie oraz zamykanie.
 */
 
 class CD3DApp 
 {
-	// Struktura przechowuj¹ca informacjê dotycz¹c¹ trybu graficznego.
+	// Struktura przechowujï¿½ca informacjï¿½ dotyczï¿½cï¿½ trybu graficznego.
 	struct D3DModeInfo
 	{
-		DWORD	   Width;				// Rozdzielczoœæ pozioma w pikselach
-		DWORD	   Height;				// Rozdzielczoœæ pionowa w pikselach
+		DWORD	   Width;				// Rozdzielczoï¿½ï¿½ pozioma w pikselach
+		DWORD	   Height;				// Rozdzielczoï¿½ï¿½ pionowa w pikselach
 		D3DFORMAT  Format;				// Format piksela
 		DWORD	   RefreshRate;
-		DWORD	   dwBehavior;			// Przetwarzanie wierzcho³ków Hardware / Software / Mixed
-		D3DFORMAT  DepthStencilFormat;	// Który format bufora g³êbi/stencil u¿yæ z tym trybem
+		DWORD	   dwBehavior;			// Przetwarzanie wierzchoï¿½kï¿½w Hardware / Software / Mixed
+		D3DFORMAT  DepthStencilFormat;	// Ktï¿½ry format bufora gï¿½ï¿½bi/stencil uï¿½yï¿½ z tym trybem
 	};
 
-	// Struktura przechowuj¹ca informacjê dotycz¹c¹ urz¹dzenia Direct3D, 
-	// wraz z list¹ trybów compatybilnych z tym urz¹dzeniem.
+	// Struktura przechowujï¿½ca informacjï¿½ dotyczï¿½cï¿½ urzï¿½dzenia Direct3D, 
+	// wraz z listï¿½ trybï¿½w compatybilnych z tym urzï¿½dzeniem.
 	struct D3DDeviceInfo
 	{
-		// Dane urz¹dzenia
+		// Dane urzï¿½dzenia
 		D3DDEVTYPE	 DeviceType;	  // Reference, HAL, itp.
-		D3DCAPS8	 d3dCaps;		  // Mo¿liwoœci urz¹dzenia
-		const TCHAR* strDesc;		  // Nazwa urz¹dzenia
+		D3DCAPS8	 d3dCaps;		  // Moï¿½liwoï¿½ci urzï¿½dzenia
+		const TCHAR* strDesc;		  // Nazwa urzï¿½dzenia
 
-		// Tryby graficzne dla tego urz¹dzenia
+		// Tryby graficzne dla tego urzï¿½dzenia
 		DWORD		 dwNumModes;
 		D3DModeInfo  modes[150];
 
-		// Bie¿¹cy stan
+		// Bieï¿½ï¿½cy stan
 		DWORD		 dwCurrentMode;
 		D3DMULTISAMPLE_TYPE MultiSampleType;
 	};
 
 
-	// Struktura przechowuj¹ca informacjê dotycz¹c¹ karty graficznej, 
-	// wraz z list¹ urz¹dzeñ zgodnych z Direct3D dostêpnych na tej karcie.
+	// Struktura przechowujï¿½ca informacjï¿½ dotyczï¿½cï¿½ karty graficznej, 
+	// wraz z listï¿½ urzï¿½dzeï¿½ zgodnych z Direct3D dostï¿½pnych na tej karcie.
 	struct D3DAdapterInfo
 	{
 		// Dane karty graficznej
 		D3DADAPTER_IDENTIFIER8 d3dAdapterIdentifier;
 		D3DDISPLAYMODE d3ddmDesktop;	  // Desktop display mode for this adapter
 
-		// Urz¹dzenia na tej karcie graficznej
+		// Urzï¿½dzenia na tej karcie graficznej
 		DWORD		   dwNumDevices;
 		D3DDeviceInfo  devices[5];
 
-		// Bie¿¹cy stan
+		// Bieï¿½ï¿½cy stan
 		DWORD		   dwCurrentDevice;
 	};
 
 public:
 		//! Konstruktor
 		/*!
-			\param	WindowTitle	Tytu³ okna aplikacji
+			\param	WindowTitle	Tytuï¿½ okna aplikacji
 		*/
 	CD3DApp( TCHAR* WindowTitle );
 
 		//! Tworzy aplikacje Direct3D
 		/*!
 			- Tworzy okno aplikacji.
-			- Enumeruje i wybiera odpowiedni tryb obs³ugiwany przez kartê graficzn¹.
+			- Enumeruje i wybiera odpowiedni tryb obsï¿½ugiwany przez kartï¿½ graficznï¿½.
 			- Inicjalizuje asynchroniczny (buforowany) odczyt z klawiatury i myszy.
 			- Startuje wewnetrzny timer
 			- Inicjalizuje generator liczb losowych
 		*/
 	HRESULT Create( HINSTANCE hInstance );
 
-		//! Ustawia bie¿¹c¹ scenê
+		//! Ustawia bieï¿½ï¿½cï¿½ scenï¿½
 		/*!
-			Powinna byæ wywo³ana po wykonaniu funkcji #Create();
+			Powinna byï¿½ wywoï¿½ana po wykonaniu funkcji #Create();
 		*/
 	HRESULT StartNewScene( CD3DScene* pScene );
 
-		//! Uruchamia g³ówn¹ pêtlê programu
+		//! Uruchamia gï¿½ï¿½wnï¿½ pï¿½tlï¿½ programu
 		/*!
-			Zajmuje siê pobieraniem i przetwarzaniem zdarzeñ Windows
-			Jeœli nie ma ¿adnych zdarzeñ, renderuje bie¿¹c¹ scenê.
+			Zajmuje siï¿½ pobieraniem i przetwarzaniem zdarzeï¿½ Windows
+			Jeï¿½li nie ma ï¿½adnych zdarzeï¿½, renderuje bieï¿½ï¿½cï¿½ scenï¿½.
 		*/
 	HRESULT Run();
 
 private:
-	// Wewnêtrzne funkcje zarz¹dzaj¹ce i renderuj¹ce sceny 3D
+	// Wewnï¿½trzne funkcje zarzï¿½dzajï¿½ce i renderujï¿½ce sceny 3D
 	HRESULT	ChangeScene();
 	HRESULT StartParentScene();
 
@@ -131,7 +131,7 @@ private:
 	HRESULT Reset3DEnvironment();
 	HRESULT	Cleanup3DEnvironment();
 
-	// Wewnêtrzne funkcje enumeruj¹ce tryby karty
+	// Wewnï¿½trzne funkcje enumerujï¿½ce tryby karty
 	HRESULT BuildDeviceList();
 	BOOL	FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE DeviceType,
 				D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat );
@@ -139,7 +139,7 @@ private:
 	LRESULT MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 private:
-	// Wewnêtrzne zmienne okreœlaj¹ce stan aplikacji
+	// Wewnï¿½trzne zmienne okreï¿½lajï¿½ce stan aplikacji
 	bool					bActive;
 	bool					bReady;
 
@@ -155,38 +155,38 @@ private:
 	LPDIRECTINPUTDEVICE8	pDIMouse;
 	LPDIRECTINPUTDEVICE8	pDIKeyboard;
 
-	// G³ówny timer
+	// Gï¿½ï¿½wny timer
 	CTimer					Timer;
 
 private:
-	// Obiekty u¿ywane do tworzenia i renderowania sceny 3D
+	// Obiekty uï¿½ywane do tworzenia i renderowania sceny 3D
 
 	// Parametry dla CreateDevice/Reset
 	D3DPRESENT_PARAMETERS	d3dpp;
 	D3DAdapterInfo			Adapter;
 	
-	// Mo¿liwoœci urz¹dzenia
+	// Moï¿½liwoï¿½ci urzï¿½dzenia
 	D3DCAPS8	d3dCaps;
 
-	// Wskazuje sprzetowe/programowe przetwarzanie wierzcho³ków
+	// Wskazuje sprzetowe/programowe przetwarzanie wierzchoï¿½kï¿½w
 	DWORD		CreateFlags;
 
-	// Minimalna liczba bitów w buforze g³êbi kolorów
+	// Minimalna liczba bitï¿½w w buforze gï¿½ï¿½bi kolorï¿½w
 	DWORD		MinDepthBits;	
-	// Minimalna liczba bitów w buforze stencil
+	// Minimalna liczba bitï¿½w w buforze stencil
 	DWORD		MinStencilBits;	
 
-	// Tytu³ okna aplikacji
+	// Tytuï¿½ okna aplikacji
 	TCHAR*		strWindowTitle;
 
 private:
-	// G³ówne okno aplikacji
+	// Gï¿½ï¿½wne okno aplikacji
 	HWND		hWnd;
 
-	// Statyczny wskaŸnik do aplikacji, potrzebny dla statycznej WndProc()
+	// Statyczny wskaï¿½nik do aplikacji, potrzebny dla statycznej WndProc()
 	static CD3DApp* spD3DApp;
 
-	// Statyczny handler zdarzeñ, przekazuje zdarzenia do aplikacji spD3DApp.
+	// Statyczny handler zdarzeï¿½, przekazuje zdarzenia do aplikacji spD3DApp.
 	static LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 };
 
