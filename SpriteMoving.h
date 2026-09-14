@@ -7,8 +7,8 @@
 class CSpriteMoving : public CSprite
 {
 public:
-	CSpriteMoving(LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, float Rotation,
-				  const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel, D3DCOLOR Color);
+	CSpriteMoving(SDL_Texture* Texture, const Vec2 & Size, float Rotation,
+				  const Vec2 & Position, const Vec2 & Speed, const Vec2 & Accel, Color Color);
 
 	virtual ~CSpriteMoving(void);
 
@@ -25,26 +25,26 @@ public:
 	/*!
 		/param Speed	New speed
 	*/
-	void SetSpeed(const D3DXVECTOR2 & Speed)
+	void SetSpeed(const Vec2 & Speed)
 	{
 		vSpeed = Speed;
 	}
-	const D3DXVECTOR2 & GetSpeed() const
+	const Vec2 & GetSpeed() const
 	{
 		return vSpeed;
 	}
 
 	//! Returns the point where the collision with the object occurs.
 	/*!
-		If the objects do not collide, returns \b D3DXVECTOR(0,0)
+		If the objects do not collide, returns \b Vec2(0,0)
 	*/
-	D3DXVECTOR2 GetCollisionSide(CSprite* pSprite) const;
+	Vec2 GetCollisionSide(CSprite* pSprite) const;
 
-	D3DXVECTOR2 vOldPosition;
+	Vec2 vOldPosition;
 
 protected:
-	D3DXVECTOR2 vSpeed;
-	D3DXVECTOR2 vAccel;
+	Vec2 vSpeed;
+	Vec2 vAccel;
 };
 
 #endif

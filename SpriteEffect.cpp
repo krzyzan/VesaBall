@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include "SpriteEffect.h"
 
-CSpriteEffect::CSpriteEffect(LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
-							 const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel,
-							 DWORD Color, float Duration)
+CSpriteEffect::CSpriteEffect(SDL_Texture* Texture, const Vec2 & Size,
+							 const Vec2 & Position, const Vec2 & Speed, const Vec2 & Accel,
+							 Color Color, float Duration)
 	: CSpriteMoving(Texture, Size, 0, Position, Speed, Accel, Color)
 {
 	fDuration = fRemaining = Duration;
@@ -18,9 +18,7 @@ void CSpriteEffect::FrameMove(float fElapsedTime)
 	CSpriteMoving::FrameMove(fElapsedTime);
 
 	fRemaining -= fElapsedTime;
-	D3DXCOLOR dxBlending(dwColor);
-	dxBlending.a = fRemaining / fDuration;
-	dwColor = dxBlending;
+	dwColor = ColorWithAlpha(dwColor, fRemaining / fDuration);
 }
 
 bool CSpriteEffect::HasExpired() const

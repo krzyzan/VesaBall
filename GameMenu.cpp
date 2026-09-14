@@ -8,7 +8,6 @@
 
 CGameMenu::CGameMenu()
 {
-	pSprite = NULL;
 	pCursor = NULL;
 
 	pPressedItem = NULL;
@@ -18,27 +17,27 @@ CGameMenu::~CGameMenu()
 {
 }
 
-HRESULT CGameMenu::OnInitDevice()
+HRESULT CGameMenu::OnInit()
 {
-	LPDIRECT3DTEXTURE8 pTex;
+	SDL_Texture* pTex;
 
 	CMenuItem* pMenuItem;
 	LoadTexture("gfx/Menu_Title.png", &pTex);
-	pMenuItem = new CMenuItem(pTex, D3DXVECTOR2(0.8f, 0.2f), D3DXVECTOR2(0.5f, 0.15f), 0xFFFFFFFF, 0);
+	pMenuItem = new CMenuItem(pTex, Vec2(0.8f, 0.2f), Vec2(0.5f, 0.15f), 0xFFFFFFFF, 0);
 	listRender.push_back(pMenuItem);
 
 	LoadTexture("gfx/Menu_Start.png", &pTex);
-	pMenuItem = new CMenuItem(pTex, D3DXVECTOR2(0.4f, 0.1f), D3DXVECTOR2(0.5f, 0.4f), 0xFFFFCC00, UID_START);
+	pMenuItem = new CMenuItem(pTex, Vec2(0.4f, 0.1f), Vec2(0.5f, 0.4f), 0xFFFFCC00, UID_START);
 	listRender.push_back(pMenuItem);
 	listMenuItem.push_back(pMenuItem);
 
 	LoadTexture("gfx/Menu_Editor.png", &pTex);
-	pMenuItem = new CMenuItem(pTex, D3DXVECTOR2(0.4f, 0.1f), D3DXVECTOR2(0.5f, 0.5f), 0xFFFFCC00, UID_EDITOR);
+	pMenuItem = new CMenuItem(pTex, Vec2(0.4f, 0.1f), Vec2(0.5f, 0.5f), 0xFFFFCC00, UID_EDITOR);
 	listRender.push_back(pMenuItem);
 	listMenuItem.push_back(pMenuItem);
 
 	LoadTexture("gfx/Menu_Quit.png", &pTex);
-	pMenuItem = new CMenuItem(pTex, D3DXVECTOR2(0.4f, 0.1f), D3DXVECTOR2(0.5f, 0.6f), 0xFFFFCC00, UID_QUIT);
+	pMenuItem = new CMenuItem(pTex, Vec2(0.4f, 0.1f), Vec2(0.5f, 0.6f), 0xFFFFCC00, UID_QUIT);
 	listRender.push_back(pMenuItem);
 	listMenuItem.push_back(pMenuItem);
 
@@ -53,13 +52,6 @@ HRESULT CGameMenu::OnInitDevice()
 	return S_OK;
 }
 
-HRESULT CGameMenu::OnRestoreDevice()
-{
-	D3DXCreateSprite(pD3DDevice, &pSprite);
-
-	return S_OK;
-}
-
 CMenuItem* CGameMenu::GetPOINTedMenuItem() const
 {
 	list<CMenuItem*>::const_iterator iMenuItem;
@@ -70,24 +62,26 @@ CMenuItem* CGameMenu::GetPOINTedMenuItem() const
 	return (iMenuItem != listMenuItem.end()) ? *iMenuItem : NULL;
 }
 
-HRESULT CGameMenu::OnMouseEvent(LPDIDEVICEOBJECTDATA didod)
+HRESULT CGameMenu::OnMouseEvent(const InputEvent* evt)
 {
-	switch (didod->dwOfs)
+	switch (evt->ofs)
 	{
-	case DIMOFS_X:
-		pCursor->Move(D3DXVECTOR2((float)(int)didod->dwData, 0));
+	case InputEvent::AxisX:
+		pCursor->Move(Vec2((float)evt->data, 0));
 		break;
-	case DIMOFS_Y:
-		pCursor->Move(D3DXVECTOR2(0, (float)(int)didod->dwData));
+	case InputEvent::AxisY:
+		pCursor->Move(Vec2(0, (float)evt->data));
+		break;
+	default:
 		break;
 	}
 
 	CMenuItem* pOldMenuItem;
 
-	switch (didod->dwOfs)
+	switch (evt->ofs)
 	{
-	case DIMOFS_X:
-	case DIMOFS_Y:
+	case InputEvent::AxisX:
+	case InputEvent::AxisY:
 		pOldMenuItem = pCurrentItem;
 		pCurrentItem = GetPOINTedMenuItem();
 		if (pPressedItem && pCurrentItem != pPressedItem)
@@ -101,8 +95,8 @@ HRESULT CGameMenu::OnMouseEvent(LPDIDEVICEOBJECTDATA didod)
 		}
 		break;
 
-	case DIMOFS_BUTTON0:
-		if (didod->dwData & 0x80)
+	case InputEvent::Button0:
+		if (evt->data & 0x80)
 		{ // button pressed
 			if (pCurrentItem)
 			{
@@ -134,14 +128,17 @@ HRESULT CGameMenu::OnMouseEvent(LPDIDEVICEOBJECTDATA didod)
 			}
 		}
 		break;
+
+	default:
+		break;
 	}
 
 	return S_OK;
 }
 
-HRESULT CGameMenu::OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod)
+HRESULT CGameMenu::OnKeyboardEvent(const InputEvent* evt)
 {
-	if (didod->dwOfs == DIK_ESCAPE && (didod->dwData & 0x80))
+	if (evt->ofs == InputEvent::Key && evt->scancode == SDL_SCANCODE_ESCAPE && (evt->data & 0x80))
 		SetCurrentScene(NULL);
 
 	return S_OK;
@@ -154,25 +151,17 @@ HRESULT CGameMenu::FrameMove(float fElapsedTime)
 
 HRESULT CGameMenu::FrameRender()
 {
-	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(58, 110, 145), 1.0f, 0);
+	SDL_SetRenderDrawColor(pRenderer, 58, 110, 145, 255);
+	SDL_RenderClear(pRenderer);
 
-	pSprite->Begin();
 	list<CSprite*>::iterator iSprite;
 	for (iSprite = listRender.begin(); iSprite != listRender.end(); iSprite++)
-		(*iSprite)->Render(pSprite);
-	pSprite->End();
+		(*iSprite)->Render(pRenderer);
 
 	return S_OK;
 }
 
-HRESULT CGameMenu::OnInvalidateDevice()
-{
-	SAFE_RELEASE(pSprite);
-
-	return S_OK;
-}
-
-HRESULT CGameMenu::OnDeleteDevice()
+HRESULT CGameMenu::OnDestroy()
 {
 	// Remove from the render list
 	list<CSprite*>::iterator iSprite = listRender.begin();

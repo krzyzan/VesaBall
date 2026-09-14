@@ -44,9 +44,9 @@ CGameEngine::~CGameEngine()
 {
 }
 
-HRESULT CGameEngine::OnInitDevice()
+HRESULT CGameEngine::OnInit()
 {
-	CGameBoard::OnInitDevice();
+	CGameBoard::OnInit();
 
 	// paddle
 	LoadTexture("gfx/Paddle.png", &CPaddle::spTexture);
@@ -58,6 +58,16 @@ HRESULT CGameEngine::OnInitDevice()
 
 	// Explosions
 	LoadTexture("gfx/Explosion.png", &pExplosionTex);
+	// The explosion/fireball-tail animation uses a "brightening" blend
+	// (replacing the original's SetRenderState(SRCBLEND=DESTCOLOR,
+	// DESTBLEND=ONE) toggled around that render pass) instead of normal
+	// alpha blending. SDL applies blend mode per-texture rather than as a
+	// global render state, and pExplosionTex is only ever used for this
+	// animation, so it's set once here instead of toggled every frame.
+	SDL_SetTextureBlendMode(pExplosionTex,
+							SDL_ComposeCustomBlendMode(
+								SDL_BLENDFACTOR_DST_COLOR, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,
+								SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD));
 
 	// load the bonus textures
 	LoadTexture("gfx/Bonus_Thrubrick.PNG", &CBonus::spTextures[CBonus::ThruBrick]);
@@ -87,29 +97,29 @@ HRESULT CGameEngine::OnInitDevice()
 	// create the counter
 	LoadTexture("gfx/Digits.png", &CCounter::spTexture);
 	POINT DigitPixels = {64, 92};
-	pScoreCounter = new CCounter(0, D3DXVECTOR2(BOARD_W * 0.2f, 0.05f * 0.75f), D3DXVECTOR2(BOARD_L + BOARD_W * 0.125f, 0.05f / 2), DigitPixels, 6);
-	pLivesCounter = new CCounter(INITIAL_LIVES, D3DXVECTOR2(BOARD_W * 0.2f, 0.05f * 0.75f), D3DXVECTOR2(BOARD_R - BOARD_W * 0.125f, 0.05f / 2), DigitPixels, 6);
+	pScoreCounter = new CCounter(0, Vec2(BOARD_W * 0.2f, 0.05f * 0.75f), Vec2(BOARD_L + BOARD_W * 0.125f, 0.05f / 2), DigitPixels, 6);
+	pLivesCounter = new CCounter(INITIAL_LIVES, Vec2(BOARD_W * 0.2f, 0.05f * 0.75f), Vec2(BOARD_R - BOARD_W * 0.125f, 0.05f / 2), DigitPixels, 6);
 
 	BoardReset();
 
 	return S_OK;
 }
 
-HRESULT CGameEngine::OnDeleteDevice()
+HRESULT CGameEngine::OnDestroy()
 {
 	BoardClear();
 
 	SAFE_DELETE(pScoreCounter);
 	SAFE_DELETE(pLivesCounter);
 
-	return CGameBoard::OnDeleteDevice();
+	return CGameBoard::OnDestroy();
 }
 
 void CGameEngine::BoardPrepare()
 {
 	// create the paddle with a ball
 	pPaddle = new CPaddle();
-	CBall* pBall = new CBall(pPaddle->vPosition + D3DXVECTOR2(BALL_SHIFT, 0), D3DXVECTOR2(0, BALL_SPEED_VAL_AVG));
+	CBall* pBall = new CBall(pPaddle->vPosition + Vec2(BALL_SHIFT, 0), Vec2(0, BALL_SPEED_VAL_AVG));
 	listBall.push_front(pBall);
 	pPaddle->CatchBall(pBall);
 }
@@ -160,60 +170,67 @@ void CGameEngine::BoardReset()
 	BoardPrepare();
 }
 
-HRESULT CGameEngine::OnMouseEvent(LPDIDEVICEOBJECTDATA didod)
+HRESULT CGameEngine::OnMouseEvent(const InputEvent* evt)
 {
 	if (pPaddle && !bPaused)
-		switch (didod->dwOfs)
+		switch (evt->ofs)
 		{
-		case DIMOFS_X:
-			pPaddle->Move((float)(int)didod->dwData * PADDLE_SPEED / RES_X);
+		case InputEvent::AxisX:
+			pPaddle->Move((float)evt->data * PADDLE_SPEED / RES_X);
 			break;
 
-		case DIMOFS_BUTTON0:
-			if (didod->dwData & 0x80) // button pressed
+		case InputEvent::Button0:
+			if (evt->data & 0x80) // button pressed
 				pPaddle->LaunchCatchedBalls();
+			break;
+
+		default:
 			break;
 		}
 
 	if (!bCheats)
 		return S_OK;
 
-	if (didod->dwOfs == DIMOFS_BUTTON1)
-		if (didod->dwData & 0x80) // button pressed
+	if (evt->ofs == InputEvent::Button1)
+	{
+		if (evt->data & 0x80) // button pressed
 			fGameSpeed = GAME_SPEED / 5;
 		else // button released
 			fGameSpeed = GAME_SPEED;
+	}
 
 	return S_OK;
 }
 
-HRESULT CGameEngine::OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod)
+HRESULT CGameEngine::OnKeyboardEvent(const InputEvent* evt)
 {
-	if (didod->dwData & 0x80)
-		switch (didod->dwOfs)
+	if (evt->ofs == InputEvent::Key && (evt->data & 0x80))
+		switch (evt->scancode)
 		{
-		case DIK_P:
-		case DIK_PAUSE:
+		case SDL_SCANCODE_P:
+		case SDL_SCANCODE_PAUSE:
 			bPaused = !bPaused;
 			return S_OK;
-		case DIK_SYSRQ:
+		case SDL_SCANCODE_SYSREQ:
 			bCheats = !bCheats;
 			return S_OK;
-		case DIK_SPACE:
+		case SDL_SCANCODE_SPACE:
 			if (bCheats)
 				pBrickArray->Clear();
 			return S_OK;
-		case DIK_B:
+		case SDL_SCANCODE_B:
 			if (bCheats)
 			{
 				int type = listBonus.empty() ? 0 : (listBonus.front()->GetType() + 1) % CBonus::MAX_TYPE;
-				CBonus* pBonus = new CBonus(static_cast<CBonus::TypeEnum>(type), D3DXVECTOR2(0.50f, 0.375f), D3DXVECTOR2(0, 0));
+				CBonus* pBonus = new CBonus(static_cast<CBonus::TypeEnum>(type), Vec2(0.50f, 0.375f), Vec2(0, 0));
 				listBonus.push_front(pBonus);
 			}
 			return S_OK;
+		default:
+			break;
 		}
 
-	return CGameBoard::OnKeyboardEvent(didod);
+	return CGameBoard::OnKeyboardEvent(evt);
 }
 
 HRESULT CGameEngine::FrameMove(float fElapsedTime)
@@ -263,46 +280,39 @@ HRESULT CGameEngine::FrameMove(float fElapsedTime)
 HRESULT CGameEngine::FrameRender()
 {
 	// render
-	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40, 0x60, 0x60), 1.0f, 0);
+	SDL_SetRenderDrawColor(pRenderer, 0x40, 0x60, 0x60, 255);
+	SDL_RenderClear(pRenderer);
 
 	// scenery
 	CGameBoard::FrameRender();
 
-	pSprite->Begin();
-
 	// vanishing bricks
 	list<CSpriteEffect*>::iterator iEffect;
 	for (iEffect = listEffect.begin(); iEffect != listEffect.end(); iEffect++)
-		(*iEffect)->Render(pSprite);
+		(*iEffect)->Render(pRenderer);
 
 	// balls
 	list<CBall*>::iterator iBall;
 	for (iBall = listBall.begin(); iBall != listBall.end(); iBall++)
-		(*iBall)->Render(pSprite);
+		(*iBall)->Render(pRenderer);
 
 	// bonuses
 	list<CBonus*>::iterator iBonus;
 	for (iBonus = listBonus.begin(); iBonus != listBonus.end(); iBonus++)
-		(*iBonus)->Render(pSprite);
+		(*iBonus)->Render(pRenderer);
 
 	// paddle
 	if (pPaddle)
-		pPaddle->Render(pSprite);
+		pPaddle->Render(pRenderer);
 
 	// explosions
-	pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_DESTCOLOR);
-	pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	list<CSpriteAnimated*>::iterator iExplosion;
 	for (iExplosion = listExplosion.begin(); iExplosion != listExplosion.end(); iExplosion++)
-		(*iExplosion)->Render(pSprite);
-	pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+		(*iExplosion)->Render(pRenderer);
 
 	// counters
-	pScoreCounter->Render(pSprite);
-	pLivesCounter->Render(pSprite);
-
-	pSprite->End();
+	pScoreCounter->Render(pRenderer);
+	pLivesCounter->Render(pRenderer);
 
 	return S_OK;
 }
@@ -382,7 +392,7 @@ void CGameEngine::CollideObjects()
 	{
 		if (!pPaddle)
 			break;
-		if ((*iBonus)->GetCollisionSide(pPaddle) != D3DXVECTOR2(0, 0))
+		if ((*iBonus)->GetCollisionSide(pPaddle) != Vec2(0, 0))
 		{
 			ApplyBonus((*iBonus)->GetType());
 			iBonus = listBonus.erase(iBonus);
@@ -397,8 +407,8 @@ void CGameEngine::CollideBallPaddle(CBall* pBall)
 	if (pBall->bCatched)
 		return;
 
-	D3DXVECTOR2 vSide = pBall->GetCollisionSide(pPaddle);
-	if (vSide == D3DXVECTOR2(0, 0))
+	Vec2 vSide = pBall->GetCollisionSide(pPaddle);
+	if (vSide == Vec2(0, 0))
 		return;
 
 	if (pPaddle->bGrabPaddle && vSide.y && fabs(pBall->vPosition.x - pPaddle->vPosition.x) < pPaddle->vSize.x / 3)
@@ -419,7 +429,7 @@ void CGameEngine::CollideBallBricks(CBall* pBall)
 	for (LONG x = 0; x < 2; x++)
 		for (LONG y = 0; y < 2; y++)
 		{
-			D3DXVECTOR2 vPos = pBall->vPosition - pBall->vSize / 2 + D3DXVECTOR2(pBall->vSize.x * x, pBall->vSize.y * y);
+			Vec2 vPos = pBall->vPosition - pBall->vSize / 2 + Vec2(pBall->vSize.x * x, pBall->vSize.y * y);
 			POINT pos = pBrickArray->GetArrayCoordsAt(vPos);
 			if (!pBrickArray->IsValid(pos))
 				continue;
@@ -428,7 +438,7 @@ void CGameEngine::CollideBallBricks(CBall* pBall)
 			if (pBrick == NULL)
 				continue;
 
-			D3DXVECTOR2 vSide = pBall->GetCollisionSide(pBrick);
+			Vec2 vSide = pBall->GetCollisionSide(pBrick);
 
 			if (!bThruBrick)
 			{
@@ -443,7 +453,7 @@ void CGameEngine::CollideBallBricks(CBall* pBall)
 				BYTE idNextType = pBrick->GetNextType();
 				if (idNextType && !bThruBrick)
 				{
-					listEffect.push_front(pBrick->CreateBlendEffect(D3DXVECTOR2(0, 0)));
+					listEffect.push_front(pBrick->CreateBlendEffect(Vec2(0, 0)));
 					pBrickArray->RemoveBrick(pos);
 					pBrickArray->InsertBrick(idNextType, pos);
 				}
@@ -458,8 +468,8 @@ void CGameEngine::DoExplosion(const POINT & pos)
 	for (int i = 0; i < 2; i++)
 	{
 		POINT ptFramePixels = {64, 64};
-		CSpriteAnimated* pAnimation = new CSpriteAnimated(pExplosionTex, D3DXVECTOR2(1.0f, 1.0f) / 8, frand(0, D3DX_PI * 2),
-														  pBrickArray->GetPositionAt(pos) + D3DXVECTOR2(frand(-0.01f, 0.01f), frand(-0.01f, 0.01f)), D3DXVECTOR2(0.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f), 0xFFFFFFFF, 1.0f, 0, 44, ptFramePixels);
+		CSpriteAnimated* pAnimation = new CSpriteAnimated(pExplosionTex, Vec2(1.0f, 1.0f) / 8, frand(0, PI * 2),
+														  pBrickArray->GetPositionAt(pos) + Vec2(frand(-0.01f, 0.01f), frand(-0.01f, 0.01f)), Vec2(0.0f, 0.0f), Vec2(0.0f, 0.0f), 0xFFFFFFFF, 1.0f, 0, 44, ptFramePixels);
 		listExplosion.push_back(pAnimation);
 	}
 
@@ -467,10 +477,10 @@ void CGameEngine::DoExplosion(const POINT & pos)
 	for (posAdj.x = pos.x - 1; posAdj.x <= pos.x + 1; posAdj.x++)
 		for (posAdj.y = pos.y - 1; posAdj.y <= pos.y + 1; posAdj.y++)
 			if (pBrickArray->IsValid(posAdj))
-				DestroyBrick(posAdj, D3DXVECTOR2(float(posAdj.x - pos.x), float(posAdj.y - pos.y)) * EXPL_BLOW);
+				DestroyBrick(posAdj, Vec2(float(posAdj.x - pos.x), float(posAdj.y - pos.y)) * EXPL_BLOW);
 }
 
-void CGameEngine::DestroyBrick(const POINT & pos, const D3DXVECTOR2 & vSpeed)
+void CGameEngine::DestroyBrick(const POINT & pos, const Vec2 & vSpeed)
 {
 	CBrick* pBrick = pBrickArray->GetBrick(pos);
 	if (!pBrick)
@@ -543,8 +553,8 @@ void CGameEngine::ApplyBonus(DWORD Type)
 	case CBonus::SlowBall:
 		for (iBall = listBall.begin(); iBall != listBall.end(); iBall++)
 		{
-			D3DXVECTOR2 vSpeed = (*iBall)->GetSpeed();
-			D3DXVec2Normalize(&vSpeed, &vSpeed);
+			Vec2 vSpeed = (*iBall)->GetSpeed();
+			Vec2Normalize(&vSpeed, &vSpeed);
 			(*iBall)->SetSpeed(vSpeed * BALL_SPEED_VAL_MIN);
 		}
 		break;
@@ -567,8 +577,8 @@ void CGameEngine::ApplyBonus(DWORD Type)
 	case CBonus::FastBall:
 		for (iBall = listBall.begin(); iBall != listBall.end(); iBall++)
 		{
-			D3DXVECTOR2 vSpeed = (*iBall)->GetSpeed();
-			D3DXVec2Normalize(&vSpeed, &vSpeed);
+			Vec2 vSpeed = (*iBall)->GetSpeed();
+			Vec2Normalize(&vSpeed, &vSpeed);
 			(*iBall)->SetSpeed(vSpeed * BALL_SPEED_VAL_MAX);
 		}
 		break;
@@ -598,8 +608,8 @@ void CGameEngine::ApplyBonus(DWORD Type)
 				if (listBall.size() > MAX_BALLS)
 					continue;
 				CBall* pBall = new CBall(**iBall);
-				D3DXVECTOR2 vSpeed = (*iBall)->GetSpeed();
-				pBall->SetSpeed(D3DXVECTOR2(vSpeed.y, -vSpeed.x));
+				Vec2 vSpeed = (*iBall)->GetSpeed();
+				pBall->SetSpeed(Vec2(vSpeed.y, -vSpeed.x));
 				listBall.push_front(pBall);
 			}
 		break;
@@ -612,8 +622,6 @@ void CGameEngine::ApplyBonus(DWORD Type)
 	case CBonus::EightBall:
 	{
 		ApplyBonus(CBonus::FastBall);
-		D3DXMATRIX matRotation;
-		D3DXMatrixRotationZ(&matRotation, D3DX_PI / 4);
 		for (iBall = listBall.begin(); iBall != listBall.end(); iBall++)
 			if (!(*iBall)->bCatched)
 			{
@@ -623,8 +631,7 @@ void CGameEngine::ApplyBonus(DWORD Type)
 					if (listBall.size() > MAX_BALLS)
 						continue;
 					pBall = new CBall(*pBall);
-					D3DXVECTOR2 vNewSpeed = pBall->GetSpeed();
-					D3DXVec2TransformCoord(&vNewSpeed, &vNewSpeed, &matRotation);
+					Vec2 vNewSpeed = Vec2Rotate(pBall->GetSpeed(), PI / 4);
 					pBall->SetSpeed(vNewSpeed);
 					listBall.push_front(pBall);
 				}
@@ -634,18 +641,18 @@ void CGameEngine::ApplyBonus(DWORD Type)
 	}
 }
 
-void CGameEngine::CreateSparkles(CBall* pBall, const D3DXVECTOR2 & vSide)
+void CGameEngine::CreateSparkles(CBall* pBall, const Vec2 & vSide)
 {
-	D3DXVECTOR2 vSparkSize = D3DXVECTOR2(1.0f / 256, 1.0f / 256);
-	D3DXVECTOR2 vSparkPosition = pBall->vPosition + vSide;
-	D3DXVECTOR2 vSparkGravity = D3DXVECTOR2(0, GRAV_ACCEL);
+	Vec2 vSparkSize = Vec2(1.0f / 256, 1.0f / 256);
+	Vec2 vSparkPosition = pBall->vPosition + vSide;
+	Vec2 vSparkGravity = Vec2(0, GRAV_ACCEL);
 	for (int i = 0; i < 8; i++)
 	{
 		if (listEffect.size() >= MAX_EFFECTS)
 			continue;
 
 		float fSparkDuration = frand(0.5f, 1.0f);
-		D3DXVECTOR2 vSparkSpeed = D3DXVECTOR2(frand(-1.0f, 1.0f), frand(-1.0f, 1.0f)) / 20 + pBall->GetSpeed() / 4;
+		Vec2 vSparkSpeed = Vec2(frand(-1.0f, 1.0f), frand(-1.0f, 1.0f)) / 20 + pBall->GetSpeed() / 4;
 		CSpriteEffect* pEffectSprite = new CSpriteEffect(pSparkTex, vSparkSize,
 														 vSparkPosition, vSparkSpeed, vSparkGravity, 0xFFFFFFFF, fSparkDuration);
 		listEffect.push_back(pEffectSprite);
@@ -655,9 +662,9 @@ void CGameEngine::CreateSparkles(CBall* pBall, const D3DXVECTOR2 & vSide)
 void CGameEngine::CreateFireballTail(CBall* pBall)
 {
 	POINT ptFramePixels = {64, 64};
-	CSpriteAnimated* pAnimation = new CSpriteAnimated(pExplosionTex, pBall->vSize * 2, frand(0, D3DX_PI * 2),
-													  pBall->vPosition + D3DXVECTOR2(frand(-0.5f, 0.5f) * pBall->vSize.x, frand(-0.5f, 0.5f) * pBall->vSize.y),
-													  D3DXVECTOR2(0, 0), D3DXVECTOR2(0, 0), bThruBrick ? 0xFF0000FF : 0xFFFFFFFF, frand(0.05f, 0.2f), 8, 44, ptFramePixels);
+	CSpriteAnimated* pAnimation = new CSpriteAnimated(pExplosionTex, pBall->vSize * 2, frand(0, PI * 2),
+													  pBall->vPosition + Vec2(frand(-0.5f, 0.5f) * pBall->vSize.x, frand(-0.5f, 0.5f) * pBall->vSize.y),
+													  Vec2(0, 0), Vec2(0, 0), bThruBrick ? 0xFF0000FF : 0xFFFFFFFF, frand(0.05f, 0.2f), 8, 44, ptFramePixels);
 	listExplosion.push_back(pAnimation);
 }
 

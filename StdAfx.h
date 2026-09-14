@@ -6,7 +6,6 @@
 #ifndef STDAFX_H
 #define STDAFX_H
 
-#define _USE_MATH_DEFINES
 #include <stdlib.h>
 #include <math.h>
 #include <memory.h>
@@ -17,13 +16,9 @@
 #include <fstream>
 using namespace std;
 
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#include <windows.h>
-#include <tchar.h>
+#include <SDL.h>
 
-#define DIRECTINPUT_VERSION 0x0800
-#include <dxerr8.h>
-#include <d3dx8.h>
+#include "WinTypes.h"
 
 #define SAFE_DELETE(p)  \
 	{                   \
@@ -40,14 +35,6 @@ using namespace std;
 			delete[] (p);    \
 			(p) = NULL;      \
 		}                    \
-	}
-#define SAFE_RELEASE(p)     \
-	{                       \
-		if (p)              \
-		{                   \
-			(p)->Release(); \
-			(p) = NULL;     \
-		}                   \
 	}
 
 extern DWORD RES_X;

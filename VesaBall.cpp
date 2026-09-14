@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-#include "D3DApp.h"
+#include "App.h"
 #include "GameMenu.h"
 
 #include <fstream>
@@ -9,8 +9,8 @@ using namespace std;
 DWORD RES_X;
 DWORD RES_Y;
 
-//! Initializes Direct3D and starts the game menu.
-INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR args, INT argc)
+//! Initializes SDL2 and starts the game menu.
+int main(int argc, char* argv[])
 {
 	ifstream ConfigFile;
 	ConfigFile.open("cfg/res.cfg", ios::in);
@@ -18,11 +18,11 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR args, INT argc)
 	ConfigFile >> RES_Y;
 	ConfigFile.close();
 
-	CD3DApp app(_T("VesaBall"));
+	CApp app("VesaBall");
 
 	HRESULT hr;
 
-	if (FAILED(hr = app.Create(hInstance)))
+	if (FAILED(hr = app.Create()))
 		return hr;
 
 	if (FAILED(hr = app.StartNewScene(new CGameMenu())))

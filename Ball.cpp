@@ -6,11 +6,11 @@
 #include "Ball.h"
 #include "Paddle.h"
 
-LPDIRECT3DTEXTURE8 CBall::spTexture;
+SDL_Texture* CBall::spTexture;
 
-CBall::CBall(const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed)
+CBall::CBall(const Vec2 & Position, const Vec2 & Speed)
 	: CSpriteMoving(spTexture, BALL_SIZE_AVG, 0,
-					Position, Speed, D3DXVECTOR2(0, 0), 0xFFFFFFFF)
+					Position, Speed, Vec2(0, 0), 0xFFFFFFFF)
 {
 	bCatched = false;
 }
@@ -27,16 +27,16 @@ void CBall::FrameMove(float fElapsedTime)
 	CSpriteMoving::FrameMove(fElapsedTime);
 }
 
-void CBall::SetSpeed(const D3DXVECTOR2 & vNewSpeed)
+void CBall::SetSpeed(const Vec2 & vNewSpeed)
 {
-	float fNewSpeedVal = D3DXVec2Length(&vNewSpeed);
+	float fNewSpeedVal = Vec2Length(&vNewSpeed);
 	fNewSpeedVal = min(fNewSpeedVal, BALL_SPEED_VAL_MAX);
 	fNewSpeedVal = max(fNewSpeedVal, BALL_SPEED_VAL_MIN);
-	D3DXVec2Normalize(&vSpeed, &vNewSpeed);
+	Vec2Normalize(&vSpeed, &vNewSpeed);
 	vSpeed *= fNewSpeedVal;
 }
 
-void CBall::Reflect(const CSprite* pSprite, const D3DXVECTOR2 & vSide)
+void CBall::Reflect(const CSprite* pSprite, const Vec2 & vSide)
 {
 	if (vSide.y > 0)
 	{

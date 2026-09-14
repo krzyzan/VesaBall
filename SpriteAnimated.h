@@ -19,14 +19,14 @@ public:
 		\param Position		Initial position
 		\param Speed		Initial speed
 		\param Accel		Acceleration
-		\param Color		The color and alpha channel are multiplied by this value. The value \c 0xFFFFFFFF preserves the original source color.
+		\param Color		The color and alpha channel are multiplied by this value. The value 0xFFFFFFFF preserves the original source color.
 		\param Duration		Duration; after this time #HasExpired() returns \b true
 		\param FirstFrame	First frame of the animation
 		\param LastFrame	Last frame of the animation
 		\param FramePixels	Frame size within the texture, in pixels
 	*/
-	CSpriteAnimated(LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, float Rotation,
-					const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel, DWORD Color,
+	CSpriteAnimated(SDL_Texture* Texture, const Vec2 & Size, float Rotation,
+					const Vec2 & Position, const Vec2 & Speed, const Vec2 & Accel, Color Color,
 					float Duration, DWORD FirstFrame, DWORD LastFrame, const POINT & FramePixels);
 
 	virtual ~CSpriteAnimated();
@@ -40,10 +40,9 @@ public:
 
 	//! Renders the animation
 	/*!
-		If balls are caught, also renders the lightning effect.
-		\param pSprite The \b ID3DXSprite object used for rendering.
+		\param pRenderer The SDL renderer used for rendering.
 	*/
-	void Render(LPD3DXSPRITE pSprite) const;
+	void Render(SDL_Renderer* pRenderer) const;
 
 private:
 	DWORD dwFirstFrame;

@@ -4,7 +4,6 @@
 
 CGameBoard::CGameBoard()
 {
-	pSprite = NULL;
 	dwLevelNum = 0;
 }
 
@@ -12,7 +11,7 @@ CGameBoard::~CGameBoard()
 {
 }
 
-HRESULT CGameBoard::OnInitDevice()
+HRESULT CGameBoard::OnInit()
 {
 	// brick textures
 	LoadTexture("gfx/Brick_red.png", &CBrick::spTexture[1]);
@@ -39,29 +38,22 @@ HRESULT CGameBoard::OnInitDevice()
 	LoadTexture("gfx/Brick_bluel.png", &CBrick::spTexture[22]);
 
 	// scenery
-	LPDIRECT3DTEXTURE8 pWallTex;
+	SDL_Texture* pWallTex;
 	LoadTexture("gfx/Wall.png", &pWallTex);
-	listSprite.push_back(new CSprite(pWallTex, D3DXVECTOR2(BOARD_L - 0.0f, 0.75f), 0, D3DXVECTOR2((BOARD_L + 0.00f) / 2, 0.75f / 2), 0xFFFFFFFF));
-	listSprite.push_back(new CSprite(pWallTex, D3DXVECTOR2(1.0f - BOARD_R, 0.75f), 0, D3DXVECTOR2((1.00f + BOARD_R) / 2, 0.75f / 2), 0xFFFFFFFF));
+	listSprite.push_back(new CSprite(pWallTex, Vec2(BOARD_L - 0.0f, 0.75f), 0, Vec2((BOARD_L + 0.00f) / 2, 0.75f / 2), 0xFFFFFFFF));
+	listSprite.push_back(new CSprite(pWallTex, Vec2(1.0f - BOARD_R, 0.75f), 0, Vec2((1.00f + BOARD_R) / 2, 0.75f / 2), 0xFFFFFFFF));
 
 	// create the bricks
 	POINT arraySize = {20, 20};
-	pBrickArray = new CBrickArray(arraySize, D3DXVECTOR2(BOARD_L + BOARD_W / 2, 0.30f), D3DXVECTOR2(BOARD_W, BOARD_W / 2));
+	pBrickArray = new CBrickArray(arraySize, Vec2(BOARD_L + BOARD_W / 2, 0.30f), Vec2(BOARD_W, BOARD_W / 2));
 	pBrickArray->Load(dwLevelNum);
 
 	return S_OK;
 }
 
-HRESULT CGameBoard::OnRestoreDevice()
+HRESULT CGameBoard::OnKeyboardEvent(const InputEvent* evt)
 {
-	D3DXCreateSprite(pD3DDevice, &pSprite);
-
-	return S_OK;
-}
-
-HRESULT CGameBoard::OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod)
-{
-	if (didod->dwOfs == DIK_ESCAPE && (didod->dwData & 0x80))
+	if (evt->ofs == InputEvent::Key && evt->scancode == SDL_SCANCODE_ESCAPE && (evt->data & 0x80))
 		SetCurrentScene(NULL);
 
 	return S_OK;
@@ -71,21 +63,14 @@ HRESULT CGameBoard::FrameRender()
 {
 	list<CSprite*>::iterator iSprite;
 	for (iSprite = listSprite.begin(); iSprite != listSprite.end(); iSprite++)
-		(*iSprite)->Render(pSprite);
+		(*iSprite)->Render(pRenderer);
 
-	pBrickArray->Render(pSprite);
-
-	return S_OK;
-}
-
-HRESULT CGameBoard::OnInvalidateDevice()
-{
-	SAFE_RELEASE(pSprite);
+	pBrickArray->Render(pRenderer);
 
 	return S_OK;
 }
 
-HRESULT CGameBoard::OnDeleteDevice()
+HRESULT CGameBoard::OnDestroy()
 {
 	// Remove from the render list
 	list<CSprite*>::iterator iSprite;

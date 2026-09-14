@@ -15,13 +15,13 @@ public:
 		\param Color		Color
 		\param UID			Unique ID
 	*/
-	CMenuItem(LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
-			  const D3DXVECTOR2 & Position, D3DCOLOR Color, HRESULT UID);
+	CMenuItem(SDL_Texture* Texture, const Vec2 & Size,
+			  const Vec2 & Position, Color Color, HRESULT UID);
 
 	virtual ~CMenuItem();
 
 	//! Renders the menu item and its cast shadow.
-	void Render(LPD3DXSPRITE pSprite) const;
+	void Render(SDL_Renderer* pRenderer) const;
 
 	//! Sets whether it's pressed
 	void SetPressed(bool bPressed);

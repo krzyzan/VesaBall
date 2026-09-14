@@ -27,9 +27,9 @@ public:
 	//! Renders the paddle
 	/*!
 		If balls are caught, also renders the lightning effect.
-		\param pSprite The \b ID3DXSprite object used for rendering.
+		\param pRenderer The SDL renderer used for rendering.
 	*/
-	void Render(LPD3DXSPRITE pSprite) const;
+	void Render(SDL_Renderer* pRenderer) const;
 
 	//! Moves the paddle horizontally
 	/*!
@@ -68,8 +68,8 @@ public:
 	//! Determines whether the paddle "catches" balls
 	bool bGrabPaddle;
 
-	static LPDIRECT3DTEXTURE8 spTexture;
-	static LPDIRECT3DTEXTURE8 spLightningTexture;
+	static SDL_Texture* spTexture;
+	static SDL_Texture* spLightningTexture;
 
 private:
 	list<CBall*> listCatchedBalls;

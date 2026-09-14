@@ -1,11 +1,13 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include <windows.h>
+#include <SDL.h>
 
 //! High-resolution timer
 /*!
-	\warning Uses \e QueryPerformanceCounter(); this function is not supported on very old computers!
+	Backed by SDL_GetPerformanceCounter(), which is always available (unlike
+	the Windows QueryPerformanceCounter() this class originally wrapped,
+	which some very old computers didn't support).
 */
 
 class CTimer
@@ -31,13 +33,12 @@ public:
 	bool IsStopped();
 
 protected:
-	bool bUsingQPF;
 	bool bTimerStopped;
-	LONGLONG llQPFTicksPerSec;
+	Uint64 llTicksPerSec;
 
-	LONGLONG llStopTime;
-	LONGLONG llLastElapsedTime;
-	LONGLONG llBaseTime;
+	Uint64 llStopTime;
+	Uint64 llLastElapsedTime;
+	Uint64 llBaseTime;
 };
 
 #endif

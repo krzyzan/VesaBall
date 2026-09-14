@@ -20,16 +20,16 @@ public:
 		\param DigitPixels	Digit size within the texture, in pixels
 		\param NumDigits	Number of digits displayed
 	*/
-	CCounter(LONG Value, const D3DXVECTOR2 & Size, const D3DXVECTOR2 & Position,
+	CCounter(LONG Value, const Vec2 & Size, const Vec2 & Position,
 			 POINT DigitPixels, DWORD NumDigits);
 
 	virtual ~CCounter();
 
 	//! Renders the counter
 	/*!
-		\param pSprite	address of the \e ID3DXSprite used for rendering
+		\param pRenderer	the SDL renderer used for rendering
 	*/
-	void Render(LPD3DXSPRITE pSprite) const;
+	void Render(SDL_Renderer* pRenderer) const;
 
 	//! Updates the displayed number
 	/*!
@@ -41,7 +41,7 @@ public:
 	/*!
 		\warning Set before creating instances of this class.
 	*/
-	static LPDIRECT3DTEXTURE8 spTexture;
+	static SDL_Texture* spTexture;
 	LONG lValue;
 
 protected:

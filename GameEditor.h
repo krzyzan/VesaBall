@@ -13,15 +13,15 @@ public:
 	CGameEditor();
 	virtual ~CGameEditor();
 
-	//! Initializes objects in system memory
+	//! Initializes the scene's objects and loads its textures.
 	/*!
-		\copydoc CGameBoard::OnInitDevice()
+		\copydoc CGameBoard::OnInit()
 		Creates the cursor.
 	*/
-	HRESULT OnInitDevice();
+	HRESULT OnInit();
 
-	//! Releases objects in system memory
-	HRESULT OnDeleteDevice();
+	//! Releases the scene's objects.
+	HRESULT OnDestroy();
 
 	//! Processes mouse events
 	/*!
@@ -30,7 +30,7 @@ public:
 		by left-clicking on the bottom array.
 	*/
 
-	HRESULT OnMouseEvent(LPDIDEVICEOBJECTDATA didod);
+	HRESULT OnMouseEvent(const InputEvent* evt);
 
 	//! Processes keyboard events
 	/*!
@@ -41,7 +41,7 @@ public:
 		- The L key loads the level.
 		- The C key clears all bricks.
 	*/
-	HRESULT OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod);
+	HRESULT OnKeyboardEvent(const InputEvent* evt);
 
 	HRESULT FrameMove(float fElapsedTime);
 	HRESULT FrameRender();

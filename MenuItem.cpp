@@ -1,10 +1,10 @@
 #include "StdAfx.h"
 #include "MenuItem.h"
 
-const D3DXVECTOR2 SHADOW_POS = D3DXVECTOR2(0.005f, 0.005f);
+const Vec2 SHADOW_POS = Vec2(0.005f, 0.005f);
 
-CMenuItem::CMenuItem(LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
-					 const D3DXVECTOR2 & Position, D3DCOLOR Color, HRESULT UID)
+CMenuItem::CMenuItem(SDL_Texture* Texture, const Vec2 & Size,
+					 const Vec2 & Position, Color Color, HRESULT UID)
 	: CSprite(Texture, Size, 0, Position, Color)
 {
 	dwUID = UID;
@@ -19,10 +19,10 @@ CMenuItem::~CMenuItem()
 	delete pShadow;
 }
 
-void CMenuItem::Render(LPD3DXSPRITE pSprite) const
+void CMenuItem::Render(SDL_Renderer* pRenderer) const
 {
-	pShadow->Render(pSprite);
-	CSprite::Render(pSprite);
+	pShadow->Render(pRenderer);
+	CSprite::Render(pRenderer);
 }
 
 void CMenuItem::SetPressed(bool bPressed)

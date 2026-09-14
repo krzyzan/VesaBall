@@ -20,22 +20,22 @@ CGameEditor::~CGameEditor()
 {
 }
 
-HRESULT CGameEditor::OnInitDevice()
+HRESULT CGameEditor::OnInit()
 {
-	CGameBoard::OnInitDevice();
+	CGameBoard::OnInit();
 
-	LPDIRECT3DTEXTURE8 pTex;
+	SDL_Texture* pTex;
 	LoadTexture("gfx/Cursor_arrow.png", &pTex);
 	pCursor = new CCursor(pTex);
 
 	// create the level counter
 	LoadTexture("gfx/Digits.png", &CCounter::spTexture);
 	POINT DigitPixels = {64, 92};
-	pLevelCounter = new CCounter(0, D3DXVECTOR2(BOARD_W * 0.2f, 0.05f * 0.75f), D3DXVECTOR2(BOARD_L + BOARD_W * 0.125f, 0.05f / 2), DigitPixels, 6);
+	pLevelCounter = new CCounter(0, Vec2(BOARD_W * 0.2f, 0.05f * 0.75f), Vec2(BOARD_L + BOARD_W * 0.125f, 0.05f / 2), DigitPixels, 6);
 
 	// create the brick legend
 	POINT arraySize = {10, 4};
-	pBrickToolkit = new CBrickArray(arraySize, D3DXVECTOR2(BOARD_L + BOARD_W / 2, BOARD_B - BOARD_W / 10), D3DXVECTOR2(BOARD_W / 2, BOARD_W / 10));
+	pBrickToolkit = new CBrickArray(arraySize, Vec2(BOARD_L + BOARD_W / 2, BOARD_B - BOARD_W / 10), Vec2(BOARD_W / 2, BOARD_W / 10));
 
 	POINT pos;
 	BYTE idType = 0;
@@ -51,20 +51,20 @@ HRESULT CGameEditor::OnInitDevice()
 	return S_OK;
 }
 
-HRESULT CGameEditor::OnMouseEvent(LPDIDEVICEOBJECTDATA didod)
+HRESULT CGameEditor::OnMouseEvent(const InputEvent* evt)
 {
-	switch (didod->dwOfs)
+	switch (evt->ofs)
 	{
-	case DIMOFS_X:
-		pCursor->Move(D3DXVECTOR2((float)(int)didod->dwData, 0));
+	case InputEvent::AxisX:
+		pCursor->Move(Vec2((float)evt->data, 0));
 		break;
 
-	case DIMOFS_Y:
-		pCursor->Move(D3DXVECTOR2(0, (float)(int)didod->dwData));
+	case InputEvent::AxisY:
+		pCursor->Move(Vec2(0, (float)evt->data));
 		break;
 
-	case DIMOFS_BUTTON0:
-		if (didod->dwData & 0x80)
+	case InputEvent::Button0:
+		if (evt->data & 0x80)
 		{
 			POINT pos = pBrickToolkit->GetArrayCoordsAt(pCursor->vPosition);
 			if (pBrickToolkit->IsValid(pos))
@@ -74,23 +74,26 @@ HRESULT CGameEditor::OnMouseEvent(LPDIDEVICEOBJECTDATA didod)
 					curType = pBrick->GetType();
 			}
 		}
-		bLMB = ((didod->dwData & 0x80) != 0);
+		bLMB = ((evt->data & 0x80) != 0);
 		break;
 
-	case DIMOFS_BUTTON1:
-		bRMB = ((didod->dwData & 0x80) != 0);
+	case InputEvent::Button1:
+		bRMB = ((evt->data & 0x80) != 0);
+		break;
+
+	default:
 		break;
 	}
 
 	return S_OK;
 }
 
-HRESULT CGameEditor::OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod)
+HRESULT CGameEditor::OnKeyboardEvent(const InputEvent* evt)
 {
-	if (didod->dwData & 0x80)
-		switch (didod->dwOfs)
+	if (evt->ofs == InputEvent::Key && (evt->data & 0x80))
+		switch (evt->scancode)
 		{
-		case DIK_RIGHT:
+		case SDL_SCANCODE_RIGHT:
 			if (dwLevelNum < NUM_LEVELS - 1)
 			{
 				dwLevelNum++;
@@ -99,7 +102,7 @@ HRESULT CGameEditor::OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod)
 			}
 			return S_OK;
 
-		case DIK_LEFT:
+		case SDL_SCANCODE_LEFT:
 			if (dwLevelNum > 0)
 			{
 				dwLevelNum--;
@@ -108,20 +111,23 @@ HRESULT CGameEditor::OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod)
 			}
 			return S_OK;
 
-		case DIK_L:
+		case SDL_SCANCODE_L:
 			pBrickArray->Load(dwLevelNum);
 			return S_OK;
 
-		case DIK_S:
+		case SDL_SCANCODE_S:
 			pBrickArray->Save(dwLevelNum);
 			return S_OK;
 
-		case DIK_C:
+		case SDL_SCANCODE_C:
 			pBrickArray->Clear();
 			return S_OK;
+
+		default:
+			break;
 		}
 
-	return CGameBoard::OnKeyboardEvent(didod);
+	return CGameBoard::OnKeyboardEvent(evt);
 }
 
 HRESULT CGameEditor::FrameMove(float fElapsedTime)
@@ -144,23 +150,23 @@ HRESULT CGameEditor::FrameMove(float fElapsedTime)
 
 HRESULT CGameEditor::FrameRender()
 {
-	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x40, 0x60, 0x60), 1.0f, 0);
+	SDL_SetRenderDrawColor(pRenderer, 0x40, 0x60, 0x60, 255);
+	SDL_RenderClear(pRenderer);
 
 	CGameBoard::FrameRender();
 
-	pSprite->Begin();
-	pBrickToolkit->Render(pSprite);
-	pLevelCounter->Render(pSprite);
-	pCursor->Render(pSprite);
-	pSprite->End();
+	pBrickToolkit->Render(pRenderer);
+	pLevelCounter->Render(pRenderer);
+	pCursor->Render(pRenderer);
 
 	return S_OK;
 }
 
-HRESULT CGameEditor::OnDeleteDevice()
+HRESULT CGameEditor::OnDestroy()
 {
 	SAFE_DELETE(pCursor);
 	SAFE_DELETE(pLevelCounter);
+	delete pBrickToolkit;
 
-	return CGameBoard::OnDeleteDevice();
+	return CGameBoard::OnDestroy();
 }

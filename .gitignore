@@ -17,6 +17,9 @@ Release/
 *.dll
 BuildLog.htm
 
+# CMake build output
+build/
+
 # Doxygen-generated documentation (regenerate from Doxyfile with `doxygen`)
 html/
 

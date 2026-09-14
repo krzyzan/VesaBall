@@ -17,12 +17,12 @@ public:
 		\param Position		Initial position
 		\param Speed		Initial speed
 		\param Accel		Acceleration
-		\param Color		The color and alpha channel are multiplied by this value. The value \c 0xFFFFFFFF preserves the original source color.
+		\param Color		The color and alpha channel are multiplied by this value. The value 0xFFFFFFFF preserves the original source color.
 		\param Duration		Duration of the effect; after this time #HasExpired() returns \b true
 	*/
-	CSpriteEffect(LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size,
-				  const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel,
-				  DWORD Color, float Duration);
+	CSpriteEffect(SDL_Texture* Texture, const Vec2 & Size,
+				  const Vec2 & Position, const Vec2 & Speed, const Vec2 & Accel,
+				  Color Color, float Duration);
 
 	virtual ~CSpriteEffect();
 

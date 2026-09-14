@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include "SpriteAnimated.h"
 
-CSpriteAnimated::CSpriteAnimated(LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, float Rotation,
-								 const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel,
-								 DWORD Color, float Duration, DWORD FirstFrame, DWORD LastFrame, const POINT & FramePixels)
+CSpriteAnimated::CSpriteAnimated(SDL_Texture* Texture, const Vec2 & Size, float Rotation,
+								 const Vec2 & Position, const Vec2 & Speed, const Vec2 & Accel, Color Color,
+								 float Duration, DWORD FirstFrame, DWORD LastFrame, const POINT & FramePixels)
 	: CSpriteEffect(Texture, Size, Position, Speed, Accel, Color, Duration)
 {
 	fRotation = Rotation;
@@ -11,23 +11,22 @@ CSpriteAnimated::CSpriteAnimated(LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 &
 	dwFirstFrame = FirstFrame;
 	dwLastFrame = LastFrame;
 	ptFramePixels = FramePixels;
-
-	D3DSURFACE_DESC sd;
-	pTexture->GetLevelDesc(0, &sd);
-	vScaling.y *= 8;
-	vScaling.x *= 8;
 }
 
 CSpriteAnimated::~CSpriteAnimated()
 {
 }
 
-void CSpriteAnimated::Render(LPD3DXSPRITE pSprite) const
+void CSpriteAnimated::Render(SDL_Renderer* pRenderer) const
 {
-	D3DXVECTOR2 Position = (vPosition - vSize / 2) * (float)RES_X;
 	LONG lFrame = LONG((1.0f - fRemaining / fDuration) * (dwLastFrame - dwFirstFrame)) + dwFirstFrame;
-	CONST RECT SrcRect = {(lFrame / 8) * ptFramePixels.x, (lFrame % 8) * ptFramePixels.y, (lFrame / 8 + 1) * ptFramePixels.x, (lFrame % 8 + 1) * ptFramePixels.y};
-	pSprite->Draw(pTexture, &SrcRect, &vScaling, &vRotationCenter, fRotation, &Position, dwColor);
+	SDL_Rect SrcRect;
+	SrcRect.x = (lFrame / 8) * ptFramePixels.x;
+	SrcRect.y = (lFrame % 8) * ptFramePixels.y;
+	SrcRect.w = ptFramePixels.x;
+	SrcRect.h = ptFramePixels.y;
+
+	DrawTexture(pRenderer, pTexture, &SrcRect, vPosition, vSize, fRotation, dwColor, bFlipX, bFlipY);
 }
 
 void CSpriteAnimated::FrameMove(float fElapsedTime)

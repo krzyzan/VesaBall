@@ -4,13 +4,13 @@
 #include <list>
 using namespace std;
 
-#include "D3DScene.h"
+#include "Scene.h"
 
 class CMenuItem;
 class CCursor;
 class CSprite;
 
-class CGameMenu : public CD3DScene
+class CGameMenu : public CScene
 {
 public:
 	enum UID_MSG
@@ -23,21 +23,17 @@ public:
 	CGameMenu();
 	virtual ~CGameMenu();
 
-	HRESULT OnInitDevice();
-	HRESULT OnRestoreDevice();
-	HRESULT OnInvalidateDevice();
-	HRESULT OnDeleteDevice();
+	HRESULT OnInit();
+	HRESULT OnDestroy();
 
-	HRESULT OnMouseEvent(LPDIDEVICEOBJECTDATA didod);
-	HRESULT OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod);
+	HRESULT OnMouseEvent(const InputEvent* evt);
+	HRESULT OnKeyboardEvent(const InputEvent* evt);
 
 	HRESULT FrameMove(float fElapsedTime);
 	HRESULT FrameRender();
 
 private:
 	CMenuItem* GetPOINTedMenuItem() const;
-
-	LPD3DXSPRITE pSprite;
 
 	list<CSprite*> listRender;
 	list<CMenuItem*> listMenuItem;

@@ -20,7 +20,7 @@ public:
 		/param	Position	Position of the brick array's center
 		/param	ScreenSize	On-screen size of the brick array
 	*/
-	CBrickArray(const POINT & Size, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & ScreenSize);
+	CBrickArray(const POINT & Size, const Vec2 & Position, const Vec2 & ScreenSize);
 
 	virtual ~CBrickArray();
 
@@ -29,9 +29,9 @@ public:
 
 	//! Renders the brick array
 	/*!
-		\param pSprite	address of the \e ID3DXSprite used for rendering
+		\param pRenderer	the SDL renderer used for rendering
 	*/
-	void Render(LPD3DXSPRITE pSprite) const;
+	void Render(SDL_Renderer* pRenderer) const;
 
 	//! Inserts a brick into the array
 	/*!
@@ -82,10 +82,10 @@ public:
 	/*!
 		\param	vPos	Point on screen
 	*/
-	POINT GetArrayCoordsAt(const D3DXVECTOR2 & vPos) const;
+	POINT GetArrayCoordsAt(const Vec2 & vPos) const;
 
 	//! Returns the on-screen point corresponding to array coordinates
-	D3DXVECTOR2 GetPositionAt(const POINT & pos) const;
+	Vec2 GetPositionAt(const POINT & pos) const;
 
 	//! Returns a pointer to the brick at the given position
 	/*!
@@ -114,8 +114,8 @@ public:
 	void PushExplosive(list<POINT>* pList);
 
 private:
-	D3DXVECTOR2 vSize;
-	D3DXVECTOR2 vPosition;
+	Vec2 vSize;
+	Vec2 vPosition;
 
 	CBrick*** pBrick;
 	POINT Max;

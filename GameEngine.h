@@ -18,9 +18,9 @@ public:
 	CGameEngine();
 	virtual ~CGameEngine();
 
-	//! Initializes objects in system memory
+	//! Initializes the scene's objects and loads its textures.
 	/*!
-		\copydoc CGameBoard::OnInitDevice()
+		\copydoc CGameBoard::OnInit()
 		\par
 		Loads textures:
 		- paddle
@@ -34,11 +34,11 @@ public:
 		- lives counter
 		- paddle with a ball
 	*/
-	HRESULT OnInitDevice();
+	HRESULT OnInit();
 
-	//! Releases objects in system memory
+	//! Releases the scene's objects.
 	/*!
-		\copydoc CGameBoard::OnDeleteDevice()
+		\copydoc CGameBoard::OnDestroy()
 		\par
 		Releases:
 		- the paddle
@@ -47,21 +47,21 @@ public:
 		- bonuses
 		- explosion positions
 	*/
-	HRESULT OnDeleteDevice();
+	HRESULT OnDestroy();
 
 	//! Processes events from the mouse buffer
 	/*!
 		\par
 		Moves the paddle. The left button releases all balls "caught" by the paddle.
 	*/
-	HRESULT OnMouseEvent(LPDIDEVICEOBJECTDATA didod);
+	HRESULT OnMouseEvent(const InputEvent* evt);
 
 	//! Processes events from the keyboard buffer
 	/*!
 		\par
 		The P key pauses the game.
 	*/
-	HRESULT OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod);
+	HRESULT OnKeyboardEvent(const InputEvent* evt);
 
 	//! Moves the scene's objects and computes collisions
 	/*!
@@ -133,7 +133,7 @@ private:
 		\param pos		Position of the brick in the array
 		\param vSpeed	Speed of the "destruction" and of the bonus created
 	*/
-	void DestroyBrick(const POINT & pos, const D3DXVECTOR2 & vSpeed);
+	void DestroyBrick(const POINT & pos, const Vec2 & vSpeed);
 
 	//! Activates the effects of a collected bonus
 	/*!
@@ -143,7 +143,7 @@ private:
 	void ApplyBonus(DWORD Type);
 
 	//! Creates a spark effect when the ball bounces
-	void CreateSparkles(CBall* pBall, const D3DXVECTOR2 & vSide);
+	void CreateSparkles(CBall* pBall, const Vec2 & vSide);
 
 	//! Creates the fireball's "tail"
 	void CreateFireballTail(CBall* pBall);
@@ -164,8 +164,8 @@ private:
 	CCounter* pLivesCounter;
 	CPaddle* pPaddle;
 
-	LPDIRECT3DTEXTURE8 pSparkTex;
-	LPDIRECT3DTEXTURE8 pExplosionTex;
+	SDL_Texture* pSparkTex;
+	SDL_Texture* pExplosionTex;
 
 	bool bThruBrick;
 	bool bFireBall;

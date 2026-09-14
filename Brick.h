@@ -29,7 +29,7 @@ public:
 		\param Position	Initial position
 		\param Size		Size
 	*/
-	CBrick(BYTE Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size);
+	CBrick(BYTE Type, const Vec2 & Position, const Vec2 & Size);
 
 	virtual ~CBrick();
 
@@ -37,7 +37,7 @@ public:
 	/*!
 		\return The allocated #CSpriteEffect object
 	*/
-	CSpriteEffect* CreateBlendEffect(const D3DXVECTOR2 & vSpeed) const;
+	CSpriteEffect* CreateBlendEffect(const Vec2 & vSpeed) const;
 
 	//! Returns the brick's type index
 	BYTE GetType() const
@@ -74,7 +74,7 @@ public:
 		Static array of texture pointers, one for each brick type.
 		\warning Load the textures before creating instances of this class.
 	*/
-	static LPDIRECT3DTEXTURE8 spTexture[BRICK_TYPE_MAX];
+	static SDL_Texture* spTexture[BRICK_TYPE_MAX];
 
 private:
 	BYTE idType;

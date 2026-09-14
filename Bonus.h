@@ -48,7 +48,7 @@ public:
 		\param Position	Initial position
 		\param Speed	Initial speed
 	*/
-	CBonus(TypeEnum Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed);
+	CBonus(TypeEnum Type, const Vec2 & Position, const Vec2 & Speed);
 
 	virtual ~CBonus();
 
@@ -63,7 +63,7 @@ public:
 		Static array of texture pointers, one for each bonus type.
 		\warning Load the textures before creating instances of this class.
 	*/
-	static LPDIRECT3DTEXTURE8 spTextures[MAX_TYPE];
+	static SDL_Texture* spTextures[MAX_TYPE];
 
 private:
 	TypeEnum eType;

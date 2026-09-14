@@ -3,9 +3,9 @@
 
 #include "SpriteMoving.h"
 
-const D3DXVECTOR2 BALL_SIZE_MIN = D3DXVECTOR2(1.0f / 128, 1.0f / 128);
-const D3DXVECTOR2 BALL_SIZE_MAX = D3DXVECTOR2(1.0f / 56, 1.0f / 56);
-const D3DXVECTOR2 BALL_SIZE_AVG = (BALL_SIZE_MIN + BALL_SIZE_MAX) / 2;
+const Vec2 BALL_SIZE_MIN = Vec2(1.0f / 128, 1.0f / 128);
+const Vec2 BALL_SIZE_MAX = Vec2(1.0f / 56, 1.0f / 56);
+const Vec2 BALL_SIZE_AVG = (BALL_SIZE_MIN + BALL_SIZE_MAX) / 2;
 
 const float BALL_SPEED_VAL_MIN = 0.20f;
 const float BALL_SPEED_VAL_MAX = 0.80f;
@@ -24,7 +24,7 @@ public:
 		\param Position		Initial position
 		\param Speed		Initial speed
 	*/
-	CBall(const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed);
+	CBall(const Vec2 & Position, const Vec2 & Speed);
 
 	virtual ~CBall();
 
@@ -40,14 +40,14 @@ public:
 	/*!
 		\param vNewSpeed	New speed.
 	*/
-	void SetSpeed(const D3DXVECTOR2 & vNewSpeed);
+	void SetSpeed(const Vec2 & vNewSpeed);
 
 	//! Changes the direction of the speed vector when bouncing off a rectangular object
 	/*!
 		\param pSprite		Pointer to the object
 		\param vSide		Vector of the collision point relative to the ball's center
 	*/
-	void Reflect(const CSprite* pSprite, const D3DXVECTOR2 & vSide);
+	void Reflect(const CSprite* pSprite, const Vec2 & vSide);
 
 	//! If \b true, the ball does not move; defaults to \b false
 	bool bCatched;
@@ -56,7 +56,7 @@ public:
 	/*!
 		\warning Set before creating instances of this class.
 	*/
-	static LPDIRECT3DTEXTURE8 spTexture;
+	static SDL_Texture* spTexture;
 };
 
 #endif

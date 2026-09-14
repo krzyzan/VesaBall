@@ -5,14 +5,14 @@
 
 const float BALL_ACCEL = 1.0f / 200;
 
-LPDIRECT3DTEXTURE8 CPaddle::spTexture;
-LPDIRECT3DTEXTURE8 CPaddle::spLightningTexture;
+SDL_Texture* CPaddle::spTexture;
+SDL_Texture* CPaddle::spLightningTexture;
 
 CPaddle::CPaddle()
-	: CSprite(spTexture, D3DXVECTOR2(1.0f / 8, 1.0f / 64), 0,
-			  D3DXVECTOR2(BOARD_L + BOARD_W / 2, BOARD_B - 1.0f / 64), 0xFFFFFFFF)
+	: CSprite(spTexture, Vec2(1.0f / 8, 1.0f / 64), 0,
+			  Vec2(BOARD_L + BOARD_W / 2, BOARD_B - 1.0f / 64), 0xFFFFFFFF)
 {
-	pLightning = new CSprite(spLightningTexture, D3DXVECTOR2(vSize.x, vSize.y * 2), 0, vPosition - D3DXVECTOR2(0, vSize.y / 2), dwColor);
+	pLightning = new CSprite(spLightningTexture, Vec2(vSize.x, vSize.y * 2), 0, vPosition - Vec2(0, vSize.y / 2), dwColor);
 	bGrabPaddle = false;
 }
 
@@ -21,9 +21,9 @@ CPaddle::~CPaddle()
 	delete pLightning;
 }
 
-void CPaddle::Render(LPD3DXSPRITE pSprite) const
+void CPaddle::Render(SDL_Renderer* pRenderer) const
 {
-	CSprite::Render(pSprite);
+	CSprite::Render(pRenderer);
 
 	if (bGrabPaddle || !listCatchedBalls.empty())
 	{
@@ -31,7 +31,7 @@ void CPaddle::Render(LPD3DXSPRITE pSprite) const
 			pLightning->FlipV();
 		if (rand() % 20 == 0)
 			pLightning->FlipH();
-		pLightning->Render(pSprite);
+		pLightning->Render(pRenderer);
 	}
 }
 
@@ -63,9 +63,9 @@ void CPaddle::CatchBall(CBall* pBall)
 
 void CPaddle::SetBallSpeed(CBall* pBall) const
 {
-	D3DXVECTOR2 vNormal = pBall->vPosition - D3DXVECTOR2(vPosition.x, vPosition.y + vSize.x / 4);
-	D3DXVec2Normalize(&vNormal, &vNormal);
-	float fSpeedVal = D3DXVec2Length(&pBall->GetSpeed()) + (BALL_SPEED_VAL_MAX - BALL_SPEED_VAL_MIN) * BALL_ACCEL;
+	Vec2 vNormal = pBall->vPosition - Vec2(vPosition.x, vPosition.y + vSize.x / 4);
+	Vec2Normalize(&vNormal, &vNormal);
+	float fSpeedVal = Vec2Length(&pBall->GetSpeed()) + (BALL_SPEED_VAL_MAX - BALL_SPEED_VAL_MIN) * BALL_ACCEL;
 	pBall->SetSpeed(vNormal * fSpeedVal);
 }
 
@@ -88,6 +88,6 @@ void CPaddle::SetWidth(float fNewWidth)
 	for (iBall = listCatchedBalls.begin(); iBall != listCatchedBalls.end(); iBall++)
 		(*iBall)->vPosition.x = ((*iBall)->vPosition.x - vPosition.x) * fNewWidth / vSize.x + vPosition.x;
 
-	SetSize(D3DXVECTOR2(fNewWidth, vSize.y));
-	pLightning->SetSize(D3DXVECTOR2(fNewWidth, pLightning->vSize.y));
+	SetSize(Vec2(fNewWidth, vSize.y));
+	pLightning->SetSize(Vec2(fNewWidth, pLightning->vSize.y));
 }

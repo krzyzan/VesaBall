@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "SpriteMoving.h"
 
-CSpriteMoving::CSpriteMoving(LPDIRECT3DTEXTURE8 Texture, const D3DXVECTOR2 & Size, float Rotation,
-							 const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Speed, const D3DXVECTOR2 & Accel, D3DCOLOR Color)
+CSpriteMoving::CSpriteMoving(SDL_Texture* Texture, const Vec2 & Size, float Rotation,
+							 const Vec2 & Position, const Vec2 & Speed, const Vec2 & Accel, Color Color)
 	: CSprite(Texture, Size, Rotation, Position, Color)
 {
 	vOldPosition = vPosition;
@@ -45,15 +45,15 @@ bool CSpriteMoving::HasExpired() const
 	return vPosition.y - vSize.y / 2 > BOARD_B;
 }
 
-D3DXVECTOR2 CSpriteMoving::GetCollisionSide(CSprite* pSprite) const
+Vec2 CSpriteMoving::GetCollisionSide(CSprite* pSprite) const
 {
 	if (fabs(vOldPosition.x - pSprite->vPosition.x) < vSize.x / 2 + pSprite->vSize.x / 2 &&
 		fabs(vPosition.y - pSprite->vPosition.y) < vSize.y / 2 + pSprite->vSize.y / 2)
-		return D3DXVECTOR2(0, (vSpeed.y > 0) ? vSize.y / 2 : -vSize.y / 2);
+		return Vec2(0, (vSpeed.y > 0) ? vSize.y / 2 : -vSize.y / 2);
 
 	if (fabs(vOldPosition.y - pSprite->vPosition.y) < vSize.y / 2 + pSprite->vSize.y / 2 &&
 		fabs(vPosition.x - pSprite->vPosition.x) < vSize.x / 2 + pSprite->vSize.x / 2)
-		return D3DXVECTOR2((vSpeed.x > 0) ? vSize.x / 2 : -vSize.x / 2, 0);
+		return Vec2((vSpeed.x > 0) ? vSize.x / 2 : -vSize.x / 2, 0);
 
-	return D3DXVECTOR2(0, 0);
+	return Vec2(0, 0);
 }

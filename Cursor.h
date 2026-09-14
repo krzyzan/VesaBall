@@ -11,7 +11,7 @@ public:
 	/*!
 		Creates the cursor at the center of the screen
 	*/
-	CCursor(LPDIRECT3DTEXTURE8 Texture);
+	CCursor(SDL_Texture* Texture);
 
 	virtual ~CCursor();
 
@@ -19,16 +19,16 @@ public:
 	/*!
 		Renders by rounding the position to the nearest pixel.
 		This improves the visual effect at low resolutions.
-		\param pSprite	address of the \e ID3DXSprite used for rendering
+		\param pRenderer	the SDL renderer used for rendering
 	*/
-	void Render(LPD3DXSPRITE pSprite) const;
+	void Render(SDL_Renderer* pRenderer) const;
 
 	//! Moves the cursor
 	/*!
 		The function ensures the cursor does not leave the screen.
 		\param vMovement	Displacement vector
 	*/
-	HRESULT Move(const D3DXVECTOR2 & vMovement);
+	HRESULT Move(const Vec2 & vMovement);
 };
 
 #endif

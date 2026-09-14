@@ -1,47 +1,36 @@
 #ifndef GAMEBOARD_H
 #define GAMEBOARD_H
 
-#include "D3DScene.h"
+#include "Scene.h"
 #include "BrickArray.h"
 
 //! Game scenery
 /*!
 	Side boundaries and the brick array
 */
-class CGameBoard : public CD3DScene
+class CGameBoard : public CScene
 {
 protected:
 	CGameBoard();
 	virtual ~CGameBoard();
 
-	//! Initializes objects in system memory
+	//! Initializes the scene's objects and loads its textures.
 	/*!
 		Loads the needed textures into memory.
 		Creates the side boundaries and loads the brick array from a file.
 	*/
-	HRESULT OnInitDevice();
+	HRESULT OnInit();
 
-	//! Initializes objects in graphics card memory
-	/*!
-		Creates the \b ID3DXSprite object used for rendering
-	*/
-	HRESULT OnRestoreDevice();
-
-	//! Releases objects in graphics card memory
-	HRESULT OnInvalidateDevice();
-
-	//! Releases objects in system memory
-	HRESULT OnDeleteDevice();
+	//! Releases the scene's objects.
+	HRESULT OnDestroy();
 
 	//! Ends the scene if the user pressed the Escape key
-	HRESULT OnKeyboardEvent(LPDIDEVICEOBJECTDATA didod);
+	HRESULT OnKeyboardEvent(const InputEvent* evt);
 
 	//! Renders the game scenery
 	HRESULT FrameRender();
 
 protected:
-	LPD3DXSPRITE pSprite;
-
 	list<CSprite*> listSprite;
 	CBrickArray* pBrickArray;
 	DWORD dwLevelNum;

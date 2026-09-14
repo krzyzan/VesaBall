@@ -29,9 +29,9 @@ CBrick::SType CBrick::s_Type[BRICK_TYPE_MAX] = {
 	{22, 0, 1},
 };
 
-LPDIRECT3DTEXTURE8 CBrick::spTexture[BRICK_TYPE_MAX];
+SDL_Texture* CBrick::spTexture[BRICK_TYPE_MAX];
 
-CBrick::CBrick(BYTE Type, const D3DXVECTOR2 & Position, const D3DXVECTOR2 & Size)
+CBrick::CBrick(BYTE Type, const Vec2 & Position, const Vec2 & Size)
 	: CSprite(spTexture[Type], Size, 0, Position, 0xFFFFFFFF)
 {
 	idType = Type;
@@ -41,7 +41,7 @@ CBrick::~CBrick()
 {
 }
 
-CSpriteEffect* CBrick::CreateBlendEffect(const D3DXVECTOR2 & vSpeed) const
+CSpriteEffect* CBrick::CreateBlendEffect(const Vec2 & vSpeed) const
 {
-	return new CSpriteEffect(pTexture, vSize, vPosition, vSpeed, D3DXVECTOR2(0, 0), 0xFFFFFFFF, 0.25f);
+	return new CSpriteEffect(pTexture, vSize, vPosition, vSpeed, Vec2(0, 0), 0xFFFFFFFF, 0.25f);
 }
