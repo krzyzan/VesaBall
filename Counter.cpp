@@ -30,6 +30,8 @@ void CCounter::Render(LPD3DXSPRITE pSprite) const
 	D3DXVECTOR2 Position = vPosition - vSize / 2 + D3DXVECTOR2(vSize.x, 0);
 	Position *= (float)RES_X;
 	LONG lDigit = LONG(fValue + 0.5f);
+	if (lDigit < 0)
+		lDigit = 0;
 	for (DWORD r = 0; r < dwNumDigits; r++)
 	{
 		Position.x -= vSize.x / dwNumDigits * (float)RES_X;
