@@ -65,13 +65,33 @@ After building, run `VesaBall.exe` from the repository root (or copy it next to 
 
 ## Documentation
 
-The source is documented with Doxygen-style comments (in Polish). Generate HTML docs with:
+The source is documented with Doxygen-style comments (in English). Generate HTML docs with:
 
 ```
 doxygen Doxyfile
 ```
 
 Output is written to `html/` (ignored by git).
+
+## Changelog
+
+### v0.97
+
+- **Fixed:**
+  - `CBrickArray::Load()` could read out-of-bounds when a level file was missing or corrupt, due to an unchecked file open/read and an unvalidated brick-type byte flowing into the fixed-size brick-type arrays.
+  - `CD3DScene::LoadTexture()` swallowed texture-load failures and always reported success, which could queue a guaranteed null-pointer crash at scene teardown for any failed load.
+  - Invalid "extra qualification" C++ syntax on `CSpriteMoving::SetSpeed()` in `SpriteMoving.h` that only compiled under GCC's `-fpermissive` and would fail outright on stricter/newer compilers.
+  - A one-frame rendering glitch in the lives counter when the player loses their last life (a negative value briefly fed into digit rendering).
+  - Case-mismatched `#include` directives and `gfx/` asset paths that would fail to build or load assets on case-sensitive filesystems (Linux, strict macOS/Windows).
+  - A tracked filename case mismatch (`timer.h` vs. the on-disk `Timer.h`).
+  - Author-machine-specific absolute paths in `Doxyfile` that broke `doxygen Doxyfile` for anyone but the original author.
+  - Missing `gfx/Bonus_EightBall.png` asset for the fully-implemented EightBall bonus.
+- **Changed:**
+  - Translated all Polish Doxygen and inline comments to English.
+  - Normalized indentation to tabs and applied a consistent `clang-format` style across all source files.
+  - Normalized line endings via `.gitattributes` (CRLF for source/project files, stored as LF in the repository).
+- **Added:**
+  - This README, `LICENSE` (GPL-3.0), and `.gitattributes`.
 
 ## License
 
