@@ -25,21 +25,21 @@ HRESULT CGameMenu::OnInitDevice()
 	LPDIRECT3DTEXTURE8 pTex;
 
 	CMenuItem* pMenuItem;
-	LoadTexture( "gfx/Menu_title.png", &pTex );
+	LoadTexture( "gfx/Menu_Title.png", &pTex );
 	pMenuItem = new CMenuItem( pTex, D3DXVECTOR2( 0.8f, 0.2f ), D3DXVECTOR2( 0.5f, 0.15f ), 0xFFFFFFFF, 0 );
 	listRender.push_back( pMenuItem );
 
-	LoadTexture( "gfx/Menu_start.png", &pTex );
+	LoadTexture( "gfx/Menu_Start.png", &pTex );
 	pMenuItem = new CMenuItem( pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.4f ), 0xFFFFCC00, UID_START );
 	listRender.push_back( pMenuItem );
 	listMenuItem.push_back( pMenuItem );
 
-	LoadTexture( "gfx/Menu_editor.png", &pTex );
+	LoadTexture( "gfx/Menu_Editor.png", &pTex );
 	pMenuItem = new CMenuItem( 	pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.5f ), 0xFFFFCC00, UID_EDITOR );
 	listRender.push_back( pMenuItem );
 	listMenuItem.push_back( pMenuItem );
 
-	LoadTexture( "gfx/Menu_quit.png", &pTex );
+	LoadTexture( "gfx/Menu_Quit.png", &pTex );
 	pMenuItem = new CMenuItem( 	pTex, D3DXVECTOR2( 0.4f, 0.1f ), D3DXVECTOR2( 0.5f, 0.6f ), 0xFFFFCC00, UID_QUIT );
 	listRender.push_back( pMenuItem );
 	listMenuItem.push_back( pMenuItem );

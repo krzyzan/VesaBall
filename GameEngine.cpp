@@ -62,13 +62,13 @@ HRESULT CGameEngine::OnInitDevice()
 	LoadTexture( "gfx/Explosion.png",			&pExplosionTex );
 
 	// ³adujemy tekstury bonusów
-	LoadTexture( "gfx/Bonus_ThruBrick.png",		&CBonus::spTextures[CBonus::ThruBrick] );
-	LoadTexture( "gfx/Bonus_SetOffExploding.png",&CBonus::spTextures[CBonus::SetOffExploding] );
-	LoadTexture( "gfx/Bonus_FireBall.png",		&CBonus::spTextures[CBonus::FireBall] );
+	LoadTexture( "gfx/Bonus_Thrubrick.PNG",		&CBonus::spTextures[CBonus::ThruBrick] );
+	LoadTexture( "gfx/Bonus_SetOffExploding.PNG",&CBonus::spTextures[CBonus::SetOffExploding] );
+	LoadTexture( "gfx/Bonus_Fireball.PNG",		&CBonus::spTextures[CBonus::FireBall] );
 	LoadTexture( "gfx/Bonus_ShootingPaddle.png",&CBonus::spTextures[CBonus::ShootingPaddle] );
 	LoadTexture( "gfx/Bonus_GrabPaddle.png",	&CBonus::spTextures[CBonus::GrabPaddle] );
 
-	LoadTexture( "gfx/Bonus_ExtraLife.png",		&CBonus::spTextures[CBonus::ExtraLife] );
+	LoadTexture( "gfx/Bonus_ExtraLife.PNG",		&CBonus::spTextures[CBonus::ExtraLife] );
 	LoadTexture( "gfx/Bonus_LevelWarp.png",		&CBonus::spTextures[CBonus::LevelWarp] );
 	LoadTexture( "gfx/Bonus_ZapBricks.png",		&CBonus::spTextures[CBonus::ZapBricks] );
 	LoadTexture( "gfx/Bonus_SlowBall.png",		&CBonus::spTextures[CBonus::SlowBall] );
