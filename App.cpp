@@ -7,6 +7,8 @@ CApp::CApp(const char* WindowTitle)
 	pWindow = NULL;
 	pRenderer = NULL;
 	strWindowTitle = WindowTitle;
+	fMouseRemainderX = 0.0f;
+	fMouseRemainderY = 0.0f;
 }
 
 HRESULT CApp::Create()
@@ -14,14 +16,24 @@ HRESULT CApp::Create()
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		return E_FAIL;
 
+	// Fullscreen at the desktop's actual resolution (width/height are ignored
+	// by SDL for SDL_WINDOW_FULLSCREEN_DESKTOP, which always matches the
+	// current desktop video mode -- borderless, so no display-mode switch).
 	pWindow = SDL_CreateWindow(strWindowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-							   RES_X, RES_Y, SDL_WINDOW_SHOWN);
+							   0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP);
 	if (!pWindow)
 		return E_FAIL;
 
 	pRenderer = SDL_CreateRenderer(pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!pRenderer)
 		return E_FAIL;
+
+	// Render at a fixed logical resolution matching the game's 640x480-era
+	// pixel art; SDL scales (and letterboxes, preserving aspect ratio) this
+	// up to whatever the real fullscreen resolution turns out to be, so
+	// every draw call and all of the RES_X-based pixel math in Sprite.cpp,
+	// Cursor.cpp, etc. stay correct without needing to know the real size.
+	SDL_RenderSetLogicalSize(pRenderer, RES_X, RES_Y);
 
 	SDL_SetRenderDrawBlendMode(pRenderer, SDL_BLENDMODE_BLEND);
 
@@ -103,19 +115,37 @@ void CApp::ProcessEvent(const SDL_Event & event)
 	switch (event.type)
 	{
 	case SDL_MOUSEMOTION:
-		if (event.motion.xrel != 0)
+	{
+		// Raw relative-motion deltas are reported in real screen pixels,
+		// unaffected by the logical-resolution scaling set up in Create()
+		// -- rescale them into logical-canvas pixels (accumulating the
+		// fractional remainder across events, so slow/precise movement
+		// isn't lost to truncation) so mouse sensitivity stays the same
+		// regardless of the real fullscreen resolution.
+		float fScaleX, fScaleY;
+		SDL_RenderGetScale(pRenderer, &fScaleX, &fScaleY);
+
+		fMouseRemainderX += event.motion.xrel / fScaleX;
+		long lMoveX = (long)fMouseRemainderX;
+		fMouseRemainderX -= lMoveX;
+		if (lMoveX != 0)
 		{
 			evt.ofs = InputEvent::AxisX;
-			evt.data = event.motion.xrel;
+			evt.data = lMoveX;
 			sScenes.top()->OnMouseEvent(&evt);
 		}
-		if (event.motion.yrel != 0)
+
+		fMouseRemainderY += event.motion.yrel / fScaleY;
+		long lMoveY = (long)fMouseRemainderY;
+		fMouseRemainderY -= lMoveY;
+		if (lMoveY != 0)
 		{
 			evt.ofs = InputEvent::AxisY;
-			evt.data = event.motion.yrel;
+			evt.data = lMoveY;
 			sScenes.top()->OnMouseEvent(&evt);
 		}
 		break;
+	}
 
 	case SDL_MOUSEBUTTONDOWN:
 	case SDL_MOUSEBUTTONUP:

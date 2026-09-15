@@ -78,8 +78,8 @@ cmake --build build
 ```
 
 This produces a `VesaBall` executable (`VesaBall.exe` on Windows) in
-`build/`. The `gfx/`, `lev/`, and `cfg/` asset folders are copied alongside
-it automatically as part of the build, so the executable is self-contained
+`build/`. The `gfx/` and `lev/` asset folders are copied alongside it
+automatically as part of the build, so the executable is self-contained
 and runnable directly from `build/`.
 
 For a specific build type (the default is `Release`):
@@ -96,17 +96,17 @@ cd build
 ```
 
 Run it from inside `build/` (or the repository root, if you're running an
-in-source build) so it can find `cfg/res.cfg` and the `gfx/`/`lev/` folders
-next to the executable.
+in-source build) so it can find the `gfx/`/`lev/` folders next to the
+executable.
 
-Screen resolution is read from `cfg/res.cfg` (width and height, one per
-line) — edit it before launching to change it.
+The game always runs fullscreen, at the desktop's current resolution.
 
 ## 5. Verifying the install
 
-On first launch you should see the VESABALL title screen with three menu
-options: **start game**, **level editor**, **quit to dos**. If the window
-doesn't appear or exits immediately, see Troubleshooting below.
+On first launch you should see the VESABALL title screen (fullscreen) with
+three menu options: **start game**, **level editor**, **quit to dos**. Press
+**Esc** from the main menu to quit. If the window doesn't appear or exits
+immediately, see Troubleshooting below.
 
 ## macOS: Xcode project and universal binaries
 
@@ -133,8 +133,8 @@ scripts/package-macos-universal.sh
 ```
 
 This writes a self-contained `dist-macos-universal/` (the `VesaBall`
-binary, its `Frameworks/`, and `gfx/`/`lev/`/`cfg/`) that can be zipped up
-and run on any Mac without installing SDL2 separately.
+binary, its `Frameworks/`, and `gfx/`/`lev/`) that can be zipped up and
+run on any Mac without installing SDL2 separately.
 
 ## Troubleshooting
 
@@ -142,9 +142,9 @@ and run on any Mac without installing SDL2 separately.
   the `-dev`/`-devel` package wasn't installed, or (on Windows) the vcpkg
   toolchain file wasn't passed to `cmake -S`. Re-check step 1.
 - **Builds but the window flashes and closes immediately** — check that
-  `gfx/`, `lev/`, and `cfg/` ended up next to the executable (the build's
-  post-build step copies them automatically; a manual copy of just the
-  binary will be missing them).
+  `gfx/` and `lev/` ended up next to the executable (the build's post-build
+  step copies them automatically; a manual copy of just the binary will be
+  missing them).
 - **"Permission denied" running an executable that built without errors** —
   see the network-mounted-checkout note in step 2.
 - **Everything installed but CMake still can't find SDL2 on Linux** — confirm

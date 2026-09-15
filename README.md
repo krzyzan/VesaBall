@@ -10,7 +10,7 @@ The game was originally written for Windows and DirectX 8 (2005-2006) and later 
 - **50 levels** included under `lev/` (`00.lev`–`49.lev`).
 - **Bonus power-ups**, including expanding/shrinking paddle and ball, extra life, fireball, multi-ball split, exploding bricks, level warp, thru-brick, and more (see `gfx/Bonus_*.png`).
 - **Level editor** (`CGameEditor`), accessible from the main menu, for creating or modifying levels.
-- **Configurable resolution** via `cfg/res.cfg`.
+- **Fullscreen**, matching the desktop's resolution — the game's fixed 640x480 pixel art is scaled up (letterboxed to preserve its aspect ratio) to fit whatever the real display turns out to be.
 
 ## Installing / building from source
 
@@ -26,6 +26,7 @@ cd build && ./VesaBall   # Windows: VesaBall.exe
 
 - **Mouse move** — move the paddle.
 - **Left mouse button** — launch a caught ball.
+- **Esc** — back out to the previous screen (from the main menu, quits the game).
 - **P** / **Pause** — pause the game.
 - **Sys Rq** — toggle cheat mode.
 - With cheats enabled: **Space** clears all bricks, **B** spawns/cycles bonus power-ups, holding **right mouse button** slows the game down.
@@ -38,7 +39,6 @@ cd build && ./VesaBall   # Windows: VesaBall.exe
 | `Vec2.h`, `Color.h`, `InputEvent.h`, `WinTypes.h` | Small portable primitives (2D vector math, packed color, input events, and a few Win32-named integer typedefs) the game logic is built on, letting most of it stay platform-agnostic. |
 | `App.cpp/h`, `Scene.cpp/h` | The SDL2 application shell and the scene base class (window/renderer setup, the main loop, texture loading and lifetime). |
 | `CMakeLists.txt` | The build configuration. |
-| `cfg/res.cfg` | Screen resolution (width and height, one per line). |
 | `gfx/` | Sprite textures (bricks, paddle, ball, bonuses, UI). |
 | `lev/` | Level data files (`00.lev`–`49.lev`). |
 | `legacy/` | The original DirectX 8 / Win32 platform layer and Visual Studio / Dev-C++ project files, kept for historical reference. See [`legacy/README.md`](legacy/README.md). |
@@ -55,6 +55,12 @@ doxygen Doxyfile
 Output is written to `html/` (ignored by git).
 
 ## Changelog
+
+### Unreleased
+
+- **Changed:**
+  - The game now always runs fullscreen at the desktop's resolution, instead of a fixed-size window. Internally it still renders at a fixed 640x480 logical resolution (matching its pixel art) which SDL scales up and letterboxes to fit the real display, so sprites stay crisp and correctly proportioned regardless of the actual screen's aspect ratio. Mouse sensitivity (paddle movement, cursor speed) is rescaled to match, so it feels the same as before regardless of the real display's resolution.
+  - Removed `cfg/res.cfg` and the resolution-from-file logic it enabled — there's no longer a window size to configure.
 
 ### v0.99 — Xcode build & universal macOS binary
 

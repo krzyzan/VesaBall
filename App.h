@@ -49,6 +49,14 @@ private:
 
 	bool bRunning;
 
+	// Fractional remainder of mouse motion not yet reported to the current
+	// scene, carried across events -- see ProcessEvent()'s SDL_MOUSEMOTION
+	// case. Rescaling real screen-pixel deltas down to the game's fixed
+	// logical resolution can shrink a single event's delta below one whole
+	// logical pixel; accumulating instead of truncating each event keeps
+	// slow/precise mouse movement from being silently dropped.
+	float fMouseRemainderX, fMouseRemainderY;
+
 	// Scene stack
 	stack<CScene*> sScenes;
 

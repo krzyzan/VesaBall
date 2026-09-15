@@ -72,7 +72,7 @@ echo "==> Assembling package"
 mkdir -p "$OUT_DIR/Frameworks"
 cp -R "$FW_DIR/SDL2.framework" "$OUT_DIR/Frameworks/"
 cp -R "$FW_DIR/SDL2_image.framework" "$OUT_DIR/Frameworks/"
-cp -R "$REPO_ROOT/gfx" "$REPO_ROOT/lev" "$REPO_ROOT/cfg" "$OUT_DIR/"
+cp -R "$REPO_ROOT/gfx" "$REPO_ROOT/lev" "$OUT_DIR/"
 
 echo "==> Ad-hoc code-signing"
 codesign --force --sign - "$OUT_DIR/Frameworks/SDL2.framework"

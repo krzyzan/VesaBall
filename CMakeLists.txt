@@ -58,5 +58,4 @@ target_link_libraries(VesaBall PRIVATE ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES}
 add_custom_command(TARGET VesaBall POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/gfx $<TARGET_FILE_DIR:VesaBall>/gfx
 	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/lev $<TARGET_FILE_DIR:VesaBall>/lev
-	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/cfg $<TARGET_FILE_DIR:VesaBall>/cfg
 )

@@ -37,8 +37,14 @@ using namespace std;
 		}                    \
 	}
 
-extern DWORD RES_X;
-extern DWORD RES_Y;
+// The game's fixed logical render resolution (its sprites are 640x480-era
+// pixel art, and the normalized coordinate space below already bakes in a
+// 4:3 aspect ratio). The window itself runs fullscreen at the desktop's
+// actual resolution; SDL_RenderSetLogicalSize() (see App.cpp) scales this
+// fixed 640x480 canvas up to fill it, letterboxing as needed so sprites
+// stay crisp and correctly proportioned on any real display.
+const DWORD RES_X = 640;
+const DWORD RES_Y = 480;
 
 const float BOARD_L = 0.025f;			   // left
 const float BOARD_R = 0.975f;			   // right
