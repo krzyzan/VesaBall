@@ -56,11 +56,12 @@ Output is written to `html/` (ignored by git).
 
 ## Changelog
 
-### Unreleased
+### v1.0
 
 - **Changed:**
   - The game now always runs fullscreen at the desktop's resolution, instead of a fixed-size window. Internally it still renders at a fixed 640x480 logical resolution (matching its pixel art) which SDL scales up and letterboxes to fit the real display, so sprites stay crisp and correctly proportioned regardless of the actual screen's aspect ratio. Mouse sensitivity (paddle movement, cursor speed) is rescaled to match, so it feels the same as before regardless of the real display's resolution.
   - Removed `cfg/res.cfg` and the resolution-from-file logic it enabled — there's no longer a window size to configure.
+  - Doubled the resolution of every sprite in `gfx/` and enabled bilinear texture filtering, so the art looks meaningfully sharper when scaled up to fill a fullscreen display instead of blocky/nearest-neighbor. Upscaled with alpha-premultiplied Lanczos resampling (the source art is smoothly-shaded rather than hard-edged pixel art, so a pixel-art scaler like Scale2x makes no visible difference here); the two sprite sheets (`Explosion.png`, `Digits.png`) were upscaled frame-by-frame rather than as whole images, so individual animation frames don't bleed into each other.
 
 ### v0.99 — Xcode build & universal macOS binary
 
