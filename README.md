@@ -56,17 +56,22 @@ Output is written to `html/` (ignored by git).
 
 ## Changelog
 
-### Unreleased — SDL2 port
+### v0.98 — SDL2 port
 
-Ported the game from DirectX 8 (Direct3D 8 + DirectInput 8) to SDL2, making it buildable on Windows, macOS, and Linux instead of Windows only:
+Ported the game from DirectX 8 (Direct3D 8 + DirectInput 8) to SDL2, making it buildable on Windows, macOS, and Linux instead of Windows only.
 
-- Replaced `D3DApp`/`D3DScene` with an SDL2 `App`/`Scene` application shell. DirectX 8's four-stage device-loss lifecycle (`OnInitDevice`/`OnRestoreDevice`/`OnInvalidateDevice`/`OnDeleteDevice`) doesn't apply to SDL2's renderer, so scenes now use a simpler `OnInit`/`OnDestroy`.
-- Replaced `ID3DXSprite`-based rendering with `SDL_RenderCopyExF` (float-precision, so sprite motion stays as smooth as the original's), and DirectInput's buffered mouse/keyboard events with SDL's event queue feeding the same event-handling code paths.
-- Replaced the small set of D3DX8 math/color types (`D3DXVECTOR2`, `D3DCOLOR`, `D3DXCOLOR`, `D3DXMATRIX`) with portable equivalents (`Vec2`, `Color`) — see `Vec2.h`/`Color.h`.
-- Replaced `CTimer`'s Windows `QueryPerformanceCounter` with SDL's always-available equivalent.
-- Moved the DirectX 8 / Win32-specific files to `legacy/`; see that folder's `README.md`.
-- The game logic itself (physics, collisions, the bonus system, the level file format) is unchanged — only the platform layer was replaced.
-- Incidental fixes found during the port: `CGameEditor` no longer leaks its brick-legend array on scene teardown; a dangling-else and a deprecated `sprintf` call were cleaned up.
+- **Fixed:**
+  - A segfault returning to a suspended parent scene (e.g. backing out of a game or the level editor to the main menu): the scene being suspended had its sprites destroyed as if it were ending for good, so it came back with dangling pointers in its render list. Only a scene actually leaving the stack for good is torn down now; a merely-suspended one keeps its resources and resumes where it left off, matching the original DirectX 8 code's own suspend/resume distinction.
+  - Incidental fixes found during the port: `CGameEditor` no longer leaks its brick-legend array on scene teardown; a dangling-else and a deprecated `sprintf` call were cleaned up.
+- **Changed:**
+  - Replaced `D3DApp`/`D3DScene` with an SDL2 `App`/`Scene` application shell. DirectX 8's four-stage device-loss lifecycle (`OnInitDevice`/`OnRestoreDevice`/`OnInvalidateDevice`/`OnDeleteDevice`) doesn't apply to SDL2's renderer, so scenes now use a simpler `OnInit`/`OnDestroy`.
+  - Replaced `ID3DXSprite`-based rendering with `SDL_RenderCopyExF` (float-precision, so sprite motion stays as smooth as the original's), and DirectInput's buffered mouse/keyboard events with SDL's event queue feeding the same event-handling code paths.
+  - Replaced the small set of D3DX8 math/color types (`D3DXVECTOR2`, `D3DCOLOR`, `D3DXCOLOR`, `D3DXMATRIX`) with portable equivalents (`Vec2`, `Color`) — see `Vec2.h`/`Color.h`.
+  - Replaced `CTimer`'s Windows `QueryPerformanceCounter` with SDL's always-available equivalent.
+  - Moved the DirectX 8 / Win32-specific files to `legacy/`; see that folder's `README.md`.
+  - The game logic itself (physics, collisions, the bonus system, the level file format) is unchanged — only the platform layer was replaced.
+- **Added:**
+  - `INSTALL.md`, with detailed per-OS build/install/troubleshooting steps.
 
 ### v0.97
 
