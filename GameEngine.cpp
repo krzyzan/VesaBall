@@ -96,7 +96,7 @@ HRESULT CGameEngine::OnInit()
 
 	// create the counter
 	LoadTexture("gfx/Digits.png", &CCounter::spTexture);
-	POINT DigitPixels = {64, 92};
+	POINT DigitPixels = {128, 184};
 	pScoreCounter = new CCounter(0, Vec2(BOARD_W * 0.2f, 0.05f * 0.75f), Vec2(BOARD_L + BOARD_W * 0.125f, 0.05f / 2), DigitPixels, 6);
 	pLivesCounter = new CCounter(INITIAL_LIVES, Vec2(BOARD_W * 0.2f, 0.05f * 0.75f), Vec2(BOARD_R - BOARD_W * 0.125f, 0.05f / 2), DigitPixels, 6);
 
@@ -467,7 +467,7 @@ void CGameEngine::DoExplosion(const POINT & pos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		POINT ptFramePixels = {64, 64};
+		POINT ptFramePixels = {128, 128};
 		CSpriteAnimated* pAnimation = new CSpriteAnimated(pExplosionTex, Vec2(1.0f, 1.0f) / 8, frand(0, PI * 2),
 														  pBrickArray->GetPositionAt(pos) + Vec2(frand(-0.01f, 0.01f), frand(-0.01f, 0.01f)), Vec2(0.0f, 0.0f), Vec2(0.0f, 0.0f), 0xFFFFFFFF, 1.0f, 0, 44, ptFramePixels);
 		listExplosion.push_back(pAnimation);
@@ -661,7 +661,7 @@ void CGameEngine::CreateSparkles(CBall* pBall, const Vec2 & vSide)
 
 void CGameEngine::CreateFireballTail(CBall* pBall)
 {
-	POINT ptFramePixels = {64, 64};
+	POINT ptFramePixels = {128, 128};
 	CSpriteAnimated* pAnimation = new CSpriteAnimated(pExplosionTex, pBall->vSize * 2, frand(0, PI * 2),
 													  pBall->vPosition + Vec2(frand(-0.5f, 0.5f) * pBall->vSize.x, frand(-0.5f, 0.5f) * pBall->vSize.y),
 													  Vec2(0, 0), Vec2(0, 0), bThruBrick ? 0xFF0000FF : 0xFFFFFFFF, frand(0.05f, 0.2f), 8, 44, ptFramePixels);

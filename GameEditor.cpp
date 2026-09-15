@@ -30,7 +30,7 @@ HRESULT CGameEditor::OnInit()
 
 	// create the level counter
 	LoadTexture("gfx/Digits.png", &CCounter::spTexture);
-	POINT DigitPixels = {64, 92};
+	POINT DigitPixels = {128, 184};
 	pLevelCounter = new CCounter(0, Vec2(BOARD_W * 0.2f, 0.05f * 0.75f), Vec2(BOARD_L + BOARD_W * 0.125f, 0.05f / 2), DigitPixels, 6);
 
 	// create the brick legend

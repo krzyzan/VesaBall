@@ -16,6 +16,14 @@ HRESULT CApp::Create()
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		return E_FAIL;
 
+	// Smooth (bilinear) texture filtering instead of SDL's default
+	// nearest-neighbor -- the game's art is anti-aliased/smoothly-shaded
+	// rather than hard-edged pixel art, so this reduces blockiness when
+	// sprites are scaled up to fill the screen. Must be set before any
+	// texture is created (LoadTexture(), from each scene's OnInit()) to
+	// take effect, so it's set here, as early in startup as possible.
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+
 	// Fullscreen at the desktop's actual resolution (width/height are ignored
 	// by SDL for SDL_WINDOW_FULLSCREEN_DESKTOP, which always matches the
 	// current desktop video mode -- borderless, so no display-mode switch).
