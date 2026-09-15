@@ -26,3 +26,7 @@ html/
 # OS cruft
 Thumbs.db
 .DS_Store
+
+# Editor-local settings (e.g. a local-disk build path, for checkouts on a
+# network share -- see .vscode/settings.json's comment / INSTALL.md)
+.vscode/
