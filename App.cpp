@@ -45,10 +45,14 @@ HRESULT CApp::StartNewScene(CScene* pScene)
 {
 	HRESULT hr;
 
-	if (!sScenes.empty())
-		if (FAILED(hr = sScenes.top()->OnDestroy()))
-			return hr;
-
+	// Pushing a child scene only suspends the current one -- it stays alive
+	// on the stack (and keeps its sprites/textures) so it can resume exactly
+	// where it left off if/when the child ends and StartParentScene() pops
+	// back to it. OnDestroy() tears a scene down for good, so it must only
+	// run once, in StartParentScene(), when the scene is actually leaving
+	// the stack -- calling it here too would delete this scene's sprites
+	// while it's merely paused, leaving the dangling pointers in e.g.
+	// CGameMenu::listRender to be dereferenced the next time it's rendered.
 	sScenes.push(pScene);
 
 	if (FAILED(hr = sScenes.top()->OnInit()))
