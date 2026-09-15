@@ -56,6 +56,12 @@ Output is written to `html/` (ignored by git).
 
 ## Changelog
 
+### v0.99 — Xcode build & universal macOS binary
+
+- **Added:**
+  - Documented generating an Xcode project via CMake's Xcode generator (`cmake -G Xcode`) — see `INSTALL.md`.
+  - `scripts/package-macos-universal.sh`, which builds and packages a universal (x86_64 + arm64) macOS binary by linking against the official prebuilt universal SDL2/SDL2_image frameworks, for Macs without SDL2 installed separately.
+
 ### v0.98 — SDL2 port
 
 Ported the game from DirectX 8 (Direct3D 8 + DirectInput 8) to SDL2, making it buildable on Windows, macOS, and Linux instead of Windows only.

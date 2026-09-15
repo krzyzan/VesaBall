@@ -108,6 +108,34 @@ On first launch you should see the VESABALL title screen with three menu
 options: **start game**, **level editor**, **quit to dos**. If the window
 doesn't appear or exits immediately, see Troubleshooting below.
 
+## macOS: Xcode project and universal binaries
+
+To open the project in Xcode instead of building from the command line, generate
+an Xcode project with CMake's Xcode generator, then open it:
+
+```
+cmake -S . -B build-xcode -G Xcode
+open build-xcode/VesaBall.xcodeproj
+```
+
+Build and run from Xcode as usual (`Cmd+R`), or from the command line with
+`xcodebuild -project build-xcode/VesaBall.xcodeproj -target VesaBall -configuration Release build`.
+
+A regular build (via either generator) only produces a binary for the
+machine's own architecture, since Homebrew's SDL2/SDL2_image are single-arch.
+To build a **universal (x86_64 + arm64) binary** that runs natively on both
+Intel and Apple Silicon Macs, use `scripts/package-macos-universal.sh` — it
+downloads the official prebuilt universal SDL2/SDL2_image frameworks from
+libsdl.org and links against those instead:
+
+```
+scripts/package-macos-universal.sh
+```
+
+This writes a self-contained `dist-macos-universal/` (the `VesaBall`
+binary, its `Frameworks/`, and `gfx/`/`lev/`/`cfg/`) that can be zipped up
+and run on any Mac without installing SDL2 separately.
+
 ## Troubleshooting
 
 - **`SDL2 not found` / `SDL2_image not found` during `cmake` configure** —
